@@ -1,0 +1,10 @@
+{
+	"author" : "MelOzone",
+	"version" : "0.1",
+  "name" : "sb.Teleport",
+	"friendlyName" : "sb.Teleport",
+	"link" : "https://github.com/Kilkenni/sb.Teleport",
+	"description" : "A test mod adding a crafting station to reassemble your weapon in game, changing its appearance.",
+  "requires" : ["StardustLib"],
+  "priority": 0
+}
