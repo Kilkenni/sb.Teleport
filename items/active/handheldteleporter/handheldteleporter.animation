@@ -1,0 +1,65 @@
+{
+
+	"animatedParts" : {
+
+		"stateTypes" : {
+			"charging" : {
+				"default" : "off",
+				"states" : {
+					"off" : { },
+					"active" : {
+						"frames" : 5,
+						"cycle" : 0.15,
+						"mode" : "transition",
+						"transition" : "off"
+					}
+				}
+			}
+		},
+
+		"parts" : {
+			"chargingEffect" : {
+				"properties" : {
+					"anchorPart" : "item",
+					"centered" : true,
+					"offset" : [0, 0]
+				},
+
+				"partStates" : {
+					"charging" : {
+						"active" : {
+							"properties" : {
+								"image" : "handheldteleporter_charging.png:<frameIndex>",
+          			"zLevel" : 1,
+								"fullbright" : true
+							}
+						}
+					}
+				}
+			},
+			"item" : {
+				"properties" : {
+					"centered" : true,
+					"image" : "handheldteleporter.png",
+					"offset" : [0.4, 0]
+				}
+			}
+		}
+	},
+
+	"lights" : {
+		"chargeGlow" : {
+			"active" : false,
+			"achorPart" : "item",
+			"position" : [0, 0],
+			"color" : [0, 0, 255],
+			"flickerPeriod" : 0.2,
+			"flickerMinIntensity" : 0.5,
+			"flickerMaxIntensity" : 0.6
+		}
+	},
+
+	"sounds" : {
+		"charging" : [ "/sfx/tech/tech_hoverloop.ogg"]
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "itemName" : "handheldteleporter",
+  "shortdescription" : "Handheld Teleporter",
+  "description" : "Modified Teleporter Core. Fully charge it to teleport.",
+  "price" : 2000,
+  "maxStack" : 1,
+  "rarity" : "legendary",
+  "category" : "Tool",
+  "twoHanded" : false,
+  "itemTags" : ["tool"],
+  "inventoryIcon" : "handheldteleporter.png",
+  "baseOffset" : [0.75, 0],
+  "animation" : "handheldteleporter.animation",
+  "scripts" : ["handheldteleporter.lua"]
+}
