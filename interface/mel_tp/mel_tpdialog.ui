@@ -17,23 +17,18 @@
     [
       { 
         "type" : "scrollArea", "scrollDirections" : [0, 1], "scrollBars" : true, 
-        "children" : [] 
-      },
-      { 
-        "type" : "label",
-        "text" : "Here is a simple label. Formatting works as usual."
-      },
-      { 
-        "type" : "image",
-        "file" : "picture.png"
-      }
+        "children" : [
+          { "type" : "label", "text" : "Debug info" },
+          { "type": "label", "id" : "lblDebug", "text" : ""}
+        ] 
+      }   
     ],
     [ 
       { "size" : 80 },
       { 
         "type" : "button",
-        "caption" : "Top button.",
-        "id" : "btnTop"
+        "caption" : "Dump teleports",
+        "id" : "btnDumpTp"
       },
       { 
         "type" : "button", 

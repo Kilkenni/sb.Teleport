@@ -14,3 +14,9 @@ end
 local function uninit()
 
 end
+
+function btnDumpTp:onClick()
+  chat.addMessage("boop")
+  lblDebug:setText(sb.printJson(player.teleportBookmarks()))
+  sb.logInfo(sb.printJson(player.teleportBookmarks()))
+end
