@@ -1,0 +1,52 @@
+{
+  "style" : "window",
+  "size" : [320, 200],
+  "resizable" : true,
+  "minSize" : [120, 64],
+  "title" : "Teleporter",
+  "icon" : "/interface/warping/icon.png.png",
+  "accentColor" : "3f3fff",
+  "scripts" : ["mel_tpdialog.lua"],
+  
+  "openWithInventory" : false,
+  "anchor" : ["center", [-50, -50]],
+  "uniqueBy" : "path",
+  "uniqueMode" : "toggle", 
+  "children" : [
+    { "mode" : "horizontal" },
+    [
+      { 
+        "type" : "scrollArea", "scrollDirections" : [0, 1], "scrollBars" : true, 
+        "children" : [] 
+      },
+      { 
+        "type" : "label",
+        "text" : "Here is a simple label. Formatting works as usual."
+      },
+      { 
+        "type" : "image",
+        "file" : "picture.png"
+      }
+    ],
+    [ 
+      { "size" : 80 },
+      { 
+        "type" : "button",
+        "caption" : "Top button.",
+        "id" : "btnTop"
+      },
+      { 
+        "type" : "button", 
+        "caption" : "Another button.", 
+        "color" : "accent" 
+      },
+      "spacer",
+      { 
+        "type" : "button",
+        "caption" : "Teleport",
+        "color" : "accent",
+        "id" : "btnTeleport"
+      }
+    ]
+  ]
+}

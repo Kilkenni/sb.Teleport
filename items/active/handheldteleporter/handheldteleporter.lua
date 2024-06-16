@@ -21,7 +21,8 @@ function update(dt, fireMode, shiftHeld, moves)
 	elseif self.active then
 		local max = status.resourceMax("energy")
 		if self.consumed >= max-1 then
-			activeItem.interact("OpenTeleportDialog", "/interface/warping/warpcoreteleporter.config", activeItem.ownerEntityId())
+      -- ("ScriptPane", { gui = { }, scripts = {"/metagui.lua"}, ui = "modname:pane" })
+			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tpdialog.ui"}, activeItem.ownerEntityId())
 			self.consumed = 0
 		end
 		if fireMode ~= "primary" or status.resourceLocked("energy") then
