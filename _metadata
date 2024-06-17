@@ -4,7 +4,7 @@
   "name" : "sb.Teleport",
 	"friendlyName" : "sb.Teleport",
 	"link" : "https://github.com/Kilkenni/sb.Teleport",
-	"description" : "A test mod adding a crafting station to reassemble your weapon in game, changing its appearance.",
+	"description" : "A test mod changing teleportation UI.",
   "requires" : ["QuickbarMini"],
   "priority": 0
 }

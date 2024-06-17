@@ -19,6 +19,11 @@
         "type" : "scrollArea", "scrollDirections" : [0, 1], "scrollBars" : true, 
         "children" : [
           { "type" : "label", "text" : "Debug info" },
+          { "type": "listItem", "id" : "lstTestPortal", "children": [
+            { "type": "image", "file": ""},
+            {"type":"label", "id":"tpName", "text": ""},
+            {"type": "label", "id":"tpPlanetName", "text": ""}
+          ]},
           { "type": "label", "id" : "lblDebug", "text" : ""}
         ] 
       }   
