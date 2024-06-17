@@ -4,7 +4,7 @@
   "resizable" : true,
   "minSize" : [120, 64],
   "title" : "Teleporter",
-  "icon" : "/interface/warping/icon.png.png",
+  "icon" : "/interface/warping/icon.png",
   "accentColor" : "3f3fff",
   "scripts" : ["mel_tpdialog.lua"],
   
@@ -16,17 +16,20 @@
     { "mode" : "horizontal" },
     [
       { 
-        "type" : "scrollArea", "scrollDirections" : [0, 1], "scrollBars" : true, 
-        "children" : [
-          { "type" : "label", "text" : "Debug info" },
-          { "type": "listItem", "id" : "lstTestPortal", "children": [
-            { "type": "image", "file": ""},
-            {"type":"label", "id":"tpName", "text": ""},
-            {"type": "label", "id":"tpPlanetName", "text": ""}
-          ]},
-          { "type": "label", "id" : "lblDebug", "text" : ""}
-        ] 
-      }   
+        "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
+        "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
+          { "type": "image", "id":"tpIcon", "file": ""},
+          {"type":"label", "id":"tpName", "text": "name"},
+          {"type": "label", "id":"tpPlanetName", "text": "planet"}
+          ],
+          "data": {"target": null}
+        },
+        "selected": null,
+        "children" : [] 
+      },
+      { "type" : "label", "text" : "Debug info" },
+      { "type": "label", "id" : "lblDebug", "text" : ""},
+      { "type": "label", "id" : "lblDump", "text" : ""}
     ],
     [ 
       { "size" : 80 },
@@ -37,8 +40,9 @@
       },
       { 
         "type" : "button", 
-        "caption" : "Another button.", 
-        "color" : "accent" 
+        "caption" : "Dump self", 
+        "id": "btnSelf",
+        "color" : "accent"
       },
       "spacer",
       { 

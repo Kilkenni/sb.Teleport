@@ -21,7 +21,6 @@ function update(dt, fireMode, shiftHeld, moves)
 	elseif self.active then
 		local max = status.resourceMax("energy")
 		if self.consumed >= max-1 then
-      -- ("ScriptPane", { gui = { }, scripts = {"/metagui.lua"}, ui = "modname:pane" })
 			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tpdialog.ui"}, activeItem.ownerEntityId())
 			self.consumed = 0
 		end
@@ -39,7 +38,7 @@ function update(dt, fireMode, shiftHeld, moves)
 		end
 		activeItem.setArmAngle(0.1)
 		animator.setLightActive("chargeGlow", true)
-		local consumeAmount = max/200
+		local consumeAmount = max/50
 		status.overConsumeResource("energy", consumeAmount)
 		self.consumed = self.consumed + consumeAmount
 		animator.setAnimationState("charging", "active")
