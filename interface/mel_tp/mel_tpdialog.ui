@@ -40,8 +40,8 @@
       },
       { 
         "type" : "button", 
-        "caption" : "Dump self", 
-        "id": "btnSelf",
+        "caption" : "Sort by planet", 
+        "id": "btnSortByPlanet",
         "color" : "accent"
       },
       "spacer",
