@@ -4,25 +4,23 @@ JSON file optionally passed to InteractAction `OpenTeleportDialog` to customize 
 
 ## Structure
 
-`
-{
-  "canBookmark"? : boolean, //default: false
-  "canTeleport"? : boolean, //default: true.
-  "includePartyMembers"? : true, //default: false
-  "includePlayerBookmarks"? : boolean, //Default: false
-  "destinations" : [
     {
-      "name" : string, //equivalent of Bookmark.bookmarkName. Default: ""
-      "planetName" : string, //equivalent of Bookmark.targetName. Default: "???"
-      "warpAction" : string, //equivalent of Bookmark.target
-      "icon" : string, //equivalent of Bookmark.icon
-      "deploy"? : boolean, //Deploy mech. Default: false
-      "mission"? : boolean, //Default: false
-      "prerequisiteQuest"? : //if the player has not completed the quest, destination is not available
+    "canBookmark"? : boolean, //default: false
+    "canTeleport"? : boolean, //default: true.
+    "includePartyMembers"? : true, //default: false
+    "includePlayerBookmarks"? : boolean, //Default: false
+    "destinations" : [
+        {
+        "name" : string, //equivalent of Bookmark.bookmarkName. Default: ""
+        "planetName" : string, //equivalent of Bookmark.targetName. Default: "???"
+        "warpAction" : string, //equivalent of Bookmark.target
+        "icon" : string, //equivalent of Bookmark.icon
+        "deploy"? : boolean, //Deploy mech. Default: false
+        "mission"? : boolean, //Default: false
+        "prerequisiteQuest"? : //if the player has not completed the quest, destination is not available
+        }
+    ]
     }
-  ]
-}
-`
 
 In addition to serialized TeleportTarget (see Bookmark.md), `warpAction` can take following aliases:
 
