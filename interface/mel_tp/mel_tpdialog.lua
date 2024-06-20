@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- require "/scripts/util.lua"
 -- require "/scripts/vec2.lua"
 
@@ -59,6 +60,7 @@ end
 
 mel_tp.bookmarkTemplate = bookmarksList.data
 populateBookmarks()
+sb.logInfo(sb.print(self))
 
 
 

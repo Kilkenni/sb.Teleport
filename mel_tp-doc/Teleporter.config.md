@@ -7,7 +7,7 @@ JSON file optionally passed to InteractAction `OpenTeleportDialog` to customize 
     {
     "canBookmark"? : boolean, //default: false
     "canTeleport"? : boolean, //default: true.
-    "includePartyMembers"? : true, //default: false
+    "includePartyMembers"? : boolean, //default: false
     "includePlayerBookmarks"? : boolean, //Default: false
     "destinations" : [
         {
@@ -26,7 +26,7 @@ In addition to serialized TeleportTarget (see Bookmark.md), `warpAction` can tak
 
 - `"Return"` - returns to previous location (unclear)
 - `"OrbitedWorld"` - does Warp Down when over a planet
-- `"OwnShip` - warps to player's ship
+- `"OwnShip"` - warps to player's ship
 - `"Player:Uuid"` - warps to another player with corresponding Uuid
 
 Explicitly true `canTeleport` can be used with `canBookmark`=false for locations that cannot be bookmarked but still have usable teleporters (like missions).

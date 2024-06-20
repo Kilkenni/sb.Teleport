@@ -11,5 +11,6 @@
   "inventoryIcon" : "handheldteleporter.png",
   "baseOffset" : [0.75, 0],
   "animation" : "handheldteleporter.animation",
-  "scripts" : ["handheldteleporter.lua"]
+  "scripts" : ["handheldteleporter.lua"],
+  "interactData" : "/interface/warping/warpcoreteleporter.config"
 }

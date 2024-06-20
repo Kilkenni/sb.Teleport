@@ -1,0 +1,56 @@
+{
+  "style" : "window",
+  "size" : [320, 200],
+  "resizable" : true,
+  "minSize" : [120, 64],
+  "title" : "Teleporter",
+  "icon" : "/interface/warping/icon.png",
+  "accentColor" : "3f3fff",
+  "scripts" : ["mel_tpdialog.lua"],
+  
+  "openWithInventory" : false,
+  "anchor" : ["center", [-50, -50]],
+  "uniqueBy" : "path",
+  "uniqueMode" : "toggle", 
+  "children" : [
+    { "mode" : "horizontal" },
+    [
+      { 
+        "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
+        "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
+          { "type": "image", "id":"tpIcon", "file": ""},
+          {"type":"label", "id":"tpName", "text": "name"},
+          {"type": "label", "id":"tpPlanetName", "text": "planet"}
+          ],
+          "data": {"target": null}
+        },
+        "selected": null,
+        "children" : [] 
+      },
+      { "type" : "label", "text" : "Debug info" },
+      { "type": "label", "id" : "lblDebug", "text" : ""},
+      { "type": "label", "id" : "lblDump", "text" : ""}
+    ],
+    [ 
+      { "size" : 80 },
+      { 
+        "type" : "button",
+        "caption" : "Dump teleports",
+        "id" : "btnDumpTp"
+      },
+      { 
+        "type" : "button", 
+        "caption" : "Sort by planet", 
+        "id": "btnSortByPlanet",
+        "color" : "accent"
+      },
+      "spacer",
+      { 
+        "type" : "button",
+        "caption" : "Teleport",
+        "color" : "accent",
+        "id" : "btnTeleport"
+      }
+    ]
+  ]
+}

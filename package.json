@@ -1,0 +1,29 @@
+{
+  "name": "sb.teleport",
+  "version": "0.0.1",
+  "description": "A proof-of-concept mod that uses some minor sorcery to reimagine Teleportation UI.",
+  "main": "readme.md",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tstl",
+    "dev": "tstl --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kilkenni/sb.Teleport.git"
+  },
+  "keywords": [
+    "Starbound",
+    "Lua"
+  ],
+  "author": "MelOzone",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kilkenni/sb.Teleport/issues"
+  },
+  "homepage": "https://github.com/Kilkenni/sb.Teleport#readme",
+  "devDependencies": {
+    "typescript": "^5.4.2",
+    "typescript-to-lua": "^1.25.2"
+  }
+}
