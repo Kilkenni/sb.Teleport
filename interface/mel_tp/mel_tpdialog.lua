@@ -60,7 +60,7 @@ end
 
 mel_tp.bookmarkTemplate = bookmarksList.data
 populateBookmarks()
-sb.logInfo(sb.print(self))
+sb.logInfo(sb.printJson(metagui.inputData))
 
 
 
