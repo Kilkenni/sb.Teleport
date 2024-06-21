@@ -7,9 +7,15 @@ Works entirety on vanilla Lua callbacks.
 
 Work in progress (currently can parse player bookmarks and additional destinations from vanilla teleporter .configs). Planned features will probably be available in Issues. Soon :tm:
 
+## License
+
+TBA
+
 ## Requirements
 
 Uses MetaGUI for quick window prototyping. Thus, requires either [Stardust Core](https://github.com/zetaPRIME/sb.StardustSuite) or Stardust Core Lite (former Quickbar Mini) to work (MetaGUI is included in both).
+
+Source code is written in Typescript. Since Starbound can't parse Typescript, it's converted into Lua with [TSTL](https://typescripttolua.github.io/) (TypescriptToLua transpiler).
 
 ## Useful links
 
