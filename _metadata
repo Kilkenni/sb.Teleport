@@ -1,10 +1,10 @@
 {
 	"author" : "MelOzone",
-	"version" : "0.1",
+	"version" : "0.2",
   "name" : "sb.Teleport",
 	"friendlyName" : "sb.Teleport",
 	"link" : "https://github.com/Kilkenni/sb.Teleport",
-	"description" : "A test mod changing teleportation UI.",
-  "requires" : ["QuickbarMini"],
+	"description" : "Like walking, but better",
+  "includes" : ["QuickbarMini"],
   "priority": 0
 }
