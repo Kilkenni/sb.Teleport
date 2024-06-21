@@ -5,12 +5,12 @@
 //   //"Player:Uuid", //warps to another player with corresponding Uuid
 // }
 
-declare type ToPlayer = `Player:${Uuid}`;
+// declare type WarpToPlayer = `Player:${Uuid}`;
 
 declare interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
   planetName : string, //equivalent of Bookmark.targetName. Default: "???"
-  warpAction : WarpAlias|ToPlayer|string, //equivalent of Bookmark.target. Can be WarpAction|WarpToPlayer
+  warpAction : WarpAlias|WarpToPlayer|WarpToWorld, //equivalent of Bookmark.target.
   icon : string, //equivalent of Bookmark.icon
   deploy? : boolean, //Deploy mech. Default: false
   mission? : boolean, //Default: false

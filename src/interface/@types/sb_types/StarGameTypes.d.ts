@@ -16,8 +16,8 @@ type InstanceWorldId = string|Uuid
 declare type WorldId = CelestialWorldId|ClientShipWorldId|InstanceWorldId
 
 type SpawnTargetUniqueEntity = string
-type SpawnTargetPosition = Vec2F
-type SpawnTargetX = number
+type SpawnTargetPosition = `[${string}, ${string}]` //string from Vec2F
+type SpawnTargetX = string //string(number)
 
 declare type SpawnTarget = SpawnTargetUniqueEntity|SpawnTargetPosition|SpawnTargetX
 
@@ -27,11 +27,14 @@ declare enum WarpAlias {
   "OwnShip"
 }
 
-declare type WarpToWorld = {
+type ToWorld = {
   world:WorldId,
   target:SpawnTarget,
 }
 
-declare type WarpToPlayer = Uuid
+type ToPlayer = Uuid
+
+declare type WarpToPlayer = `Player:${Uuid}`
+declare type WarpToWorld = `[CelestialWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
 
 declare type WarpAction = WarpToWorld|WarpToPlayer|WarpAlias;

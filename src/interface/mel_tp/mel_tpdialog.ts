@@ -56,11 +56,14 @@ function populateBookmarks() {
   if(finalTpConfig.includePlayerBookmarks && mel_tp.bookmarks !== undefined) {
     mel_tp.bookmarks.forEach((bookmark:Bookmark, index:number):void => {
       const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-      const iconPath = bookmark.icon? (`/interface/bookmarks/icons/${bookmark.icon}.png`) : "";
+      let iconPath = "";
+      if(bookmark.icon !== undefined) {
+        iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
+      }
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
-        warpAction: bookmark.target, //warp coords or command
+        warpAction: bookmark.target as WarpToWorld, //warp coords or command
         name: bookmark.bookmarkName || "???", //default: ???
         planetName: bookmark.targetName || "", //default: empty string
         icon: iconPath, //default: no icon
@@ -96,7 +99,10 @@ function populateBookmarks() {
   if(finalTpConfig.destinations !== undefined) {
     finalTpConfig.destinations.forEach((destination:Destination, index:number):void => {
       const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-      const iconPath = destination.icon?(`/interface/bookmarks/icons/${destination.icon}.png`):"";
+      let iconPath = "";
+      if(destination.icon !== undefined) {
+        iconPath =`/interface/bookmarks/icons/${destination.icon}.png`;
+      }
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
@@ -305,9 +311,14 @@ btnTeleport.onClick = function() {
     lblDump.setText("No target selected")
     return
   }
-  lblDump.setText(bookmarksList.selected.target[1]+"="+bookmarksList.selected.target[2]);
+  let warpTarget = mel_tp.selected.warpAction
+  if(typeof warpTarget !== "string"){
+    warpTarget = mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : "");
+  }
+
+  lblDump.setText(warpTarget);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
-  player.warp(mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : ""), "default");
+  player.warp(warpTarget, "default", mel_tp.selected.deploy || false);
   pane.dismiss();
 }
 
