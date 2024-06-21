@@ -8,6 +8,8 @@ mel_tp.data = player.teleportBookmarks()
     -- "icon":"garden",
     -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     -- "bookmarkName":"Merchant test"}
+mel_tp.bookmarkTemplate = bookmarksList.data
+mel_tp.customConfig = metagui.inputData
 
 function OnTpTargetSelect(bookmarkWidget)
   bookmarksList.selected = bookmarkWidget.bkmData
@@ -58,9 +60,9 @@ local function populateBookmarks()
   metagui.queueFrameRedraw()
 end
 
-mel_tp.bookmarkTemplate = bookmarksList.data
+
 populateBookmarks()
-sb.logInfo(sb.printJson(metagui.inputData))
+-- sb.logInfo(sb.printJson(metagui.inputData))
 
 
 

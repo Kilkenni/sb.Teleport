@@ -25,5 +25,8 @@
   "devDependencies": {
     "typescript": "^5.4.2",
     "typescript-to-lua": "^1.25.2"
+  },
+  "dependencies": {
+    "ts-brand": "^0.1.0"
   }
 }

@@ -1,6 +1,8 @@
 declare module pane {
-  // EntityId pane.sourceEntity()
-  // Returns the entity id of the pane's source entity. 
+  /**
+   * Returns the entity id of the pane's source entity.
+   */
+  function sourceEntity():EntityId;
 
   /**
   * Plays the specified sound asset, optionally looping the specified number of times or at the specified volume.
