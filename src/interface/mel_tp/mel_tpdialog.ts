@@ -2,6 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
+import { sortArrayByProperty } from "./mel_tp_util";
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
@@ -98,6 +99,19 @@ function populateBookmarks() {
   //process additional locations from override config
   if(finalTpConfig.destinations !== undefined) {
     finalTpConfig.destinations.forEach((destination:Destination, index:number):void => {
+      //Skip unavailable destinations in config
+      if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
+        return; //Quest not complete - skip this Destination
+      }
+      if(destination.warpAction === WarpAlias.OrbitedWorld && true  /** TODO check if player can warp down */) {
+        //!m_client->canBeamDown(deploy)
+        return; //Warping down is available only when orbiting a planet
+      }
+      if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
+        return; //If a player is already on their ship - do not offer to warp there even if config lists that
+      }
+
+      //Add destination from config to TP targets
       const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
       let iconPath = "";
       if(destination.icon !== undefined) {
@@ -114,10 +128,7 @@ function populateBookmarks() {
         mission: destination.mission || false, //Default: false
         prerequisiteQuest: destination.prerequisiteQuest || false, //if the player has not completed the quest, destination is not available
       };
-  
-      if(bkmData.prerequisiteQuest && player.hasCompletedQuest(bkmData.prerequisiteQuest) === false) {
-        return; //skip this Destination
-      }
+      
       currentBookmark.children[0].file = bkmData.icon;
       currentBookmark.children[1].text = bkmData.name;
       currentBookmark.children[2].text = bkmData.planetName;
@@ -137,35 +148,12 @@ namespace Star {
       Json config,
       EntityId sourceEntityId,
       TeleportBookmark currentLocation) {
-    m_client = client;
-    m_paneManager = paneManager;
-    m_sourceEntityId = sourceEntityId;
-    m_currentLocation = currentLocation;
-  
-    auto assets = Root::singleton().assets();
-  
-    GuiReader reader;
-  
-    reader.registerCallback("dismiss", bind(&Pane::dismiss, this));
-    reader.registerCallback("teleport", bind(&TeleportDialog::teleport, this));
-    reader.registerCallback("selectDestination", bind(&TeleportDialog::selectDestination, this));
-  
-    reader.construct(assets->json("/interface/windowconfig/teleportdialog.config:paneLayout"), this);
   
     config = assets->fetchJson(config);
     auto destList = fetchChild<ListWidget>("bookmarkList.bookmarkItemList");
     destList->registerMemberCallback("editBookmark", bind(&TeleportDialog::editBookmark, this));
   
     for (auto dest : config.getArray("destinations", JsonArray())) {
-      if (auto prerequisite = dest.optString("prerequisiteQuest")) {
-        if (!m_client->mainPlayer()->questManager()->hasCompleted(*prerequisite))
-          continue;
-      }
-  
-      auto warpAction = parseWarpAction(dest.getString("warpAction"));
-      bool deploy = dest.getBool("deploy", false);
-      if (warpAction == WarpAlias::OrbitedWorld && !m_client->canBeamDown(deploy))
-        continue;
   
       auto entry = destList->addItem();
       entry->fetchChild<LabelWidget>("name")->setText(dest.getString("name"));
@@ -256,7 +244,9 @@ namespace Star {
   metagui.queueFrameRedraw()
 }
 
-sortBookmarksByProp("bookmarkName", false)
+if(mel_tp.bookmarks !== undefined) {
+  mel_tp.bookmarks = sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as Bookmark[];
+}
 populateBookmarks()
 
 /*
@@ -275,23 +265,11 @@ btnDumpTp.onClick = function ():void {
   lblDebug.setText(sb.printJson(mel_tp.bookmarks as unknown as JSON))
 }
 
-function sortBookmarksByProp(propertyName: string, descending = false):void {
-  if(mel_tp.bookmarks === undefined) {
-    return; //no bookmarks to sort
-  }
-  if(mel_tp.bookmarks[0][propertyName] === undefined) {
-    return; //no such property name
-  }
-  if(descending === false) {
-    mel_tp.bookmarks = mel_tp.bookmarks.sort((el1, el2) => {return el1[propertyName].toLowerCase() < el2.targetName.toLowerCase()? -1 : 1 })
-  }
-  else {
-    mel_tp.bookmarks = mel_tp.bookmarks.sort((el1, el2) => {return el1[propertyName].toLowerCase() < el2.targetName.toLowerCase()? 1 : -1 })
-  }
-}
-
 btnSortByPlanet.onClick = function ():void {
-  sortBookmarksByProp("targetName", false);
+  if(mel_tp.bookmarks === undefined) {
+    return;
+  }
+  mel_tp.bookmarks = sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as Bookmark[];
   populateBookmarks();
   // if(mel_tp.bookmarks === undefined) {
   //   return;

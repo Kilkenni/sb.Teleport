@@ -17,8 +17,8 @@
     //"sourceMapTraceback": true,
     "tstlVerbose": true,
     "noImplicitGlobalVariables": true,
-    "noImplicitSelf": true,
-    "noResolvePaths": ["StarboundLua"]
+    "noImplicitSelf": false,
+    "noResolvePaths": []
     //"exclude": ["src/StarboundLua.ts", "src/sb_lua_callbacks/**/*", "src/sb_types/**/*"] 
   }
 }

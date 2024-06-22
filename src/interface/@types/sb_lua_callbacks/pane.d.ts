@@ -1,5 +1,5 @@
 declare module pane {
-  //source: windowing/StarPane.cpp
+  //SOURCE: windowing/StarPane.cpp
   /**
    * Returns the entity id of the pane's source entity.
    */

@@ -9,7 +9,11 @@ declare type Vec2F = [float, float]
 declare type Vec3I = [int, int, int]
 declare type Vec3F = [float, float, float]
 
+//Box/Rect is an Axis aligned box that can be used as a bounding volume.
+declare type RectI = [Vec2I, Vec2I] // min coord, max coord
+
 //Internal Sb types
+declare type uint64_t = number & { __brand: "uint64_t" };
 declare type Uuid = string
 declare type EntityId = number & { __brand: "int32_t" };
 
@@ -17,6 +21,30 @@ declare type EntityId = number & { __brand: "int32_t" };
 declare type LuaFunction = Function
 declare type LuaTable = Record<string, any>|any[]
 declare type LuaValue = null|boolean|int|float|string|LuaTable|LuaFunction //TODO |LuaThread|LuaUserData;
+
+/* StarSkyTypes */
+
+declare enum SkyTypeName {
+  "barren",
+  "atmospheric",
+  "atmosphereless",
+  "orbital",
+  "warp",
+  "space"
+}
+
+declare enum FlyingTypeNames {
+  "none",
+  "disembarking",
+  "warp",
+  "arriving"
+}
+
+declare enum WarpPhaseNames {
+  "slowingdown",
+  "maintain",
+  "speedingup"
+}
 
 /* StarWarping */
 type CelestialCoordinate = string
