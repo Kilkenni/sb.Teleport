@@ -37,4 +37,4 @@ type ToPlayer = Uuid
 declare type WarpToPlayer = `Player:${Uuid}`
 declare type WarpToWorld = `[CelestialWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
 
-declare type WarpAction = WarpToWorld|WarpToPlayer|WarpAlias;
+declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;

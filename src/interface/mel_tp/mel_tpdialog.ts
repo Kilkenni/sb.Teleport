@@ -63,7 +63,7 @@ function populateBookmarks() {
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
-        warpAction: bookmark.target as WarpToWorld, //warp coords or command
+        warpAction: bookmark.target as ToWorld, //warp coords or command
         name: bookmark.bookmarkName || "???", //default: ???
         planetName: bookmark.targetName || "", //default: empty string
         icon: iconPath, //default: no icon
@@ -311,9 +311,13 @@ btnTeleport.onClick = function() {
     lblDump.setText("No target selected")
     return
   }
-  let warpTarget = mel_tp.selected.warpAction
-  if(typeof warpTarget !== "string"){
+  const tempWarpTarget = mel_tp.selected.warpAction;
+  let warpTarget:string;
+  if(typeof tempWarpTarget !== "string"){
     warpTarget = mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : "");
+  }
+  else {
+    warpTarget = tempWarpTarget;
   }
 
   lblDump.setText(warpTarget);

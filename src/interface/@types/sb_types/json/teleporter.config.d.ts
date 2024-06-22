@@ -10,7 +10,7 @@
 declare interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
   planetName : string, //equivalent of Bookmark.targetName. Default: "???"
-  warpAction : WarpAlias|WarpToPlayer|WarpToWorld, //equivalent of Bookmark.target.
+  warpAction : WarpAlias|WarpToPlayer|ToWorld, //equivalent of Bookmark.target.
   icon : string, //equivalent of Bookmark.icon
   deploy? : boolean, //Deploy mech. Default: false
   mission? : boolean, //Default: false
