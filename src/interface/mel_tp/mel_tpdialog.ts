@@ -103,12 +103,14 @@ function populateBookmarks() {
       if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
         return; //Quest not complete - skip this Destination
       }
-      if(destination.warpAction === WarpAlias.OrbitedWorld && true  /** TODO check if player can warp down */) {
-        //!m_client->canBeamDown(deploy)
-        return; //Warping down is available only when orbiting a planet
+      if(destination.warpAction === WarpAlias.OrbitedWorld) {
+        const shipLocation: SystemLocation = celestial.shipLocation(); //allow warp only if CelestialCoordinate
+        if(typeof shipLocation !== "string" || celestial.planetName(shipLocation) === null){
+          return; //Warping down is available only when orbiting a planet
+        }       
       }
       if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
-        return; //If a player is already on their ship - do not offer to warp there even if config lists that
+        return; //If a player is already on their ship - do not offer to warp there even if config lists it
       }
 
       //Add destination from config to TP targets

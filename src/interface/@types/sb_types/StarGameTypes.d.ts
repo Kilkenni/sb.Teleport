@@ -74,5 +74,24 @@ type ToPlayer = Uuid
 
 declare type WarpToPlayer = `Player:${Uuid}`
 declare type WarpToWorld = `[CelestialWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
+//Instance worlds typically have named WorldID and SpawnTarget
+declare type WarpToInstance = `InstanceWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
 
 declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;
+
+declare interface CelestialOrbit {
+  target: CelestialCoordinate,
+  direction: int,
+  enterTime: double,
+  enterPosition: Vec2F
+}
+
+/**
+ * At a planet, high-orbiting a planet, at a system object, or at a vector position. Can be nil when in transit
+ * The locations are specified as a pair of type and value
+ * local location = nil -- Null;
+ * location = {"coordinate", {location = system, planet = 1, satellite = 0}} -- CelestialCoordinate;
+ * location = {"object", "11112222333344445555666677778888"} -- Object (UUID);
+ * location = {0.0, 0.0} -- Vec2F (position in space);
+*/
+declare type SystemLocation = CelestialCoordinate|CelestialOrbit|Uuid|Vec2F|null;

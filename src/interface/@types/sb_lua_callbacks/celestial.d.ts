@@ -36,81 +36,50 @@ declare module celestial {
    */
   function skyInHyperspace():boolean;
 
-  /*
-  #### `void` celestial.flyShip(`Vec3I` system, `SystemLocation` destination)
+  /**
+   * Flies the player ship to the specified SystemLocation in the specified system.
+   * @param system 
+   * @param destination is either of the following types: Null, CelestialCoordinate, Object, Vec2F
+   */
+  function flyShip(system: Vec3I, destination:SystemLocation):void;
 
-Flies the player ship to the specified SystemLocation in the specified system.
+  /**
+   * Returns whether the player ship is flying
+   */
+  function flying():boolean;
 
-SystemLocation is either of the following types: Null, CelestialCoordinate, Object, Vec2F
+  /**
+   * Returns the current position of the ship in the system.
+   * @returns [float, float] or null - if the system is not initialized
+   */
+  function shipSystemPosition():Vec2F|null;
 
-The locations are specified as a pair of type and value
+  /**
+   * Returns the current destination of the player ship.
+   */
+  function shipDestination():SystemLocation;
 
-```
-local system = celestial.currentSystem().location
-local location = nil -- Null
-location = {"coordinate", {location = system, planet = 1, satellite = 0}} -- CelestialCoordinate
-location = {"object", "11112222333344445555666677778888"} -- Object (UUID)
-location = {0.0, 0.0} -- Vec2F (position in space)
-celestial.flyShip(system, location)
-```
+  /**
+   * Returns the current system location of the player ship.
+   */
+  function shipLocation():SystemLocation;
 
----
+  /**
+   * Returns the CelestialCoordinate for system the ship is currently in.
+   */
+  function currentSystem():CelestialCoordinate;
 
-callbacks.registerCallback("flyShip", [client,systemWorld](Vec3I const& system, Json const& destination) {
-    auto location = jsonToSystemLocation(destination);
-    client->flyShip(system, location);
-  });
-*/
+  /**
+   * Returns the diameter of the specified planet in system space.
+   * @param planet 
+   */
+  function planetSize(planet:CelestialCoordinate):float;
 
-/**
- * Returns whether the player ship is flying
- */
-function flying():boolean;
-
-/**
- * Returns the current position of the ship in the system.
- * @returns [float, float] or null - if the system is not initialized
- */
-function shipSystemPosition():Vec2F|null;
-
-/*
-#### `SystemLocation` celestial.shipDestination()
-
-Returns the current destination of the player ship.
----
-
-#### `SystemLocation` celestial.shipLocation()
-
-Returns the current system location of the player ship.
----
-
-callbacks.registerCallback("shipDestination", [systemWorld]() -> Json {
-    return jsonFromSystemLocation(systemWorld->shipDestination());
-  });
-callbacks.registerCallback("shipLocation", [systemWorld]() -> Json {
-    return jsonFromSystemLocation(systemWorld->shipLocation());
-  });
-
-
-*/
-
-/**
- * Returns the CelestialCoordinate for system the ship is currently in.
- */
-function currentSystem():CelestialCoordinate;
-
-/**
- * Returns the diameter of the specified planet in system space.
- * @param planet 
- */
-function planetSize(planet:CelestialCoordinate):float;
-
-
-/**
- * Returns the position of the specified planet in system space. I.e. converts CelestialCoordinates into [float, float]
- * @param planet 
- */
-function planetPosition(planet:CelestialCoordinate):Vec2F;
+  /**
+   * Returns the position of the specified planet in system space. I.e. converts CelestialCoordinates into [float, float]
+   * @param planet 
+   */
+  function planetPosition(planet:CelestialCoordinate):Vec2F;
 
 /*
 #### `CelestialParameters` celestial.planetParameters(`CelestialCoordinate` planet)
@@ -139,33 +108,33 @@ callbacks.registerCallback("visitableParameters", [celestialDatabase](Json const
   });
 */
 
-/**
- * Returns the name of the specified planet.
- * @param planet 
- * @returns name if the planet is found
- */
-function planetName(planet:CelestialCoordinate):string|null;
+  /**
+   * Returns the name of the specified planet.
+   * @param planet 
+   * @returns name if the planet is found
+   */
+  function planetName(planet:CelestialCoordinate):string|null;
 
-/**
- * Returns the seed for the specified planet.
- * @param planet 
- * * @returns seed if the planet is found
- */
-function planetSeed(planet:CelestialCoordinate):uint64_t|null;
+  /**
+   * Returns the seed for the specified planet.
+   * @param planet 
+   * * @returns seed if the planet is found
+   */
+  function planetSeed(planet:CelestialCoordinate):uint64_t|null;
 
-/**
- * Returns the diameter of the specified planet and its orbiting moons.
- * @param planet 
- */
-function clusterSize(planet:CelestialCoordinate):float;
+  /**
+   * Returns the diameter of the specified planet and its orbiting moons.
+   * @param planet 
+   */
+  function clusterSize(planet:CelestialCoordinate):float;
 
-/**
- * Returns a list of ores available on the specified planet.
- * @param planet 
- * @param threatLevel
- * @returns array or ore names oif the planet can be found
- */
-function planetOres(planet:CelestialCoordinate, threatLevel:float):string[]|null;
+  /**
+   * Returns a list of ores available on the specified planet.
+   * @param planet 
+   * @param threatLevel
+   * @returns array or ore names oif the planet can be found
+   */
+  function planetOres(planet:CelestialCoordinate, threatLevel:float):string[]|null;
 
 /*
 
@@ -194,50 +163,50 @@ callbacks.registerCallback("orbitPosition", [systemWorld](Json const& orbit) -> 
 */
 
 
-/**
- * Returns a list of the Uuids for objects in the current system.
- */
-function systemObjects():Uuid[];
+  /**
+   * Returns a list of the Uuids for objects in the current system.
+   */
+  function systemObjects():Uuid[];
 
-/**
- * Returns the type of the specified object (if found).
- * @param uuid 
- */
-function objectType(uuid:Uuid):string|null;
-
-
-/**
- * Returns the parameters for the specified object in current system (if found).
- * @param 
- * @param uuid 
- */
-function objectParameters(uuid:Uuid):JSON|null;
+  /**
+   * Returns the type of the specified object (if found).
+   * @param uuid 
+   */
+  function objectType(uuid:Uuid):string|null;
 
 
-/**
- * Returns the warp action world ID for the specified object in current system.
- * @param uuid 
- */
-function objectWarpActionWorld(uuid:Uuid):WorldId|null;
+  /**
+   * Returns the parameters for the specified object in current system (if found).
+   * @param 
+   * @param uuid 
+   */
+  function objectParameters(uuid:Uuid):JSON|null;
 
 
-/**
- * Returns the orbit of the specified object, if any, in current system.
- * @param uuid 
- */
-function objectOrbit(uuid:Uuid):JSON|null;
+  /**
+   * Returns the warp action world ID for the specified object in current system.
+   * @param uuid 
+   */
+  function objectWarpActionWorld(uuid:Uuid):WorldId|null;
 
-/**
- * Returns the position of the specified object, if any, in current system.
- * @param uuid 
- */
-function objectPosition(uuid:Uuid):Vec2F|null;
 
-/**
- * Returns the configuration of the specified object type.
- * @param typeName type of the object spawned in a celestial system (like a station or a hostile ship)
- */
-function objectTypeConfig(typeName:string):JSON;
+  /**
+   * Returns the orbit of the specified object, if any, in current system.
+   * @param uuid 
+   */
+  function objectOrbit(uuid:Uuid):JSON|null;
+
+  /**
+   * Returns the position of the specified object, if any, in current system.
+   * @param uuid 
+   */
+  function objectPosition(uuid:Uuid):Vec2F|null;
+
+  /**
+   * Returns the configuration of the specified object type.
+   * @param typeName type of the object spawned in a celestial system (like a station or a hostile ship)
+   */
+  function objectTypeConfig(typeName:string):JSON;
 
 /*
 
@@ -256,77 +225,77 @@ callbacks.registerCallback("systemSpawnObject", [systemWorld](String const& type
   });
 */
 
-/**
- * Returns a list of the player ships in the current system.
- */
-function playerShips():Uuid[];
+  /**
+   * Returns a list of the player ships in the current system.
+   */
+  function playerShips():Uuid[];
 
-/**
- * Returns the position of player ship with specified Uuid (if it exists).
- * @param uuid 
- */
-function playerShipPosition(uuid: Uuid):Vec2F|null;
+  /**
+   * Returns the position of player ship with specified Uuid (if it exists).
+   * @param uuid 
+   */
+  function playerShipPosition(uuid: Uuid):Vec2F|null;
 
-/**
- * Returns definitively whether the coordinate has orbiting children. `nil` return means the coordinate is not loaded.
- * @param coordinate 
- */
-function hasChildren(coordinate:CelestialCoordinate):boolean|null;
+  /**
+   * Returns definitively whether the coordinate has orbiting children. `nil` return means the coordinate is not loaded.
+   * @param coordinate 
+   */
+  function hasChildren(coordinate:CelestialCoordinate):boolean|null;
 
-/**
- * Returns the children for the specified celestial coordinate. For systems, return planets, for planets, return moons.
- * @param coordinate 
- */
-function children(coordinate:CelestialCoordinate):CelestialCoordinate[]
+  /**
+   * Returns the children for the specified celestial coordinate. For systems, return planets, for planets, return moons.
+   * @param coordinate 
+   */
+  function children(coordinate:CelestialCoordinate):CelestialCoordinate[]
 
-/**
- * Returns the child orbits for the specified celestial coordinate.
- * @param coordinate 
- */
-function childOrbits(coordinate:CelestialCoordinate):int[]
+  /**
+   * Returns the child orbits for the specified celestial coordinate.
+   * @param coordinate 
+   */
+  function childOrbits(coordinate:CelestialCoordinate):int[]
 
-/**
- * Returns a list of systems in the given region. If includedTypes is specified, this will return only systems whose typeName parameter is included in the set. This scans for systems asynchronously, meaning it may not return all systems if they have not been generated or sent to the client. Use `scanRegionFullyLoaded` to see if this is the case.
- * @param region 
- * @param includedTypes 
- */
-function scanSystems(region: RectI, includedTypes?: string[]):CelestialCoordinate[];
+  /**
+   * Returns a list of systems in the given region. If includedTypes is specified, this will return only systems whose typeName parameter is included in the set. This scans for systems asynchronously, meaning it may not return all systems if they have not been generated or sent to the client. Use `scanRegionFullyLoaded` to see if this is the case.
+   * @param region 
+   * @param includedTypes 
+   */
+  function scanSystems(region: RectI, includedTypes?: string[]):CelestialCoordinate[];
 
-/**
- * Returns the constellation lines for the specified universe region.
- * @param region 
- */
-function scanConstellationLines(region: RectI):[Vec2I, Vec2I][];
+  /**
+   * Returns the constellation lines for the specified universe region.
+   * @param region 
+   */
+  function scanConstellationLines(region: RectI):[Vec2I, Vec2I][];
 
-/**
- * Returns whether the specified universe region has been fully loaded.
- * @param region 
- */
-function scanRegionFullyLoaded(region:RectI):boolean
+  /**
+   * Returns whether the specified universe region has been fully loaded.
+   * @param region 
+   */
+  function scanRegionFullyLoaded(region:RectI):boolean
 
-/**
- * Returns the images with scales for the central body (star) for the specified system coordinate.
- * @param system 
- */
-function centralBodyImages(system:CelestialCoordinate):[string, float][];
+  /**
+   * Returns the images with scales for the central body (star) for the specified system coordinate.
+   * @param system 
+   */
+  function centralBodyImages(system:CelestialCoordinate):[string, float][];
 
-/**
- * Returns the smallImages with scales for the specified planet or moon.
- * @param coordinate 
- */
-function planetaryObjectImages(coordinate:CelestialCoordinate):[string, float][];
+  /**
+   * Returns the smallImages with scales for the specified planet or moon.
+   * @param coordinate 
+   */
+  function planetaryObjectImages(coordinate:CelestialCoordinate):[string, float][];
 
-/**
- * Returns the generated world images with scales for the specified planet or moon.
- * @param coordinate 
- */
-function worldImages(coordinate:CelestialCoordinate):[string, float][];
+  /**
+   * Returns the generated world images with scales for the specified planet or moon.
+   * @param coordinate 
+   */
+  function worldImages(coordinate:CelestialCoordinate):[string, float][];
 
-/**
- * Returns the star image for the specified system. Requires a twinkle time to provide the correct image frame.
- * @param system 
- * @param twinkleTime 
- */
-function starImages(system:CelestialCoordinate, twinkleTime:float):[string, float][];
+  /**
+   * Returns the star image for the specified system. Requires a twinkle time to provide the correct image frame.
+   * @param system 
+   * @param twinkleTime 
+   */
+  function starImages(system:CelestialCoordinate, twinkleTime:float):[string, float][];
 
 }
