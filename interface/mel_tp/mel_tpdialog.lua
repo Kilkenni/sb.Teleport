@@ -81,6 +81,22 @@ local function populateBookmarks()
 
   if finalTpConfig.destinations ~= nil then
     for index, destination in ipairs(finalTpConfig.destinations) do
+      if(destination.warpAction == "OrbitedWorld") then
+        local shipLocation = celestial.shipLocation(); --allow warp only if CelestialCoordinate
+        lblDump:setText(sb.printJson(shipLocation))
+        local locString
+        if(type(shipLocation) == "table") then
+          locString = shipLocation[2]
+        end
+        if(type(shipLocation) ~= "table" or type(shipLocation[2].planet) ~= "number") then
+          --celestial.planetName(locString) == nil
+          return; --Warping down is available only when orbiting a planet
+        end      
+      end
+      if(destination.warpAction == "OwnShip" and player.worldId() == player.ownShipWorldId()) then
+        destination.warpAction = "Nowhere"; --If a player is already on their ship - do not offer to warp there even if config lists it
+      end
+
       local currentBookmark = mel_tp.bookmarkTemplate
       local iconPath = ""
       if destination.icon ~= nil then

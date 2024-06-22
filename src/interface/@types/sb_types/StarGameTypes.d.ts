@@ -79,6 +79,12 @@ declare type WarpToInstance = `InstanceWorld:${ToWorld["world"]}, ${ToWorld["tar
 
 declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;
 
+declare type CelestialCoordinateJson = ["coordinate", {
+  location: [int, int, int],
+  planet: int,
+  satellite: int
+}]
+
 declare interface CelestialOrbit {
   target: CelestialCoordinate,
   direction: int,
@@ -94,4 +100,4 @@ declare interface CelestialOrbit {
  * location = {"object", "11112222333344445555666677778888"} -- Object (UUID);
  * location = {0.0, 0.0} -- Vec2F (position in space);
 */
-declare type SystemLocation = CelestialCoordinate|CelestialOrbit|Uuid|Vec2F|null;
+declare type SystemLocation = CelestialCoordinateJson|CelestialOrbit|Uuid|Vec2F|null;

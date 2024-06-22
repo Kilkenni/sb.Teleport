@@ -105,7 +105,7 @@ function populateBookmarks() {
       }
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocation = celestial.shipLocation(); //allow warp only if CelestialCoordinate
-        if(typeof shipLocation !== "string" || celestial.planetName(shipLocation) === null){
+        if(typeof shipLocation === "string" || shipLocation === null || typeof ((shipLocation as CelestialCoordinateJson)[1].planet) !== "number" ){
           return; //Warping down is available only when orbiting a planet
         }       
       }
