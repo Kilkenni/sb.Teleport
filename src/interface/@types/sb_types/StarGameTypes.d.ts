@@ -1,12 +1,22 @@
-declare type Vec2I = [number, number]
-declare type Vec2F = [number, number]
-declare type Vec3I = [number, number, number]
-declare type Vec3F = [number, number, number]
+//Primitive C++ types
+declare type int = number & { __brand: "int" }
+declare type float = number & { __brand: "float" }
+declare type double = number & { __brand: "double" }
 
+//Vectors
+declare type Vec2I = [int, int]
+declare type Vec2F = [float, float]
+declare type Vec3I = [int, int, int]
+declare type Vec3F = [float, float, float]
+
+//Internal Sb types
+declare type Uuid = string
 declare type EntityId = number & { __brand: "int32_t" };
 
-declare type Uuid = string
-
+//Lua-specific wrappers
+declare type LuaFunction = Function
+declare type LuaTable = Record<string, any>|any[]
+declare type LuaValue = null|boolean|int|float|string|LuaTable|LuaFunction //TODO |LuaThread|LuaUserData;
 
 /* StarWarping */
 type CelestialCoordinate = string

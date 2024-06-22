@@ -11,6 +11,9 @@ declare module player {
    */
   function hasCompletedQuest(questId:string): boolean;
   
+  /**
+   * 
+   */
   function teleportBookmarks():Bookmark[];
 
   /**
