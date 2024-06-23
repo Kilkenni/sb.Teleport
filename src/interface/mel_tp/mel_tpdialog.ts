@@ -2,18 +2,20 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
-import { sortArrayByProperty } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType } from "./mel_tp_util";
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
   bookmarkTemplate: tpItem,
   configOverride: TeleportConfig|undefined,
   selected: Destination|undefined
+  animation: string,
 } = {
   bookmarks: undefined,
   bookmarkTemplate: bookmarksList.data,
   configOverride: undefined,
-  selected: undefined
+  selected: undefined,
+  animation: "default",
 };
 mel_tp.bookmarks = player.teleportBookmarks() as Bookmark[];
 mel_tp.bookmarkTemplate = bookmarksList.data;
@@ -105,11 +107,12 @@ function populateBookmarks() {
       }
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
-        if(typeof shipLocation === "string" || shipLocation === null || typeof ((shipLocation as CelestialCoordinate)[1].planet) !== "number" ){
+        const locationType = getSpaceLocationType(shipLocation);
+        if(locationType.toString() !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
         }       
       }
-      if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
+      if(destination.warpAction.toString() === "OwnShip" && player.worldId() === player.ownShipWorldId()) {
         return; //If a player is already on their ship - do not offer to warp there even if config lists it
       }
 
@@ -302,7 +305,7 @@ btnTeleport.onClick = function() {
 
   lblDump.setText(warpTarget);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
-  player.warp(warpTarget, "default", mel_tp.selected.deploy || false);
+  player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
   pane.dismiss();
 }
 

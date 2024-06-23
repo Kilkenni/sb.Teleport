@@ -28,18 +28,34 @@ enum SystemLocationType {
   "CelestialCoordinate",
   "CelestialOrbit",
   "Space",
-  "OrbitingInstance"
+  "FloatingDungeon"
 }
 
 function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType {
   if(destination === null) {
     return SystemLocationType.null;
   }
-
-  //remove that later
+  if(typeof destination[0] === "string") {
+    if(destination[0] === "object") {
+      return SystemLocationType.FloatingDungeon;
+    }
+    if(destination[0] === "orbit") {
+      return SystemLocationType.CelestialOrbit;
+    }
+    if(destination[0] === "coordinate") {
+      return SystemLocationType.CelestialCoordinate;
+    }
+    sb.logError(`GetSpaceLocationType: can't identify type, first element is %s`, [destination[0]]);
+    return SystemLocationType.null;
+  }
+  if(typeof destination[0] === typeof destination[1]) {
+    return SystemLocationType.Space
+  }
+  sb.logError(`GetSpaceLocationType: can't identify location type: %s`, [sb.printJson(destination as unknown as JSON)]);
   return SystemLocationType.null;
 }
 
 export {
   sortArrayByProperty,
+  getSpaceLocationType,
 }
