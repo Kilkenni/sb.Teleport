@@ -47,8 +47,8 @@ declare enum WarpPhaseNames {
 }
 
 /* StarWarping */
-type CelestialCoordinate = string
-type CelestialWorldId = CelestialCoordinate
+type CelestialCoordString = string
+type CelestialWorldId = CelestialCoordString
 type ClientShipWorldId = Uuid
 type InstanceWorldId = string|Uuid
 declare type WorldId = CelestialWorldId|ClientShipWorldId|InstanceWorldId
@@ -81,21 +81,21 @@ declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;
 
 declare type UuidCPP = [ "object", Uuid ]
 
-declare type CelestialCoordinateJson = ["coordinate", {
+// declare type CelestialCoordinateJson_no
+
+declare interface CelestialCoordinate {
   location: [int, int, int],
   planet: int,
   satellite: int
-}]
+}
 
-declare type CelestialOrbitJson = [
-  "orbit",
-  {
-    target: CelestialCoordinateJson, //coordinates of the planet the ship orbits
-    direction: int, //default: 1
-    enterTime: double, //default: 0. Time the orbit was entered, universe epoch time
-    enterPosition: Vec2F //the position that the orbit was entered at, relative to the target
-  }
-]
+declare interface CelestialOrbit {
+  target: CelestialCoordinate, //coordinates of the planet the ship orbits
+  direction: int, //default: 1
+  enterTime: double, //default: 0. Time the orbit was entered, universe epoch time
+  enterPosition: Vec2F //the position that the orbit was entered at, relative to the target
+}
+
 
 /**
  * At a planet, high-orbiting a planet, at a system object, or at a vector position. Can be nil when in transit
@@ -105,9 +105,18 @@ declare type CelestialOrbitJson = [
  * location = {"object", "11112222333344445555666677778888"} -- Object (UUID);
  * location = {0.0, 0.0} -- Vec2F (position in space);
 */
-declare type SystemLocationJson = CelestialCoordinateJson|CelestialOrbitJson|UuidCPP|Vec2F|null;
+declare type SystemLocationJson = ["coordinate", CelestialCoordinate]|
+["orbit", CelestialOrbit]|["object", Uuid]|Vec2F|null;
 
-declare type CelestialParametersJson = JSON; //TODO: Needs better description than that
+declare interface CelestialParametersJson { //TODO: Needs better description than that
+  imageScale?: float,
+  smallImage?: string, //example: "/celestial/system/planet_small.png"
+  description?: string, //example: "Tier 2 Planet"
+  worldType?:string, //example: "Terrestrial"
+  smallImageScale?: float,
+  worldSize?: string, //example: "medium",
+  terrestrialType:string[] //array of major surface biomes
+}
 
 declare interface VisitableParametersJson {
   typeName: string, //default: ""

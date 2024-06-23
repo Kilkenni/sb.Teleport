@@ -84,12 +84,16 @@ local function populateBookmarks()
       if(destination.warpAction == "OrbitedWorld") then
         local shipLocation = celestial.shipLocation(); --allow warp only if CelestialCoordinate
         lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
-        local locString
-        if(type(shipLocation) == "table") then
-          locString = shipLocation[2]
+
+        --sb.logInfo(sb.printJson(shipLocation[2].satellite))
+        if(shipLocation[1] == "coordinate") then
+          lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2])))
+          sb.logInfo("Location is"..sb.printJson(shipLocation[2]))
+          sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
+          sb.logInfo("Planet name is"..sb.printJson(celestial.planetName(shipLocation[2])))
         end
-        locString = 
-        sb.logInfo(sb.printJson(celestial.planetSize(ShipLocation)))
+
+        -- sb.logInfo(sb.printJson(celestial.planetName(shipLocation[2])))
         if(type(shipLocation) ~= "table" or type(shipLocation[1])== "number" or (shipLocation[2].planet and type(shipLocation[2].planet) ~= "number")) then
           --celestial.planetName(locString) == nil 
           return; --Warping down is available only when orbiting a planet
@@ -132,9 +136,16 @@ end
 populateBookmarks()
 
 function btnDumpTp:onClick()
-  --chat.addMessage("boop")
-  lblDebug:setText(sb.printJson(mel_tp.bookmarks))
+  --lblDebug:setText(sb.printJson(mel_tp.bookmarks))
+  local shipLocation = celestial.shipLocation();
+  if(shipLocation[1] == "coordinate") then
+    lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2]))..world.timeOfDay())
+    sb.logInfo("Location is "..sb.printJson(shipLocation[2]))
+    sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
+    sb.logInfo("Planet name is "..sb.printJson(celestial.planetName(shipLocation[2])))
+  end
 end
+
 
 function btnSortByPlanet:onClick()
   table.sort(mel_tp.data, function(el1, el2) return el1.targetName:upper() < el2.targetName:upper() end)
