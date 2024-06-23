@@ -79,18 +79,23 @@ declare type WarpToInstance = `InstanceWorld:${ToWorld["world"]}, ${ToWorld["tar
 
 declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;
 
+declare type UuidCPP = [ "object", Uuid ]
+
 declare type CelestialCoordinateJson = ["coordinate", {
   location: [int, int, int],
   planet: int,
   satellite: int
 }]
 
-declare interface CelestialOrbit {
-  target: CelestialCoordinate,
-  direction: int,
-  enterTime: double,
-  enterPosition: Vec2F
-}
+declare type CelestialOrbitJson = [
+  "orbit",
+  {
+    target: CelestialCoordinateJson, //coordinates of the planet the ship orbits
+    direction: int, //default: 1
+    enterTime: double, //default: 0. Time the orbit was entered, universe epoch time
+    enterPosition: Vec2F //the position that the orbit was entered at, relative to the target
+  }
+]
 
 /**
  * At a planet, high-orbiting a planet, at a system object, or at a vector position. Can be nil when in transit
@@ -100,4 +105,22 @@ declare interface CelestialOrbit {
  * location = {"object", "11112222333344445555666677778888"} -- Object (UUID);
  * location = {0.0, 0.0} -- Vec2F (position in space);
 */
-declare type SystemLocation = CelestialCoordinateJson|CelestialOrbit|Uuid|Vec2F|null;
+declare type SystemLocationJson = CelestialCoordinateJson|CelestialOrbitJson|UuidCPP|Vec2F|null;
+
+declare type CelestialParametersJson = JSON; //TODO: Needs better description than that
+
+declare interface VisitableParametersJson {
+  typeName: string, //default: ""
+  threatLevel: float,
+  worldSize: Vec2I, //actually, Vec2U, so it's unsigned (non-negative)
+  gravity: float, //default: 1.0
+  airless: boolean, //default: false
+  weatherPool: JSON, //[double,string][]. Weather types with their probabilities
+  environmentStatusEffects: JSON, //string[]. May be empty. Write better description?
+  overrideTech: JSON; //string[]. May be empty. Write better description?
+  globalDirectives: JSON, //Directives[] in JSON form. May be empty. Write better description?
+  beamUpRule: "Nowhere"|"Surface"|"Anywhere"|"AnywhereWithWarning", //default: "Surface". BeamUpRuleNames
+  disableDeathDrops: boolean, //default: false
+  terraformed: boolean, //default: false
+  worldEdgeForceRegions: "None"|"Top"|"Bottom"|"TopAndBottom", //default: "None". WorldEdgeForceRegionTypeNames
+}

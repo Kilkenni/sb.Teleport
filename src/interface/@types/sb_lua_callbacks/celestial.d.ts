@@ -41,7 +41,7 @@ declare module celestial {
    * @param system 
    * @param destination is either of the following types: Null, CelestialCoordinate, Object, Vec2F
    */
-  function flyShip(system: Vec3I, destination:SystemLocation):void;
+  function flyShip(system: Vec3I, destination:SystemLocationJson):void;
 
   /**
    * Returns whether the player ship is flying
@@ -57,76 +57,65 @@ declare module celestial {
   /**
    * Returns the current destination of the player ship.
    */
-  function shipDestination():SystemLocation;
+  function shipDestination():SystemLocationJson;
 
   /**
    * Returns the current system location of the player ship.
    */
-  function shipLocation():SystemLocation;
+  function shipLocation():SystemLocationJson;
 
   /**
    * Returns the CelestialCoordinate for system the ship is currently in.
    */
-  function currentSystem():CelestialCoordinate;
+  function currentSystem():CelestialCoordinateJson;
 
   /**
    * Returns the diameter of the specified planet in system space.
    * @param planet 
+   * @returns If a planet can't be found, returns 0
    */
-  function planetSize(planet:CelestialCoordinate):float;
+  function planetSize(planet:CelestialCoordinateJson):float;
 
   /**
    * Returns the position of the specified planet in system space. I.e. converts CelestialCoordinates into [float, float]
    * @param planet 
+   * @returns If a planet can't be found at presented CelestialCoordinate, returns [0,0]
    */
-  function planetPosition(planet:CelestialCoordinate):Vec2F;
+  function planetPosition(planet:CelestialCoordinateJson):Vec2F;
 
-/*
-#### `CelestialParameters` celestial.planetParameters(`CelestialCoordinate` planet)
+  /**
+   * Returns the celestial parameters for the specified planet.
+   * @param planet 
+   * @returns empty JSON for invalid planets
+   */
+  function planetParameters(planet:CelestialCoordinateJson):CelestialParametersJson;
 
-Returns the celestial parameters for the specified planet.
----
-
-#### `VisitableParameters` celestial.visitableParameters(`CelestialCoordinate` planet)
-
-Returns the visitable parameters for the specified visitable planet. For unvisitable planets, returns nil.
----
-
-callbacks.registerCallback("planetParameters", [celestialDatabase](Json const& coords) -> Json {
-    CelestialCoordinate coordinate = CelestialCoordinate(coords);
-    if (auto celestialParameters = celestialDatabase->parameters(coordinate))
-      return celestialParameters->parameters();
-    return Json();
-  });
-callbacks.registerCallback("visitableParameters", [celestialDatabase](Json const& coords) -> Json {
-    CelestialCoordinate coordinate = CelestialCoordinate(coords);
-    if (auto parameters = celestialDatabase->parameters(coordinate)) {
-      if (auto visitableParameters = parameters->visitableParameters())
-        return visitableParameters->store();
-    }
-    return {};
-  });
-*/
+  /**
+   * Returns the visitable parameters for the specified visitable planet.
+   * @param planet 
+   * @returns nil for unvisitable planets
+   */
+  function visitableParameters(planet: CelestialCoordinateJson):VisitableParametersJson|null;
 
   /**
    * Returns the name of the specified planet.
    * @param planet 
    * @returns name if the planet is found
    */
-  function planetName(planet:CelestialCoordinate):string|null;
+  function planetName(planet:CelestialCoordinateJson):string|null;
 
   /**
    * Returns the seed for the specified planet.
    * @param planet 
    * * @returns seed if the planet is found
    */
-  function planetSeed(planet:CelestialCoordinate):uint64_t|null;
+  function planetSeed(planet:CelestialCoordinateJson):uint64_t|null;
 
   /**
    * Returns the diameter of the specified planet and its orbiting moons.
    * @param planet 
    */
-  function clusterSize(planet:CelestialCoordinate):float;
+  function clusterSize(planet:CelestialCoordinateJson):float;
 
   /**
    * Returns a list of ores available on the specified planet.
@@ -134,15 +123,12 @@ callbacks.registerCallback("visitableParameters", [celestialDatabase](Json const
    * @param threatLevel
    * @returns array or ore names oif the planet can be found
    */
-  function planetOres(planet:CelestialCoordinate, threatLevel:float):string[]|null;
+  function planetOres(planet:CelestialCoordinateJson, threatLevel:float):string[]|null;
 
 /*
 
 //Returns the position of the specified location in the *current system*.
 function systemPosition(`SystemLocation` location):Vec2F;
-
-Returns the calculated position of the provided orbit.
-#### `Vec2F` celestial.orbitPosition(`Orbit` orbit)
 
 ```
 local orbit = {
@@ -156,12 +142,14 @@ callbacks.registerCallback("systemPosition", [systemWorld](Json const& l) -> May
   auto location = jsonToSystemLocation(l);
   return systemWorld->systemLocationPosition(location);
 });
-callbacks.registerCallback("orbitPosition", [systemWorld](Json const& orbit) -> Vec2F {
-  return systemWorld->orbitPosition(CelestialOrbit::fromJson(orbit));
-});
-
 */
 
+  
+  /**
+   * Returns the calculated position of the provided orbit.
+   * @param orbit 
+   */
+  function orbitPosition(orbit: CelestialOrbitJson):Vec2F;
 
   /**
    * Returns a list of the Uuids for objects in the current system.
@@ -194,7 +182,7 @@ callbacks.registerCallback("orbitPosition", [systemWorld](Json const& orbit) -> 
    * Returns the orbit of the specified object, if any, in current system.
    * @param uuid 
    */
-  function objectOrbit(uuid:Uuid):JSON|null;
+  function objectOrbit(uuid:Uuid):CelestialOrbitJson|null;
 
   /**
    * Returns the position of the specified object, if any, in current system.
@@ -240,26 +228,26 @@ callbacks.registerCallback("systemSpawnObject", [systemWorld](String const& type
    * Returns definitively whether the coordinate has orbiting children. `nil` return means the coordinate is not loaded.
    * @param coordinate 
    */
-  function hasChildren(coordinate:CelestialCoordinate):boolean|null;
+  function hasChildren(coordinate:CelestialCoordinateJson):boolean|null;
 
   /**
    * Returns the children for the specified celestial coordinate. For systems, return planets, for planets, return moons.
    * @param coordinate 
    */
-  function children(coordinate:CelestialCoordinate):CelestialCoordinate[]
+  function children(coordinate:CelestialCoordinateJson):CelestialCoordinateJson[]
 
   /**
    * Returns the child orbits for the specified celestial coordinate.
    * @param coordinate 
    */
-  function childOrbits(coordinate:CelestialCoordinate):int[]
+  function childOrbits(coordinate:CelestialCoordinateJson):int[]
 
   /**
    * Returns a list of systems in the given region. If includedTypes is specified, this will return only systems whose typeName parameter is included in the set. This scans for systems asynchronously, meaning it may not return all systems if they have not been generated or sent to the client. Use `scanRegionFullyLoaded` to see if this is the case.
    * @param region 
    * @param includedTypes 
    */
-  function scanSystems(region: RectI, includedTypes?: string[]):CelestialCoordinate[];
+  function scanSystems(region: RectI, includedTypes?: string[]):CelestialCoordinateJson[];
 
   /**
    * Returns the constellation lines for the specified universe region.
@@ -271,31 +259,31 @@ callbacks.registerCallback("systemSpawnObject", [systemWorld](String const& type
    * Returns whether the specified universe region has been fully loaded.
    * @param region 
    */
-  function scanRegionFullyLoaded(region:RectI):boolean
+  function scanRegionFullyLoaded(region:RectI):boolean;
 
   /**
    * Returns the images with scales for the central body (star) for the specified system coordinate.
    * @param system 
    */
-  function centralBodyImages(system:CelestialCoordinate):[string, float][];
+  function centralBodyImages(system:CelestialCoordinateJson):[string, float][];
 
   /**
    * Returns the smallImages with scales for the specified planet or moon.
    * @param coordinate 
    */
-  function planetaryObjectImages(coordinate:CelestialCoordinate):[string, float][];
+  function planetaryObjectImages(coordinate:CelestialCoordinateJson):[string, float][];
 
   /**
    * Returns the generated world images with scales for the specified planet or moon.
    * @param coordinate 
    */
-  function worldImages(coordinate:CelestialCoordinate):[string, float][];
+  function worldImages(coordinate:CelestialCoordinateJson):[string, float][];
 
   /**
    * Returns the star image for the specified system. Requires a twinkle time to provide the correct image frame.
    * @param system 
    * @param twinkleTime 
    */
-  function starImages(system:CelestialCoordinate, twinkleTime:float):[string, float][];
+  function starImages(system:CelestialCoordinateJson, twinkleTime:float):[string, float][];
 
 }

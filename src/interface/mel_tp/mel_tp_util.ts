@@ -23,6 +23,23 @@ function sortArrayByProperty(array:Record<string, any>[], propertyName: string, 
   return sortedArray;
 }
 
+enum SystemLocationType {
+  null,
+  "CelestialCoordinate",
+  "CelestialOrbit",
+  "Space",
+  "OrbitingInstance"
+}
+
+function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType {
+  if(destination === null) {
+    return SystemLocationType.null;
+  }
+
+  //remove that later
+  return SystemLocationType.null;
+}
+
 export {
   sortArrayByProperty,
 }

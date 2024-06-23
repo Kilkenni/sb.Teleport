@@ -83,13 +83,15 @@ local function populateBookmarks()
     for index, destination in ipairs(finalTpConfig.destinations) do
       if(destination.warpAction == "OrbitedWorld") then
         local shipLocation = celestial.shipLocation(); --allow warp only if CelestialCoordinate
-        lblDump:setText(sb.printJson(shipLocation))
+        lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
         local locString
         if(type(shipLocation) == "table") then
           locString = shipLocation[2]
         end
-        if(type(shipLocation) ~= "table" or type(shipLocation[2].planet) ~= "number") then
-          --celestial.planetName(locString) == nil
+        locString = 
+        sb.logInfo(sb.printJson(celestial.planetSize(ShipLocation)))
+        if(type(shipLocation) ~= "table" or type(shipLocation[1])== "number" or (shipLocation[2].planet and type(shipLocation[2].planet) ~= "number")) then
+          --celestial.planetName(locString) == nil 
           return; --Warping down is available only when orbiting a planet
         end      
       end
