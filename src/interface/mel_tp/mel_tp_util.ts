@@ -55,7 +55,27 @@ function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType
   return SystemLocationType.null;
 }
 
+/**
+ * Returns stringified CelestialCoordinate back into object
+ * @param target Can parse only CelestialWorld
+ * @returns CelestialCoordinate or null
+ */
+function WorldIdToCelestialCoordinate(target:CelestialWorldIdString):CelestialCoordinate|null {
+  if(target.charAt(0) !== "C") {
+    return null;
+  }
+  const tempTarget = target.substring("CelestialWorld:".length);
+  const parsedTarget = tempTarget.split(":");
+  const targetCoordinate:CelestialCoordinate = {
+    location: [parseInt(parsedTarget[0]) as int, parseInt(parsedTarget[1]) as int, parseInt(parsedTarget[2]) as int],
+    planet: parseInt(parsedTarget[3]) as int,
+    satellite: parseInt(parsedTarget[4]) as int,
+  }
+  return targetCoordinate;
+}
+
 export {
   sortArrayByProperty,
   getSpaceLocationType,
+  WorldIdToCelestialCoordinate,
 }

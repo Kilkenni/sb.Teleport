@@ -9,6 +9,11 @@
 declare const bookmarksList
 declare const btnDumpTp
 declare const btnSortByPlanet
+
+declare const bookmarkInfo
+declare const lblBkmName
+declare const lblBkmLocType
+
 declare const btnTeleport
 declare const lblDebug
 declare const lblDump
@@ -30,6 +35,11 @@ export {
   bookmarksList,
   btnDumpTp,
   btnSortByPlanet,
+
+  bookmarkInfo,
+  lblBkmName,
+  lblBkmLocType,
+
   btnTeleport,
   lblDebug,
   lblDump,

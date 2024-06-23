@@ -46,6 +46,14 @@
       },
       "spacer",
       { 
+        "type" : "scrollArea", "id":"bookmarkInfo", "scrollDirections" : [0, 1], "scrollBars" : true, 
+        "data" : {},
+        "children" : [
+          {"type":"label", "id":"lblBkmName", "text": "???"},
+          {"type":"label", "id":"lblBkmLocType", "text": ""}
+        ] 
+      },
+      { 
         "type" : "button",
         "caption" : "Teleport",
         "color" : "accent",

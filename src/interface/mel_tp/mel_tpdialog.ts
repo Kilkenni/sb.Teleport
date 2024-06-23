@@ -1,8 +1,8 @@
 //require "/scripts/util.lua"
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
-import { sortArrayByProperty, getSpaceLocationType } from "./mel_tp_util";
+import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToCelestialCoordinate } from "./mel_tp_util";
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
@@ -29,6 +29,29 @@ mel_tp.configOverride = metagui.inputData as TeleportConfig;
 */
 function OnTpTargetSelect(bookmarkWidget:any):void {
   mel_tp.selected = bookmarkWidget.bkmData as Destination;
+  if(typeof mel_tp.selected.warpAction === "string") {
+    lblBkmName.setText("");
+    lblBkmLocType.setText("Entity signature");
+  }
+  else {
+    const warpTarget = (mel_tp.selected.warpAction as ToWorld).world as CelestialWorldIdString;
+    const coord:CelestialCoordinate|null = WorldIdToCelestialCoordinate(warpTarget)
+    if(coord === null) {
+      lblBkmName.setText("");
+      lblBkmLocType.setText("");
+    }
+    else {
+      const name = celestial.planetName(coord);
+      const planetParams = celestial.visitableParameters(coord);
+      if(name !== null) {
+        lblBkmName.setText(name);
+      }
+      if(planetParams !== null) {
+        lblBkmLocType.setText(planetParams.typeName);
+      }
+    }
+  }
+  
   lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
 };
 

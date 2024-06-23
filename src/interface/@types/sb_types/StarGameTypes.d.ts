@@ -47,11 +47,19 @@ declare enum WarpPhaseNames {
 }
 
 /* StarWarping */
-type CelestialCoordString = string
-type CelestialWorldId = CelestialCoordString
+type CelestialWorldId = CelestialCoordinate
+interface InstanceWorldId {
+  instance: string, //instance name for named worlds like Outpost
+  uuid: Uuid|"-",
+  level: float|"-", //must be positive
+}
 type ClientShipWorldId = Uuid
-type InstanceWorldId = string|Uuid
-declare type WorldId = CelestialWorldId|ClientShipWorldId|InstanceWorldId
+
+type CelestialWorldIdString = `CelestialWorld:${CelestialCoordinate["location"][0]}:${CelestialCoordinate["location"][1]}:${CelestialCoordinate["location"][2]}:${CelestialCoordinate["planet"]}:${CelestialCoordinate["satellite"]}` //3 coords, planet, satellite
+type InstanceWorldIdString = `InstanceWorld:${InstanceWorldId["instance"]}:${InstanceWorldId["uuid"]}:${InstanceWorldId["level"]}`
+type ClientShipWorldIdString = `ClientShipWorld:${Uuid}`
+
+declare type WorldIdString = CelestialWorldIdString|ClientShipWorldIdString|InstanceWorldIdString
 
 type SpawnTargetUniqueEntity = string
 type SpawnTargetPosition = `[${string}, ${string}]` //string from Vec2F
@@ -66,16 +74,16 @@ declare enum WarpAlias {
 }
 
 type ToWorld = {
-  world:WorldId,
+  world:WorldIdString,
   target:SpawnTarget,
 }
 
 type ToPlayer = Uuid
 
 declare type WarpToPlayer = `Player:${Uuid}`
-declare type WarpToWorld = `[CelestialWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
+declare type WarpToWorld = `[${ToWorld["world"]}, ${ToWorld["target"]|undefined}]`
 //Instance worlds typically have named WorldID and SpawnTarget
-declare type WarpToInstance = `InstanceWorld:${ToWorld["world"]}, ${ToWorld["target"]} | undefined]`
+declare type WarpToInstance = `[${ToWorld["world"]}, ${ToWorld["target"]|undefined}]`
 
 declare type WarpAction = ToWorld|WarpToPlayer|WarpAlias;
 
