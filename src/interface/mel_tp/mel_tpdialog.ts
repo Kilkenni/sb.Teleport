@@ -49,6 +49,8 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
       if(planetParams !== null) {
         lblBkmLocType.setText(planetParams.typeName);
       }
+      //debug line
+      sb.logInfo(sb.printJson(planetParams as unknown as JSON));
     }
   }
   

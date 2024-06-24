@@ -175,7 +175,7 @@ callbacks.registerCallback("systemPosition", [systemWorld](Json const& l) -> May
    * Returns the warp action world ID for the specified object in current system.
    * @param uuid 
    */
-  function objectWarpActionWorld(uuid:Uuid):WorldId|null;
+  function objectWarpActionWorld(uuid:Uuid):WorldIdString|null;
 
 
   /**

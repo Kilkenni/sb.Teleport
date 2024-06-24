@@ -8,7 +8,8 @@
     "strict": true,
     "noImplicitAny": false,
     "typeRoots": ["node-module/@types", "src/@types"],
-    "outDir": "dist/"
+    "outDir": "dist/",
+    "removeComments": false
   },
   "include": ["src/**/*"],
   "exclude": ["src/@types/**/*"],

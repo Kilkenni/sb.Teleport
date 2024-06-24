@@ -1,8 +1,18 @@
----@diagnostic disable: undefined-global
+--@diagnostic disable: undefined-global
 -- require "/scripts/util.lua"
 -- require "/scripts/vec2.lua"
+--local mel_tp_util = 
+require("/interface/mel_tp/mel_tp_util.lua")
 
-local mel_tp = {bookmarks = nil, bookmarkTemplate = bookmarksList.data, configOverride = nil, selected = nil}
+--local WorldIdToCelestialCoordinate = mel_tp_util.WorldIdToCelestialCoordinate
+
+local mel_tp = {
+  bookmarks = nil,
+  bookmarkTemplate = bookmarksList.data,
+  configOverride = nil,
+  selected = nil,
+  animation = "default"
+}
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configOverride = metagui.inputData
@@ -12,8 +22,32 @@ mel_tp.configOverride = metagui.inputData
     -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     -- "bookmarkName":"Merchant test"}
 
-function OnTpTargetSelect(bookmarkWidget)
+local function OnTpTargetSelect(bookmarkWidget)
   mel_tp.selected = bookmarkWidget.bkmData
+  
+  if(type(mel_tp.selected.warpAction) == "string") then
+    lblBkmName:setText("");
+    lblBkmLocType:setText("Entity signature");
+  else
+    sb.logInfo("[log] "..sb.printJson(mel_tp.selected.warpAction[1]))
+    local warpTarget = mel_tp.selected.warpAction[1];
+    local coord = WorldIdToCelestialCoordinate(warpTarget)
+    if(coord == nil) then
+      lblBkmName:setText("Database Error");
+      lblBkmLocType:setText(world.timeOfDay());
+    else
+      local name = celestial.planetName(coord);
+      local planetParams = celestial.visitableParameters(coord);
+      if(name ~= nil) then
+        lblBkmName:setText(name); 
+      end
+      if(planetParams ~= nil) then
+        lblBkmLocType:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+      end
+      --debug line
+      --sb.logInfo(sb.printJson(planetParams));
+    end
+  end
   lblDump:setText(sb.printJson(bookmarkWidget.bkmData))
 end
 
@@ -139,13 +173,35 @@ function btnDumpTp:onClick()
   --lblDebug:setText(sb.printJson(mel_tp.bookmarks))
   local shipLocation = celestial.shipLocation();
   if(shipLocation[1] == "coordinate") then
-    lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2]))..world.timeOfDay())
-    sb.logInfo("Location is "..sb.printJson(shipLocation[2]))
-    sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
-    sb.logInfo("Planet name is "..sb.printJson(celestial.planetName(shipLocation[2])))
+    if(type(shipLocation[2]) == "string") then
+      lblBkmName:setText("");
+      lblBkmLocType:setText("Entity signature");
+    else
+      sb.logInfo("[log] "..sb.printJson(shipLocation[2]))
+      local warpTarget = shipLocation[2];
+      local coord = WorldIdToCelestialCoordinate(warpTarget)
+      if(coord == nil) then
+        lblBkmName:setText("Database Error");
+        lblBkmLocType:setText(world.timeOfDay());
+      else
+        local name = celestial.planetName(coord);
+        local planetParams = celestial.visitableParameters(coord);
+        if(name ~= nil) then
+          lblBkmName:setText(name); 
+        end
+        if(planetParams ~= nil) then
+          lblBkmLocType:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+        end
+        --debug line
+        --sb.logInfo(sb.printJson(planetParams));
+      end
+    end
+    -- lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2]))..world.timeOfDay())
+    -- sb.logInfo("Location is "..sb.printJson(shipLocation[2]))
+    -- sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
+    -- sb.logInfo("Planet name is "..sb.printJson(celestial.planetName(shipLocation[2])))
   end
 end
-
 
 function btnSortByPlanet:onClick()
   table.sort(mel_tp.data, function(el1, el2) return el1.targetName:upper() < el2.targetName:upper() end)
@@ -157,7 +213,7 @@ function btnTeleport:onClick()
     widget.playSound("/sfx/interface/clickon_error.ogg")
     lblDump.setText("No target selected")
     return
-end
+  end
 
   if(mel_tp.selected == nil) then
     widget.playSound("/sfx/interface/clickon_error.ogg")  
@@ -171,6 +227,6 @@ end
   
   lblDump:setText(warpTarget)
   widget.playSound("/sfx/interface/ship_confirm1.ogg")
-  player.warp(warpTarget, "default")
+  player.warp(warpTarget, mel_tp.animation)
   pane.dismiss()
 end
