@@ -27,14 +27,14 @@ local function OnTpTargetSelect(bookmarkWidget)
   
   if(type(mel_tp.selected.warpAction) == "string") then
     lblBkmName:setText("");
-    lblBkmLocType:setText("Entity signature");
+    lblBkmHazards:setText("Entity signature");
   else
     sb.logInfo("[log] "..sb.printJson(mel_tp.selected.warpAction[1]))
     local warpTarget = mel_tp.selected.warpAction[1];
     local coord = WorldIdToCelestialCoordinate(warpTarget)
     if(coord == nil) then
       lblBkmName:setText("Database Error");
-      lblBkmLocType:setText(world.timeOfDay());
+      lblBkmHazards:setText(world.timeOfDay());
     else
       local name = celestial.planetName(coord);
       local planetParams = celestial.visitableParameters(coord);
@@ -42,7 +42,7 @@ local function OnTpTargetSelect(bookmarkWidget)
         lblBkmName:setText(name); 
       end
       if(planetParams ~= nil) then
-        lblBkmLocType:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+        lblBkmHazards:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
       end
       --debug line
       --sb.logInfo(sb.printJson(planetParams));
@@ -175,14 +175,14 @@ function btnDumpTp:onClick()
   if(shipLocation[1] == "coordinate") then
     if(type(shipLocation[2]) == "string") then
       lblBkmName:setText("");
-      lblBkmLocType:setText("Entity signature");
+      lblBkmHazards:setText("Entity signature");
     else
-      sb.logInfo("[log] "..sb.printJson(shipLocation[2]))
+      sb.logInfo("[log] ship location "..sb.printJson(shipLocation[2]))
       local warpTarget = shipLocation[2];
       local coord = WorldIdToCelestialCoordinate(warpTarget)
       if(coord == nil) then
         lblBkmName:setText("Database Error");
-        lblBkmLocType:setText(world.timeOfDay());
+        lblBkmHazards:setText(world.timeOfDay());
       else
         local name = celestial.planetName(coord);
         local planetParams = celestial.visitableParameters(coord);
@@ -190,7 +190,21 @@ function btnDumpTp:onClick()
           lblBkmName:setText(name); 
         end
         if(planetParams ~= nil) then
-          lblBkmLocType:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+          lblBkmHazards:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+          local config = root.assetJson("/interface/mel_tp/mel_tp.config");
+          -- sb.logInfo(sb.printJson(config.planetaryEnvironmentHazards))
+          -- listHazards:clearChildren();
+          for index, effect in ipairs(planetParams.environmentStatusEffects) do
+            local iconPath = config.planetaryEnvironmentHazards[effect] or config.planetaryEnvironmentHazards.error;
+            local newEffect = {
+              type =  "image",
+              file = iconPath,
+              tooltip = "Effect!",
+              scale = 2,
+              noAutoCrop = true,
+            }
+            listHazards:addChild(newEffect);
+          end
         end
         --debug line
         --sb.logInfo(sb.printJson(planetParams));

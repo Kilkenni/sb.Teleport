@@ -96,9 +96,12 @@ end
 -- @returns CelestialCoordinate or null
 function WorldIdToCelestialCoordinate(target)
   --debug
-  sb.logInfo("[log] Trying to convert to CelestialCoordinate: "..sb.print(target))
+  -- sb.logInfo("[log] Trying to convert to CelestialCoordinate: "..sb.print(target))
   if(target == nil) then
     return nil
+  end
+  if(type(target) == "table") then
+    return target
   end
   if string.sub(target, 1, 1) ~= "C" then
       return nil
@@ -107,7 +110,7 @@ function WorldIdToCelestialCoordinate(target)
   local tempTarget = string.gsub(target, "CelestialWorld:", "")
   local parsedTarget = stringToArray(tempTarget, ":", "number")
   --debug
-  sb.logInfo("[Log] parsed "..sb.printJson(parsedTarget))
+  -- sb.logInfo("[Log] parsed "..sb.printJson(parsedTarget))
   local targetCoordinate = {
       location = {
         parsedTarget[1],
