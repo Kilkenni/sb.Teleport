@@ -2,7 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToCelestialCoordinate } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId } from "./mel_tp_util";
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
@@ -29,13 +29,13 @@ mel_tp.configOverride = metagui.inputData as TeleportConfig;
 */
 function OnTpTargetSelect(bookmarkWidget:any):void {
   mel_tp.selected = bookmarkWidget.bkmData as Destination;
-  if(typeof mel_tp.selected.warpAction === "string") {
+  if(typeof mel_tp.selected.warpActionString === "string") {
     lblBkmName.setText("");
     lblBkmLocType.setText("Entity signature");
   }
   else {
-    const warpTarget = (mel_tp.selected.warpAction as ToWorld).world as CelestialWorldIdString;
-    const coord:CelestialCoordinate|null = WorldIdToCelestialCoordinate(warpTarget)
+    const warpTarget = (mel_tp.selected.warpActionString as ToWorld).world as CelestialWorldIdString;
+    const coord:CelestialCoordinate|null = WorldIdToObject(warpTarget)
     if(coord === null) {
       lblBkmName.setText("");
       lblBkmLocType.setText("");
@@ -130,14 +130,14 @@ function populateBookmarks() {
       if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
         return; //Quest not complete - skip this Destination
       }
-      if(destination.warpAction === WarpAlias.OrbitedWorld) {
+      if(destination.warpActionString === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
         const locationType = getSpaceLocationType(shipLocation);
         if(locationType.toString() !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
         }       
       }
-      if(destination.warpAction.toString() === "OwnShip" && player.worldId() === player.ownShipWorldId()) {
+      if(destination.warpActionString.toString() === "OwnShip" && player.worldId() === player.ownShipWorldId()) {
         return; //If a player is already on their ship - do not offer to warp there even if config lists it
       }
 
@@ -147,10 +147,35 @@ function populateBookmarks() {
       if(destination.icon !== undefined) {
         iconPath =`/interface/bookmarks/icons/${destination.icon}.png`;
       }
+
+      let tempWarp;
+      if (destination.mission === true) {
+        // if the warpAction is for an instance world, set the uuid to the team uuid
+        const warpTarget = WorldIdToObject(destination.warpActionString as WorldIdString);
+        if(warpTarget === null || (warpTarget as CelestialCoordinate).location !== undefined) {
+          return;
+        }
+        //todo tempWarp convert instance to team Uuid
+
+        if (auto warpToWorld = warpAction.ptr<WarpToWorld>()) {
+          if (auto worldId = warpToWorld->world.ptr<InstanceWorldId>())
+            warpAction = WarpToWorld(InstanceWorldId(worldId->instance, m_client->teamUuid(), worldId->level), warpToWorld->target);
+        }
+      }
+
+      /*
+      if (dest.getBool("mission", false)) {
+        // if the warpaction is for an instance world, set the uuid to the team uuid
+        if (auto warpToWorld = warpAction.ptr<WarpToWorld>()) {
+          if (auto worldId = warpToWorld->world.ptr<InstanceWorldId>())
+            warpAction = WarpToWorld(InstanceWorldId(worldId->instance, m_client->teamUuid(), worldId->level), warpToWorld->target);
+        }
+      }
+      */
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
-        warpAction: destination.warpAction, //warp coords or command
+        warpActionString: tempWarp || destination.warpAction, //warp coords or command
         name: destination.name || "???", //default: ???
         planetName: destination.planetName || "", //default: empty string
         icon: iconPath, //default: no icon

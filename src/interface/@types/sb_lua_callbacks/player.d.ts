@@ -47,9 +47,9 @@ declare module player {
 
   /**
    * Immediately warps the player to the specified warp target, optionally using the specified warp animation and deployment. 
-   * @param warpAction 
-   * @param animation Use "default" to get default teleport animation
+   * @param warpActionString
+   * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation
    * @param deploy Whether to deploy player mech
    */
-  function warp(warpAction: string, animation?: string, deploy?: boolean):void;
+  function warp(warpActionString: string, animation?: string, deploy?: boolean):void;
 }

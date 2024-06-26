@@ -60,22 +60,46 @@ function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType
  * @param target Can parse only CelestialWorld
  * @returns CelestialCoordinate or null
  */
-function WorldIdToCelestialCoordinate(target:CelestialWorldIdString):CelestialCoordinate|null {
-  if(target.charAt(0) !== "C") {
+function WorldIdToObject(target:WorldIdString):CelestialCoordinate|InstanceWorldId|null {
+  if(target.charAt(0) !== "C" && target.charAt(0) !== "I") {
     return null;
   }
-  const tempTarget = target.substring("CelestialWorld:".length);
-  const parsedTarget = tempTarget.split(":");
-  const targetCoordinate:CelestialCoordinate = {
+  if(target.charAt(0) === "C") {
+    const tempTarget = target.substring("CelestialWorld:".length);
+    const parsedTarget = tempTarget.split(":");
+    const targetCoordinate:CelestialCoordinate = {
     location: [parseInt(parsedTarget[0]) as int, parseInt(parsedTarget[1]) as int, parseInt(parsedTarget[2]) as int],
     planet: parseInt(parsedTarget[3]) as int,
     satellite: parseInt(parsedTarget[4]) as int,
+    }
+    return targetCoordinate;
   }
-  return targetCoordinate;
+  else {
+    const tempTarget = target.substring("InstanceWorld:".length);
+    const parsedTarget = tempTarget.split(":");
+    const targetInstance:InstanceWorldId = {
+      instance: parsedTarget[0],
+      uuid: parsedTarget[1] || "-",
+      level: parseFloat(parsedTarget[2]) as float || "-"
+    }
+    return targetInstance;
+  } 
+}
+
+function ObjectToWorldId(target:CelestialCoordinate|InstanceWorldId):WorldIdString {
+  if((target as CelestialCoordinate).location !== null) {
+    const targetCoord = target as CelestialCoordinate;
+    return `CelestialWorld:${Object.values(targetCoord).join(":")}` as WorldIdString;
+  }
+  else {
+    const targetInstance = target as InstanceWorldId;
+    return `InstanceWorld:${Object.values(targetInstance).join(":")}` as WorldIdString;
+  }
 }
 
 export {
   sortArrayByProperty,
   getSpaceLocationType,
-  WorldIdToCelestialCoordinate,
+  WorldIdToObject,
+  ObjectToWorldId
 }
