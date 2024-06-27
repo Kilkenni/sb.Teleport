@@ -1,3 +1,5 @@
+import {Destination} from "./mel_tpdialog"
+
 /**
  * Sorts array by certain property
  * @param array Array of similar objects containing properties with string keys
@@ -57,7 +59,7 @@ function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType
 
 /**
  * Returns stringified CelestialCoordinate back into object
- * @param target Can parse only CelestialWorld
+ * @param target Can parse CelestialWorld or InstanceWorld
  * @returns CelestialCoordinate or null
  */
 function WorldIdToObject(target:WorldIdString):CelestialCoordinate|InstanceWorldId|null {
@@ -86,6 +88,11 @@ function WorldIdToObject(target:WorldIdString):CelestialCoordinate|InstanceWorld
   } 
 }
 
+/**
+ * Flattens Coordinate/WorldId into string
+ * @param target 
+ * @returns 
+ */
 function ObjectToWorldId(target:CelestialCoordinate|InstanceWorldId):WorldIdString {
   if((target as CelestialCoordinate).location !== null) {
     const targetCoord = target as CelestialCoordinate;
@@ -97,9 +104,50 @@ function ObjectToWorldId(target:CelestialCoordinate|InstanceWorldId):WorldIdStri
   }
 }
 
+function WorldIdFullToString(target: BookmarkTarget):WarpToWorld {
+  return sb.printJson(target as unknown as JSON) as WarpToWorld;
+}
+
+function parseWorldIdFull(target: WarpToWorld): BookmarkTarget {
+  const trimBrackets = target.substring(1, target.length - 1);
+  return trimBrackets.split(",") as BookmarkTarget;
+}
+
+function IsBookmarkInstance(target:BookmarkTarget):boolean {
+  return target[0].includes("InstanceWorld");
+}
+
+function JsonToDestination(destJson: JsonDestination):Destination {
+  let warpTarget:BookmarkTarget|WarpAlias;
+  if((destJson.warpAction as string).includes("InstanceWorld") === false) {
+    warpTarget = destJson.warpAction as WarpAlias;
+  }
+  else {
+    const tempTarget = destJson.warpAction as InstanceWorldIdStringWithUuid;
+    if(tempTarget.includes("=") === false) {
+      warpTarget = [tempTarget as InstanceWorldIdString, undefined] as BookmarkTarget;
+    }
+    else {
+      warpTarget = tempTarget.split("=") as BookmarkTarget; //let's hope no configs use = as actual part of the name
+    }
+  }
+
+  return {
+    name : destJson.name,
+    planetName : destJson.planetName, //equivalent of Bookmark.targetName. Default: "???"
+    warpAction : warpTarget, //equivalent of Bookmark.target.
+    icon : destJson.icon, //equivalent of Bookmark.icon
+    deploy : destJson.deploy, //Deploy mech. Default: false
+    mission : destJson.mission, //Default: false
+    prerequisiteQuest : destJson.prerequisiteQuest, //if the player has not completed the quest, destination is not available
+  }
+}
+
 export {
   sortArrayByProperty,
   getSpaceLocationType,
   WorldIdToObject,
-  ObjectToWorldId
+  ObjectToWorldId,
+  parseWorldIdFull,
+  JsonToDestination
 }

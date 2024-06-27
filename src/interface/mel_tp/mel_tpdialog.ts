@@ -2,7 +2,17 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination } from "./mel_tp_util";
+
+export interface Destination {
+  name : string, //equivalent of Bookmark.bookmarkName. Default: ""
+  planetName : string, //equivalent of Bookmark.targetName. Default: "???"
+  warpAction : WarpAction, //equivalent of Bookmark.target.
+  icon : string, //equivalent of Bookmark.icon
+  deploy? : boolean, //Deploy mech. Default: false
+  mission? : boolean, //Default: false
+  prerequisiteQuest? : any, //if the player has not completed the quest, destination is not available
+}
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
@@ -29,28 +39,49 @@ mel_tp.configOverride = metagui.inputData as TeleportConfig;
 */
 function OnTpTargetSelect(bookmarkWidget:any):void {
   mel_tp.selected = bookmarkWidget.bkmData as Destination;
-  if(typeof mel_tp.selected.warpActionString === "string") {
+  if(typeof mel_tp.selected.warpAction === "string") {
+    lblBkmName.setText("");
+    lblBkmLocType.setText("System signature");
+  }
+  else if((mel_tp.selected.warpAction as ToPlayer)[0] === "player") {
+    lblBkmName.setText("");
+    lblBkmLocType.setText("Player signature");
+  }
+  else if((mel_tp.selected.warpAction as ToUuid)[0] === "object" ) {
     lblBkmName.setText("");
     lblBkmLocType.setText("Entity signature");
   }
   else {
-    const warpTarget = (mel_tp.selected.warpActionString as ToWorld).world as CelestialWorldIdString;
-    const coord:CelestialCoordinate|null = WorldIdToObject(warpTarget)
+    const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
+    const coord:CelestialCoordinate|InstanceWorldId|null = WorldIdToObject(warpTarget)
     if(coord === null) {
       lblBkmName.setText("");
       lblBkmLocType.setText("");
     }
     else {
-      const name = celestial.planetName(coord);
-      const planetParams = celestial.visitableParameters(coord);
-      if(name !== null) {
-        lblBkmName.setText(name);
+      if((coord as CelestialCoordinate).location) {
+        //TypeGuard: coord is a CelestialCoordinate
+        const name = celestial.planetName(coord as CelestialCoordinate);
+        const planetParams = celestial.visitableParameters(coord as CelestialCoordinate);
+        if(name !== null) {
+          lblBkmName.setText(name);
+        }
+        if(planetParams !== null) {
+          lblBkmLocType.setText(planetParams.typeName);
+        }
+        //debug line
+        sb.logInfo(sb.printJson(planetParams as unknown as JSON));
       }
-      if(planetParams !== null) {
-        lblBkmLocType.setText(planetParams.typeName);
-      }
-      //debug line
-      sb.logInfo(sb.printJson(planetParams as unknown as JSON));
+      else {
+        //coord is an InstanceWorldId
+        const instanceId = coord as InstanceWorldId;
+        if(instanceId.instance !== null) {
+          lblBkmName.setText(instanceId.instance);
+        }
+        if(instanceId.level !== "-") {
+          lblBkmLocType.setText("Level ${instanceId.level}");
+        }
+      }      
     }
   }
   
@@ -91,7 +122,7 @@ function populateBookmarks() {
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
-        warpAction: bookmark.target as ToWorld, //warp coords or command
+        warpAction: bookmark.target as BookmarkTarget, //warp coords or command
         name: bookmark.bookmarkName || "???", //default: ???
         planetName: bookmark.targetName || "", //default: empty string
         icon: iconPath, //default: no icon
@@ -125,19 +156,20 @@ function populateBookmarks() {
 
   //process additional locations from override config
   if(finalTpConfig.destinations !== undefined) {
-    finalTpConfig.destinations.forEach((destination:Destination, index:number):void => {
+    finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
+      const destination:Destination = JsonToDestination(dest);
       if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
         return; //Quest not complete - skip this Destination
       }
-      if(destination.warpActionString === WarpAlias.OrbitedWorld) {
+      if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
         const locationType = getSpaceLocationType(shipLocation);
         if(locationType.toString() !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
         }       
       }
-      if(destination.warpActionString.toString() === "OwnShip" && player.worldId() === player.ownShipWorldId()) {
+      if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
         return; //If a player is already on their ship - do not offer to warp there even if config lists it
       }
 
@@ -148,18 +180,14 @@ function populateBookmarks() {
         iconPath =`/interface/bookmarks/icons/${destination.icon}.png`;
       }
 
-      let tempWarp;
-      if (destination.mission === true) {
+      if (destination.mission === true && typeof destination.warpAction !== "string") {
         // if the warpAction is for an instance world, set the uuid to the team uuid
-        const warpTarget = WorldIdToObject(destination.warpActionString as WorldIdString);
-        if(warpTarget === null || (warpTarget as CelestialCoordinate).location !== undefined) {
-          return;
-        }
-        //todo tempWarp convert instance to team Uuid
-
-        if (auto warpToWorld = warpAction.ptr<WarpToWorld>()) {
-          if (auto worldId = warpToWorld->world.ptr<InstanceWorldId>())
-            warpAction = WarpToWorld(InstanceWorldId(worldId->instance, m_client->teamUuid(), worldId->level), warpToWorld->target);
+        //we assume it is BookmarkTarget since Json configs can't teleport to dynamic objects or players, and it's not Alias
+        const warpAction = destination.warpAction as BookmarkTarget;
+        if(warpAction[0].includes("InstanceWorld")) {
+          //we have InstanceWorld here folks
+          const teamUuid:Uuid = ""; //TODO Fix this! We need to insert Team Uuid here
+          destination.warpAction = [warpAction[0], teamUuid] as BookmarkTarget;
         }
       }
 
@@ -175,7 +203,7 @@ function populateBookmarks() {
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
-        warpActionString: tempWarp || destination.warpAction, //warp coords or command
+        warpAction: destination.warpAction, //warp coords or command
         name: destination.name || "???", //default: ???
         planetName: destination.planetName || "", //default: empty string
         icon: iconPath, //default: no icon

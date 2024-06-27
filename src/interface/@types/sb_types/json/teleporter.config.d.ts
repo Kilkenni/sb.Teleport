@@ -7,10 +7,15 @@
 
 // declare type WarpToPlayer = `Player:${Uuid}`;
 
-declare interface Destination {
+//Uuid = teleporter Id or name (for named teleporters)
+
+type InstanceWorldIdStringWithUuid = `${InstanceWorldIdString}=${Uuid}` | InstanceWorldIdString
+type warpActionJson = InstanceWorldIdStringWithUuid | WarpAlias
+
+declare interface JsonDestination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
   planetName : string, //equivalent of Bookmark.targetName. Default: "???"
-  warpActionString : WarpAlias|WarpToPlayer|WarpToWorld, //equivalent of Bookmark.target.
+  warpAction : warpActionJson, //equivalent of Bookmark.target.
   icon : string, //equivalent of Bookmark.icon
   deploy? : boolean, //Deploy mech. Default: false
   mission? : boolean, //Default: false
@@ -22,7 +27,7 @@ declare interface TeleportConfig  {
   canTeleport? : boolean, //default: true.
   includePartyMembers? : boolean, //default: false
   includePlayerBookmarks? : boolean, //Default: false
-  destinations : Destination[]|undefined, //array of additional destinations
+  destinations : JsonDestination[]|undefined, //array of additional destinations
 }
 
 // export type {

@@ -56,7 +56,7 @@ interface InstanceWorldId {
 type ClientShipWorldId = Uuid
 
 type CelestialWorldIdString = `CelestialWorld:${CelestialCoordinate["location"][0]}:${CelestialCoordinate["location"][1]}:${CelestialCoordinate["location"][2]}:${CelestialCoordinate["planet"]}:${CelestialCoordinate["satellite"]}` //3 coords, planet, satellite
-type InstanceWorldIdString = `InstanceWorld:${InstanceWorldId["instance"]}:${InstanceWorldId["uuid"]}:${InstanceWorldId["level"]}`
+type InstanceWorldIdString = `InstanceWorld:${InstanceWorldId["instance"]}:${InstanceWorldId["uuid"]}:${InstanceWorldId["level"]}` | `InstanceWorld:${InstanceWorldId["instance"]}`
 
 
 declare type WorldIdString = CelestialWorldIdString|InstanceWorldIdString
@@ -65,7 +65,7 @@ type SpawnTargetUniqueEntity = string
 type SpawnTargetPosition = `[${string}, ${string}]` //string from Vec2F
 type SpawnTargetX = string //string(number)
 
-declare type SpawnTarget = SpawnTargetUniqueEntity|SpawnTargetPosition|SpawnTargetX
+declare type SpawnTarget = SpawnTargetUniqueEntity|SpawnTargetPosition|SpawnTargetX|undefined
 
 declare enum WarpAlias {
   "Return", //returns to previous location (unclear)
@@ -73,23 +73,25 @@ declare enum WarpAlias {
   "OwnShip"
 }
 
-type ToWorld = {
-  world:WorldIdString,
-  target:SpawnTarget,
-}
+declare type BookmarkTarget = [
+  WorldIdString,
+  SpawnTarget,
+]
 
 type ToPlayer = ["player", Uuid]
 type ToUuid = [ "object", Uuid ]
 
 
 declare type WarpToPlayer = `Player:${Uuid}`
-declare type WarpToWorld = `[${ToWorld["world"]}, ${ToWorld["target"]|"-"}]`
+declare type WarpToWorld = `[${BookmarkTarget[0]}, ${BookmarkTarget[1]|"-"}]`
 //Instance worlds typically have named WorldID and SpawnTarget
-declare type WarpToInstance = `[${ToWorld["world"]}, ${ToWorld["target"]|"-"}]`
+declare type WarpToInstance = WarpToWorld
 
 type WarpToShipWorldId = `ClientShipWorld:${Uuid}`
 
-declare type WarpAction = ToWorld|ToUuid|ToPlayer|WarpAlias;
+declare type WarpAction = WarpAlias|ToUuid|ToPlayer|BookmarkTarget;
+
+type WarpActionString = WarpAlias|WarpToPlayer|WarpToWorld
 
 // declare type CelestialCoordinateJson_no
 
