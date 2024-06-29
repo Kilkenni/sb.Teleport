@@ -2,7 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
 
 export interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
@@ -41,15 +41,15 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
   mel_tp.selected = bookmarkWidget.bkmData as Destination;
   if(typeof mel_tp.selected.warpAction === "string") {
     lblBkmName.setText("");
-    lblBkmLocType.setText("System signature");
+    lblBkmLocType.setText("Special system alias signature");
   }
-  else if((mel_tp.selected.warpAction as ToPlayer)[0] === "player") {
+  else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
     lblBkmName.setText("");
     lblBkmLocType.setText("Player signature");
   }
-  else if((mel_tp.selected.warpAction as ToUuid)[0] === "object" ) {
+  else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
     lblBkmName.setText("");
-    lblBkmLocType.setText("Entity signature");
+    lblBkmLocType.setText("Object Uuid signature");
   }
   else {
     const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
@@ -59,7 +59,7 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
       lblBkmLocType.setText("");
     }
     else {
-      if((coord as CelestialCoordinate).location) {
+      if((coord as CelestialCoordinate).location === undefined) {
         //TypeGuard: coord is a CelestialCoordinate
         const name = celestial.planetName(coord as CelestialCoordinate);
         const planetParams = celestial.visitableParameters(coord as CelestialCoordinate);
@@ -181,7 +181,7 @@ function populateBookmarks() {
       }
 
       if (destination.mission === true && typeof destination.warpAction !== "string") {
-        // if the warpAction is for an instance world, set the uuid to the team uuid
+        // if the warpAction is for an instance world, set the uuid to the team uuid -- or so the source code claims
         //we assume it is BookmarkTarget since Json configs can't teleport to dynamic objects or players, and it's not Alias
         const warpAction = destination.warpAction as BookmarkTarget;
         if(warpAction[0].includes("InstanceWorld")) {
@@ -372,16 +372,21 @@ btnTeleport.onClick = function() {
     lblDump.setText("No target selected")
     return
   }
-  const tempWarpTarget = mel_tp.selected.warpAction;
-  let warpTarget:string;
-  if(typeof tempWarpTarget !== "string"){
-    warpTarget = mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : "");
-  }
-  else {
-    warpTarget = tempWarpTarget;
-  }
+  // let tempWarpTarget:WarpAction = mel_tp.selected.warpAction;
+  const warpTarget:string = TargetToWarpCommand(mel_tp.selected.warpAction)
+  // if(typeof tempWarpTarget === "string"){
+  //   //WarpAction is a WarpAlias
+  //   warpTarget = tempWarpTarget;
+  // }
+  // else {
+  //   //WarpAction is an array
+  //   // const [target, spawn] = tempWarpTarget as BookmarkTarget|PlayerTarget|UuidTarget;
+    
+  //   // warpTarget = mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : "");
+  //   warpTarget = TargetToWarpCommand(tempWarpTarget as (PlayerTarget|UuidTarget|BookmarkTarget));
+  // }
 
-  lblDump.setText(warpTarget);
+  lblDump.setText(`Stringified warp target: ${warpTarget}`);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
   pane.dismiss();

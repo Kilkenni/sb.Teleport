@@ -1,0 +1,188 @@
+--[[local ____lualib = --]] require("/interface/mel_tp/lualib_bundle.lua")
+-- local __TS__ArraySort = ____lualib.__TS__ArraySort
+-- local __TS__TypeOf = ____lualib.__TS__TypeOf
+-- local __TS__StringSubstring = ____lualib.__TS__StringSubstring
+-- local __TS__StringSplit = ____lualib.__TS__StringSplit
+-- local __TS__ParseInt = ____lualib.__TS__ParseInt
+-- local __TS__ParseFloat = ____lualib.__TS__ParseFloat
+-- local __TS__ObjectValues = ____lualib.__TS__ObjectValues
+-- local __TS__ArrayJoin = ____lualib.__TS__ArrayJoin
+-- local __TS__StringIncludes = ____lualib.__TS__StringIncludes
+local ____exports = {}
+--- Sorts array by certain property
+-- 
+-- @param array Array of similar objects containing properties with string keys
+-- @param propertyName Key to sort objects
+-- @param descending If true, sort in descending alphabet order. If false, sort in ascending order.
+-- @returns
+local function sortArrayByProperty(self, array, propertyName, descending)
+    if descending == nil then
+        descending = false
+    end
+    if array == nil then
+        return array
+    end
+    local sortedArray = {table.unpack(array)}
+    if sortedArray[1][propertyName] == nil then
+        return sortedArray
+    end
+    if descending == false then
+        sortedArray = __TS__ArraySort(
+            sortedArray,
+            function(____, elem1, elem2)
+                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and -1 or 1
+            end
+        )
+    else
+        sortedArray = __TS__ArraySort(
+            sortedArray,
+            function(____, elem1, elem2)
+                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and 1 or -1
+            end
+        )
+    end
+    return sortedArray
+end
+
+local SystemLocationType = SystemLocationType or ({})
+SystemLocationType.null = 0
+SystemLocationType[SystemLocationType.null] = "null"
+SystemLocationType.CelestialCoordinate = 1
+SystemLocationType[SystemLocationType.CelestialCoordinate] = "CelestialCoordinate"
+SystemLocationType.CelestialOrbit = 2
+SystemLocationType[SystemLocationType.CelestialOrbit] = "CelestialOrbit"
+SystemLocationType.Space = 3
+SystemLocationType[SystemLocationType.Space] = "Space"
+SystemLocationType.FloatingDungeon = 4
+SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
+
+local function getSpaceLocationType(self, destination)
+    if destination == nil then
+        return SystemLocationType.null
+    end
+    if type(destination[1]) == "string" then
+        if destination[1] == "object" then
+            return SystemLocationType.FloatingDungeon
+        end
+        if destination[1] == "orbit" then
+            return SystemLocationType.CelestialOrbit
+        end
+        if destination[1] == "coordinate" then
+            return SystemLocationType.CelestialCoordinate
+        end
+        sb:logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
+        return SystemLocationType.null
+    end
+    if __TS__TypeOf(destination[1]) == __TS__TypeOf(destination[2]) then
+        return SystemLocationType.Space
+    end
+    sb:logError(
+        "GetSpaceLocationType: can't identify location type: %s",
+        {sb:printJson(destination)}
+    )
+    return SystemLocationType.null
+end
+--- Returns stringified CelestialCoordinate back into object
+-- 
+-- @param target Can parse CelestialWorld or InstanceWorld
+-- @returns CelestialCoordinate or null
+local function WorldIdToObject(self, target)
+    if string.sub(target, 1, 1) ~= "C" and string.sub(target, 1, 1) ~= "I" then
+        return nil
+    end
+    if string.sub(target, 1, 1) == "C" then
+        local tempTarget = __TS__StringSubstring(target, #"CelestialWorld:")
+        local parsedTarget = __TS__StringSplit(tempTarget, ":")
+        local targetCoordinate = {
+            location = {
+                __TS__ParseInt(parsedTarget[1]),
+                __TS__ParseInt(parsedTarget[2]),
+                __TS__ParseInt(parsedTarget[3])
+            },
+            planet = __TS__ParseInt(parsedTarget[4]),
+            satellite = __TS__ParseInt(parsedTarget[5])
+        }
+        return targetCoordinate
+    else
+        local tempTarget = __TS__StringSubstring(target, #"InstanceWorld:")
+        local parsedTarget = __TS__StringSplit(tempTarget, ":")
+        local targetInstance = {
+            instance = parsedTarget[1],
+            uuid = parsedTarget[2] or "-",
+            level = __TS__ParseFloat(parsedTarget[3]) or "-"
+        }
+        return targetInstance
+    end
+end
+--- Flattens Coordinate/WorldId into string
+-- 
+-- @param target
+-- @returns
+local function ObjectToWorldId(self, target)
+    if target.location ~= nil then
+        local targetCoord = target
+        return "CelestialWorld:" .. __TS__ArrayJoin(
+            __TS__ObjectValues(targetCoord),
+            ":"
+        )
+    else
+        local targetInstance = target
+        return "InstanceWorld:" .. __TS__ArrayJoin(
+            __TS__ObjectValues(targetInstance),
+            ":"
+        )
+    end
+end
+local function WorldIdFullToString(self, target)
+    return sb:printJson(target)
+end
+local function parseWorldIdFull(self, target)
+    local trimBrackets = __TS__StringSubstring(target, 1, #target - 1)
+    return __TS__StringSplit(trimBrackets, ",")
+end
+local function IsBookmarkInstance(self, target)
+    return __TS__StringIncludes(target[1], "InstanceWorld")
+end
+local function JsonToDestination(self, destJson)
+    local warpTarget
+    if __TS__StringIncludes(destJson.warpAction, "InstanceWorld") == false then
+        warpTarget = destJson.warpAction
+    else
+        local tempTarget = destJson.warpAction
+        if __TS__StringIncludes(tempTarget, "=") == false then
+            warpTarget = {tempTarget, nil}
+        else
+            warpTarget = __TS__StringSplit(tempTarget, "=")
+        end
+    end
+    return {
+        name = destJson.name,
+        planetName = destJson.planetName,
+        warpAction = warpTarget,
+        icon = destJson.icon,
+        deploy = destJson.deploy,
+        mission = destJson.mission,
+        prerequisiteQuest = destJson.prerequisiteQuest
+    }
+end
+local function TargetToWarpCommand(self, target)
+    if type(target) == "string" then
+        return target
+    end
+    if target[1] == "player" then
+        return "Player:" .. target[2]
+    end
+    if target[1] == "object" then
+        return "Player:" .. target[2]
+    else
+        return ((("[" .. tostring(target[1])) .. ", ") .. tostring(target[2])) .. "]"
+    end
+end
+____exports.sortArrayByProperty = sortArrayByProperty
+____exports.getSpaceLocationType = getSpaceLocationType
+____exports.WorldIdToObject = WorldIdToObject
+____exports.ObjectToWorldId = ObjectToWorldId
+____exports.parseWorldIdFull = parseWorldIdFull
+____exports.JsonToDestination = JsonToDestination
+____exports.TargetToWarpCommand = TargetToWarpCommand
+return ____exports

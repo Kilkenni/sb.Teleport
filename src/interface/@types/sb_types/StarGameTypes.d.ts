@@ -78,8 +78,8 @@ declare type BookmarkTarget = [
   SpawnTarget,
 ]
 
-type ToPlayer = ["player", Uuid]
-type ToUuid = [ "object", Uuid ]
+declare type PlayerTarget = ["player", Uuid]
+declare type UuidTarget = [ "object", Uuid ]
 
 
 declare type WarpToPlayer = `Player:${Uuid}`
@@ -89,7 +89,7 @@ declare type WarpToInstance = WarpToWorld
 
 type WarpToShipWorldId = `ClientShipWorld:${Uuid}`
 
-declare type WarpAction = WarpAlias|ToUuid|ToPlayer|BookmarkTarget;
+declare type WarpAction = WarpAlias|UuidTarget|PlayerTarget|BookmarkTarget;
 
 type WarpActionString = WarpAlias|WarpToPlayer|WarpToWorld
 

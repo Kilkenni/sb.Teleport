@@ -143,11 +143,28 @@ function JsonToDestination(destJson: JsonDestination):Destination {
   }
 }
 
+function TargetToWarpCommand(target: WarpAction):WarpToPlayer|WarpToInstance|WarpToWorld|string {
+  if(typeof target === "string") {
+    //WarpAlias
+    return target as string;
+  }
+  if(target[0] === "player") {
+    return `Player:${target[1] as Uuid}`;
+  }
+  if(target[0] === "object") {
+    return `Player:${target[1] as Uuid}`; //FIXME
+  }
+  else {
+    return `[${target[0]}, ${target[1]}]`
+  }
+}
+
 export {
   sortArrayByProperty,
   getSpaceLocationType,
   WorldIdToObject,
   ObjectToWorldId,
   parseWorldIdFull,
-  JsonToDestination
+  JsonToDestination,
+  TargetToWarpCommand
 }

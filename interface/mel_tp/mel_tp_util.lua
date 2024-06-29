@@ -33,6 +33,7 @@ local function sortArrayByProperty(self, array, propertyName, descending)
     end
     return sortedArray
 end
+
 local SystemLocationType = SystemLocationType or ({})
 SystemLocationType.null = 0
 SystemLocationType[SystemLocationType.null] = "null"
@@ -44,6 +45,7 @@ SystemLocationType.Space = 3
 SystemLocationType[SystemLocationType.Space] = "Space"
 SystemLocationType.FloatingDungeon = 4
 SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
+
 local function getSpaceLocationType(self, destination)
     if destination == nil then
         return SystemLocationType.null
@@ -83,18 +85,29 @@ local function stringToArray(inputString, separator, elemType)
       table.insert(outputArray, tonumber(str));
     
     else
-    --if(elemType == "string" or elemType == nil)
-    table.insert(outputArray, str)
+      --if(elemType == "string" or elemType == nil)
+      table.insert(outputArray, str)
     end
   end
   return outputArray
 end
 
+local function arrayToString(inputArray, separator)
+  local outputString = ""
+  for index, element in ipairs(inputArray) do
+    outputString = outputString..tostring(element)
+    if(index ~= #inputArray) then
+      outputString = outputString..":"
+    end
+  end
+  return outputString
+end
+
 --- Returns stringified CelestialCoordinate back into object
 -- 
--- @param target Can parse only CelestialWorld
+-- @param target Can parse CelestialWorld or InstanceWorld
 -- @returns CelestialCoordinate or null
-function WorldIdToCelestialCoordinate(target)
+function WorldIdToObject(target)
   --debug
   -- sb.logInfo("[log] Trying to convert to CelestialCoordinate: "..sb.print(target))
   if(target == nil) then
@@ -103,26 +116,68 @@ function WorldIdToCelestialCoordinate(target)
   if(type(target) == "table") then
     return target
   end
-  if string.sub(target, 1, 1) ~= "C" then
+  if string.sub(target, 1, 1) ~= "C" and string.sub(target, 1, 1) ~= "I" then
       return nil
   end
-  
-  local tempTarget = string.gsub(target, "CelestialWorld:", "")
-  local parsedTarget = stringToArray(tempTarget, ":", "number")
-  --debug
+
+  if string.sub(target, 1, 1) == "C" then
+    local tempTarget = string.gsub(target, "CelestialWorld:", "")
+    local parsedTarget = stringToArray(tempTarget, ":", "number")
+    --debug
   -- sb.logInfo("[Log] parsed "..sb.printJson(parsedTarget))
-  local targetCoordinate = {
-      location = {
-        parsedTarget[1],
-        parsedTarget[2],
-        parsedTarget[3],
-      },
-      planet = parsedTarget[4],
-      satellite = parsedTarget[5],
-  }
-  return targetCoordinate
+    local targetCoordinate = {
+        location = {
+          parsedTarget[1],
+          parsedTarget[2],
+          parsedTarget[3],
+        },
+        planet = parsedTarget[4],
+        satellite = parsedTarget[5]
+    }
+    return targetCoordinate
+  else
+    local tempTarget = string.gsub(target, "InstanceWorld:", "")
+    local parsedTarget = stringToArray(tempTarget, ":", "string")
+    local targetInstance = {
+        instance = parsedTarget[1],
+        uuid = parsedTarget[2] or "-",
+        level = tonumber(parsedTarget[3]) or "-"
+    }
+    return targetInstance
+  end
 end
+
+--- Flattens Coordinate/WorldId into string
+-- 
+-- @param target
+-- @returns
+local function ObjectToWorldId(target)
+    if target.location ~= nil then
+      --CelestialCoordinate
+        local targetCoord = target
+        return "CelestialWorld:" .. arrayToString(
+            target.location,
+            ":"
+        )..":"..(target.planet or 0)..":"..(target.satellite or 0)
+    else
+      --InstanceWorld
+        local targetInstance = target
+        return "InstanceWorld:" ..target.instance..":"..(target.uuid or "-")..":"..(target.level or "-")
+    end
+end
+
+local function WorldIdFullToString(target)
+  return sb.printJson(target)
+end
+
+local function parseWorldIdFull(target)
+  local trimBrackets = string.sub(target, 2, -2)
+  return stringToArray(trimBrackets, ",")
+end
+
+
 -- ____exports.sortArrayByProperty = sortArrayByProperty
 -- ____exports.getSpaceLocationType = getSpaceLocationType
-____exports.WorldIdToCelestialCoordinate = WorldIdToCelestialCoordinate
+____exports.WorldIdToObject = WorldIdToObject
+____exports.ObjectToWorldId = ObjectToWorldId
 return ____exports
