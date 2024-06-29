@@ -18,6 +18,7 @@ local mel_tp = {
 mel_tp.bookmarks = player:teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configOverride = metagui.inputData
+
 local function OnTpTargetSelect(self, bookmarkWidget)
     mel_tp.selected = bookmarkWidget.bkmData
     if type(mel_tp.selected.warpAction) == "string" then
@@ -59,6 +60,7 @@ local function OnTpTargetSelect(self, bookmarkWidget)
     end
     lblDump:setText(sb:printJson(bookmarkWidget.bkmData))
 end
+
 local function populateBookmarks(self)
     bookmarksList:clearChildren()
     local ____opt_0 = mel_tp.configOverride

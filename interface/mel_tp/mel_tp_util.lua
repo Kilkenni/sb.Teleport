@@ -46,31 +46,31 @@ SystemLocationType[SystemLocationType.Space] = "Space"
 SystemLocationType.FloatingDungeon = 4
 SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
 
-local function getSpaceLocationType(self, destination)
-    if destination == nil then
-        return SystemLocationType.null
-    end
-    if type(destination[1]) == "string" then
-        if destination[1] == "object" then
-            return SystemLocationType.FloatingDungeon
-        end
-        if destination[1] == "orbit" then
-            return SystemLocationType.CelestialOrbit
-        end
-        if destination[1] == "coordinate" then
-            return SystemLocationType.CelestialCoordinate
-        end
-        sb:logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
-        return SystemLocationType.null
-    end
-    if __TS__TypeOf(destination[1]) == __TS__TypeOf(destination[2]) then
-        return SystemLocationType.Space
-    end
-    sb:logError(
-        "GetSpaceLocationType: can't identify location type: %s",
-        {sb:printJson(destination)}
-    )
+local function getSpaceLocationType(destination)
+  if destination == nil then
     return SystemLocationType.null
+  end
+  if type(destination[1]) == "string" then
+    if destination[1] == "object" then
+      return SystemLocationType.FloatingDungeon
+    end
+    if destination[1] == "orbit" then
+      return SystemLocationType.CelestialOrbit
+    end
+    if destination[1] == "coordinate" then
+      return SystemLocationType.CelestialCoordinate
+    end
+    sb.logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
+    return SystemLocationType.null
+  end
+  if type (destination[1]) == type(destination[2]) then
+    return SystemLocationType.Space
+  end
+  sb.logError(
+    "GetSpaceLocationType: can't identify location type: %s",
+    {sb.printJson(destination)}
+  )
+  return SystemLocationType.null
 end
 
 local function stringToArray(inputString, separator, elemType)
@@ -175,9 +175,59 @@ local function parseWorldIdFull(target)
   return stringToArray(trimBrackets, ",")
 end
 
+--TODO test
+local function IsBookmarkInstance(target)
+  if string.find(target[1], "InstanceWorld") ~= nil then
+    return true
+  else
+    return false
+  end
+end
+
+local function JsonToDestination(destJson)
+  local warpTarget
+  if string.find(destJson.warpAction, "InstanceWorld") == nil then
+    --WarpAlias
+    warpTarget = destJson.warpAction
+  else
+    local tempTarget = destJson.warpAction
+    if string.find(tempTarget, "=") == nil then
+      warpTarget = {tempTarget, nil}
+    else
+      warpTarget = arrayToString(tempTarget, "=")
+    end
+  end
+  return {
+      name = destJson.name,
+      planetName = destJson.planetName,
+      warpAction = warpTarget,
+      icon = destJson.icon,
+      deploy = destJson.deploy,
+      mission = destJson.mission,
+      prerequisiteQuest = destJson.prerequisiteQuest
+  }
+end
+
+local function TargetToWarpCommand(target)
+  if type(target) == "string" then
+    --WarpAlias
+      return target
+  end
+  if target[1] == "player" then
+      return "Player:" .. target[2]
+  end
+  if target[1] == "object" then
+      return "Player:" .. target[2]  --FIXME
+  else
+      return ((("[" .. tostring(target[1])) .. ", ") .. tostring(target[2])) .. "]"
+  end
+end
+
 
 -- ____exports.sortArrayByProperty = sortArrayByProperty
--- ____exports.getSpaceLocationType = getSpaceLocationType
+____exports.getSpaceLocationType = getSpaceLocationType
 ____exports.WorldIdToObject = WorldIdToObject
 ____exports.ObjectToWorldId = ObjectToWorldId
+____exports.JsonToDestination = JsonToDestination
+____exports.TargetToWarpCommand = TargetToWarpCommand
 return ____exports

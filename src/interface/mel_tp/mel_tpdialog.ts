@@ -59,7 +59,7 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
       lblBkmLocType.setText("");
     }
     else {
-      if((coord as CelestialCoordinate).location === undefined) {
+      if((coord as CelestialCoordinate).location !== undefined) {
         //TypeGuard: coord is a CelestialCoordinate
         const name = celestial.planetName(coord as CelestialCoordinate);
         const planetParams = celestial.visitableParameters(coord as CelestialCoordinate);
