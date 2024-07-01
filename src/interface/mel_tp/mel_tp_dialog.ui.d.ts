@@ -15,6 +15,7 @@ declare const lblBkmName
 declare const lblBkmLocType
 
 declare const btnTeleport
+declare const btnFallback
 declare const lblDebug
 declare const lblDump
 declare const metagui
@@ -40,6 +41,7 @@ export {
   lblBkmName,
   lblBkmLocType,
 
+  btnFallback,
   btnTeleport,
   lblDebug,
   lblDump,

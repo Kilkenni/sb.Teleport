@@ -151,7 +151,7 @@ end
 -- 
 -- @param target
 -- @returns
-local function ObjectToWorldId(target)
+function ObjectToWorldId(target)
     if target.location ~= nil then
       --CelestialCoordinate
         local targetCoord = target
@@ -184,7 +184,7 @@ local function IsBookmarkInstance(target)
   end
 end
 
-local function JsonToDestination(destJson)
+function JsonToDestination(destJson)
   local warpTarget
   if string.find(destJson.warpAction, "InstanceWorld") == nil then
     --WarpAlias
@@ -208,7 +208,7 @@ local function JsonToDestination(destJson)
   }
 end
 
-local function TargetToWarpCommand(target)
+function TargetToWarpCommand(target)
   if type(target) == "string" then
     --WarpAlias
       return target

@@ -1,7 +1,7 @@
 //require "/scripts/util.lua"
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tpdialog.ui";
+import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnFallback, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tp_dialog.ui";
 import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
 
 export interface Destination {
@@ -17,19 +17,25 @@ export interface Destination {
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
   bookmarkTemplate: tpItem,
+  configPath: string,
   configOverride: TeleportConfig|undefined,
   selected: Destination|undefined
   animation: string,
+  dialogConfig: TpDialogConfig|undefined
 } = {
   bookmarks: undefined,
   bookmarkTemplate: bookmarksList.data,
+  configPath: "",
   configOverride: undefined,
   selected: undefined,
   animation: "default",
+  dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig
 };
 mel_tp.bookmarks = player.teleportBookmarks() as Bookmark[];
 mel_tp.bookmarkTemplate = bookmarksList.data;
-mel_tp.configOverride = metagui.inputData as TeleportConfig;
+mel_tp.configPath = metagui.inputData.configPath as string;
+sb.logInfo(metagui.inputData.configPath);
+mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
 
 /*
   {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
@@ -200,6 +206,45 @@ function populateBookmarks() {
         }
       }
       */
+
+      if(finalTpConfig.includePartyMembers === true) {
+        const beamPartyMember = mel_tp.dialogConfig?.mel_tp_dialog["beamPartyMemberLabel"];
+        const deployPartyMember  = mel_tp.dialogConfig?.mel_tp_dialog["deployPartyMemberLabel"];
+        const beamPartyMemberIcon = mel_tp.dialogConfig?.mel_tp_dialog["beamPartyMemberIcon"];
+        const deployPartyMemberIcon = mel_tp.dialogConfig?.mel_tp_dialog["deployPartyMemberIcon"];
+        //add warp options for each party member
+
+        //TODO
+      }
+      
+      /*
+      
+  
+    if (config.getBool("includePartyMembers", false)) {
+      auto teamClient = m_client->teamClient();
+      for (auto member : teamClient->members()) {
+        if (member.uuid == m_client->clientContext()->playerUuid() || member.warpMode == WarpMode::None)
+          continue;
+  
+        auto entry = destList->addItem();
+        entry->fetchChild<LabelWidget>("name")->setText(member.name);
+  
+        if (member.warpMode == WarpMode::DeployOnly)
+          entry->fetchChild<LabelWidget>("planetName")->setText(deployPartyMember);
+        else
+          entry->fetchChild<LabelWidget>("planetName")->setText(beamPartyMember);
+  
+        if (member.warpMode == WarpMode::DeployOnly)
+          entry->fetchChild<ImageWidget>("icon")->setImage(deployPartyMemberIcon);
+        else
+          entry->fetchChild<ImageWidget>("icon")->setImage(beamPartyMemberIcon);
+  
+        entry->fetchChild<ButtonWidget>("editButton")->hide();
+  
+        m_destinations.append({WarpToPlayer(member.uuid), member.warpMode == WarpMode::DeployOnly});
+      }
+    }
+    */
   
       const bkmData: Destination = {
         //system = false //for special locations like ship etc
@@ -389,6 +434,11 @@ btnTeleport.onClick = function() {
   lblDump.setText(`Stringified warp target: ${warpTarget}`);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
+  pane.dismiss();
+}
+
+btnFallback.onClick = function() {
+  activeItem.interact("OpenTeleportDialog", mel_tp.configPath,pane.sourceEntity());
   pane.dismiss();
 }
 

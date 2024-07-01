@@ -145,3 +145,5 @@ declare interface VisitableParametersJson {
   terraformed: boolean, //default: false
   worldEdgeForceRegions: "None"|"Top"|"Bottom"|"TopAndBottom", //default: "None". WorldEdgeForceRegionTypeNames
 }
+
+declare type DamageTeam = any; //FIXME

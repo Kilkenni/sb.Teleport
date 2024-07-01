@@ -6,13 +6,17 @@ require("/interface/mel_tp/mel_tp_util.lua")
 local mel_tp = {
   bookmarks = nil,
   bookmarkTemplate = bookmarksList.data,
+  configPath = nil,
   configOverride = nil,
   selected = nil,
   animation = "default"
 }
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
-mel_tp.configOverride = metagui.inputData
+mel_tp.configPath = metagui.inputData.configPath
+mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+
+sb.logInfo(metagui.inputData.configPath);
 
  -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
     -- "icon":"garden",
@@ -285,4 +289,9 @@ function btnTeleport:onClick()
   widget.playSound("/sfx/interface/ship_confirm1.ogg")
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
   pane.dismiss()
+end
+
+function btnFallback:onClick()
+  activeItem.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
+  pane.dismiss();
 end

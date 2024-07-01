@@ -5,7 +5,7 @@ The *celestial* table contains functions that relate to the client sky, flying t
 */
 
 declare module celestial {
-  //SOURCE" game/scripting/StarCelestialLuaBindings.cpp
+  //SOURCE: game/scripting/StarCelestialLuaBindings.cpp
 
   /**
    * Whether the client sky is currently flying.

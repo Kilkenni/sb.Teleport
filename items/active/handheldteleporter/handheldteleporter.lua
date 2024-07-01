@@ -47,9 +47,9 @@ function update(dt, fireMode, shiftHeld, moves)
 
       -- activeItem.interact("OpenTeleportDialog", "/interface/warping/warpcoreteleporter.config", activeItem.ownerEntityId())
       local tpConfigPath = root.itemConfig(item.descriptor()).config.interactData
-      local tpConfig = root.assetJson(tpConfigPath) --debug successful, here is tp.config content
+      
       --sb.logInfo(sb.printJson(tpConfig))
-			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tpdialog.ui", data = tpConfig}, activeItem.ownerEntityId())
+			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tpdialog.ui", data = {configPath = tpConfigPath} }, activeItem.ownerEntityId())
 			self.consumed = 0
 		end
 		if fireMode ~= "primary" or status.resourceLocked("energy") then

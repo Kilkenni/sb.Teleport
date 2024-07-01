@@ -1,0 +1,43 @@
+{
+  "style" : "window",
+  "size" : [320, 200],
+  "resizable" : true,
+  "minSize" : [120, 64],
+  "title" : "Editing bookmark",
+  "icon" : "/interface/warping/warpedit.png",
+  "accentColor" : "3f3fff",
+  "scripts" : ["mel_tp_edit.lua"],
+  
+  "openWithInventory" : false,
+  "anchor" : ["center", [-50, -50]],
+  "uniqueBy" : "path",
+  "uniqueMode" : "toggle", 
+  "children" : [
+    { "mode" : "vertical" },
+    [
+      { "type": "image", "id":"bkmIcon", "file": ""},
+      {"type":"label", "id":"bkmName", "text": "name"},
+      {"type": "label", "id":"bkmPlanet", "text": "planet"},
+      { "type": "label", "id" : "lblDump", "text" : ""}
+    ],
+    [ 
+      { "size" : 80, "mode":"horisontal" },
+      { 
+        "type" : "button",
+        "caption" : "Cancel",
+        "id" : "btnEditCancel"
+      },
+      { 
+        "type" : "button", 
+        "caption" : "Delete", 
+        "id": "btnEditDelete"
+      },
+      { 
+        "type" : "button",
+        "caption" : "Save",
+        "color" : "accent",
+        "id" : "btnEditSave"
+      }
+    ]
+  ]
+}

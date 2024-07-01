@@ -56,6 +56,12 @@
       },
       { 
         "type" : "button",
+        "caption" : "Default Teleport Dialog",
+        "color" : "accent",
+        "id" : "btnFallback"
+      },
+      { 
+        "type" : "button",
         "caption" : "Teleport",
         "color" : "accent",
         "id" : "btnTeleport"

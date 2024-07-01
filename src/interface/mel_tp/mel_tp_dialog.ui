@@ -50,8 +50,19 @@
         "data" : {},
         "children" : [
           {"type":"label", "id":"lblBkmName", "text": "???"},
-          {"type":"label", "id":"lblBkmLocType", "text": ""}
+          {"type":"label", "id":"lblBkmHazards", "text": ""},
+          {"type": "layout", "id": "listHazards", "children": [],
+            "data": {
+              "type": "image", "file": ""
+            }
+          }
         ] 
+      },
+      { 
+        "type" : "button",
+        "caption" : "Default Teleport Dialog",
+        "color" : "accent",
+        "id" : "btnFallback"
       },
       { 
         "type" : "button",
