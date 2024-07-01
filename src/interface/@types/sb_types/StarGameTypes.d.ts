@@ -13,8 +13,10 @@ declare type Vec3F = [float, float, float]
 declare type RectI = [Vec2I, Vec2I] // min coord, max coord
 
 //Internal Sb types
+declare type uint16_t = number & { __brand: "uint16_t" }; //unsigned short int 0..32767
 declare type uint64_t = number & { __brand: "uint64_t" };
-declare type Uuid = string
+declare type size_t = number & { __brand: "long unsigned int"};
+declare type Uuid = string;
 declare type EntityId = number & { __brand: "int32_t" };
 
 //Lua-specific wrappers

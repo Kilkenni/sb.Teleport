@@ -214,7 +214,7 @@ function populateBookmarks() {
         const deployPartyMemberIcon = mel_tp.dialogConfig?.mel_tp_dialog["deployPartyMemberIcon"];
         //add warp options for each party member
 
-        //TODO
+        //TODO find how to get party members
       }
       
       /*
