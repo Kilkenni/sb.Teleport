@@ -12,7 +12,7 @@
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [
-    { "mode" : "horizontal" },
+    { "mode" : "horizontal", "align": 0 },
     [
       { 
         "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
