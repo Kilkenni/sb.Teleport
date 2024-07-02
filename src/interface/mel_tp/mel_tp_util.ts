@@ -26,35 +26,35 @@ function sortArrayByProperty(array:Record<string, any>[], propertyName: string, 
 }
 
 enum SystemLocationType {
-  null,
-  "CelestialCoordinate",
-  "CelestialOrbit",
-  "Space",
-  "FloatingDungeon"
+  null, //0
+  "CelestialCoordinate", //1
+  "CelestialOrbit", //2
+  "Space", //3
+  "FloatingDungeon" //4
 }
 
-function getSpaceLocationType(destination:SystemLocationJson):SystemLocationType {
+function getSpaceLocationType(destination:SystemLocationJson):string|null {
   if(destination === null) {
-    return SystemLocationType.null;
+    return SystemLocationType[0];
   }
   if(typeof destination[0] === "string") {
     if(destination[0] === "object") {
-      return SystemLocationType.FloatingDungeon;
+      return SystemLocationType[4];
     }
     if(destination[0] === "orbit") {
-      return SystemLocationType.CelestialOrbit;
+      return SystemLocationType[2];
     }
     if(destination[0] === "coordinate") {
-      return SystemLocationType.CelestialCoordinate;
+      return SystemLocationType[1];
     }
     sb.logError(`GetSpaceLocationType: can't identify type, first element is %s`, [destination[0]]);
-    return SystemLocationType.null;
+    return SystemLocationType[0];
   }
   if(typeof destination[0] === typeof destination[1]) {
-    return SystemLocationType.Space
+    return SystemLocationType[3];
   }
   sb.logError(`GetSpaceLocationType: can't identify location type: %s`, [sb.printJson(destination as unknown as JSON)]);
-  return SystemLocationType.null;
+  return SystemLocationType[0];
 }
 
 /**
@@ -159,12 +159,26 @@ function TargetToWarpCommand(target: WarpAction):WarpActionString {
   }
 }
 
-export {
+function FilterBookmarks(bookmarks: Bookmark[], filter:string):Bookmark[]|undefined {
+  if(filter === "") {
+    return bookmarks;
+  }
+  let filteredBookmarks:Bookmark[] = [];
+  bookmarks.forEach((bkm: Bookmark, index: number) => {
+    if(bkm.bookmarkName.toLowerCase().includes(filter.toLowerCase()) || bkm.targetName.toLowerCase().includes(filter.toLowerCase())) {
+      filteredBookmarks.push(bkm);
+    }
+  });
+  return filteredBookmarks;
+}
+
+export const mel_tp_util =  {
   sortArrayByProperty,
   getSpaceLocationType,
   WorldIdToObject,
   ObjectToWorldId,
   // parseWorldIdFull,
   JsonToDestination,
-  TargetToWarpCommand
+  TargetToWarpCommand,
+  FilterBookmarks
 }

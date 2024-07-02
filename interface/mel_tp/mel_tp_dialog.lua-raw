@@ -1,24 +1,95 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local displayPlanetInfo, OnTpTargetSelect, mel_tp
 local ____mel_tp_dialog_2Eui = require("interface.mel_tp.mel_tp_dialog.ui")
 local metagui = ____mel_tp_dialog_2Eui.metagui
 local bookmarksList = ____mel_tp_dialog_2Eui.bookmarksList
-local btnDumpTp = ____mel_tp_dialog_2Eui.btnDumpTp
+local txtboxFilter = ____mel_tp_dialog_2Eui.txtboxFilter
+local btnResetFilter = ____mel_tp_dialog_2Eui.btnResetFilter
 local btnSortByPlanet = ____mel_tp_dialog_2Eui.btnSortByPlanet
 local lblBkmName = ____mel_tp_dialog_2Eui.lblBkmName
-local lblBkmLocType = ____mel_tp_dialog_2Eui.lblBkmLocType
+local lblBkmHazards = ____mel_tp_dialog_2Eui.lblBkmHazards
+local listHazards = ____mel_tp_dialog_2Eui.listHazards
 local btnFallback = ____mel_tp_dialog_2Eui.btnFallback
 local btnTeleport = ____mel_tp_dialog_2Eui.btnTeleport
-local lblDebug = ____mel_tp_dialog_2Eui.lblDebug
 local lblDump = ____mel_tp_dialog_2Eui.lblDump
 local ____mel_tp_util = require("interface.mel_tp.mel_tp_util")
-local sortArrayByProperty = ____mel_tp_util.sortArrayByProperty
-local getSpaceLocationType = ____mel_tp_util.getSpaceLocationType
-local WorldIdToObject = ____mel_tp_util.WorldIdToObject
-local JsonToDestination = ____mel_tp_util.JsonToDestination
-local TargetToWarpCommand = ____mel_tp_util.TargetToWarpCommand
-local mel_tp = {
+local mel_tp_util = ____mel_tp_util.mel_tp_util
+function displayPlanetInfo(self, coord)
+    local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
+    local name = celestial:planetName(coord)
+    local planetParams = celestial:visitableParameters(coord)
+    if name ~= nil then
+        lblBkmName:setText(name)
+    else
+        lblBkmName:setText(dbErrorText)
+    end
+    if planetParams ~= nil then
+        lblBkmHazards:setText("Hazards: " .. sb:printJson(planetParams.environmentStatusEffects))
+        if #planetParams.environmentStatusEffects > 0 then
+            local hazardTemplate = listHazards.data
+            hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].icon or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
+            hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].displayName or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
+            listHazards:addChild(hazardTemplate)
+        end
+    else
+        lblBkmHazards:setText(world:timeOfDay())
+    end
+end
+function OnTpTargetSelect(self, bookmarkWidget)
+    mel_tp.selected = bookmarkWidget.bkmData
+    local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
+    listHazards:clearChildren()
+    if type(mel_tp.selected.warpAction) == "string" then
+        if mel_tp.selected.warpAction ~= WarpAlias.OrbitedWorld then
+            lblBkmName:setText("Special system alias signature: " .. tostring(mel_tp.selected.warpAction))
+            lblBkmHazards:setText(world:timeOfDay())
+        else
+            local shipLocation = celestial:shipLocation()
+            local locationType = mel_tp_util:getSpaceLocationType(shipLocation)
+            if shipLocation == nil or locationType ~= "CelestialCoordinate" then
+                if shipLocation == nil then
+                    sb:logError("Teleport list contains [Orbited World] but ship location is NIL}")
+                else
+                    sb:logError("Teleport list contains [Orbited World] but ship location is " .. sb:printJson(shipLocation))
+                end
+                return
+            end
+            local coord = shipLocation[2]
+            displayPlanetInfo(nil, coord)
+        end
+    elseif mel_tp.selected.warpAction[1] == "player" then
+        lblBkmName:setText("Player signature")
+        lblBkmHazards:setText(world:timeOfDay())
+    elseif mel_tp.selected.warpAction[1] == "object" then
+        lblBkmName:setText("Object Uuid signature")
+        lblBkmHazards:setText(world:timeOfDay())
+    else
+        local warpTarget = mel_tp.selected.warpAction[1]
+        local coord = mel_tp_util:WorldIdToObject(warpTarget)
+        if coord == nil then
+            lblBkmName:setText(dbErrorText)
+            lblBkmHazards:setText(world:timeOfDay())
+        else
+            if coord.location ~= nil then
+                displayPlanetInfo(nil, coord)
+            else
+                local instanceId = coord
+                if instanceId.instance ~= nil then
+                    lblBkmName:setText(instanceId.instance)
+                end
+                if instanceId.level ~= "-" then
+                    lblBkmHazards:setText("Level " .. tostring(instanceId.level))
+                end
+            end
+        end
+    end
+    lblDump:setText(sb:printJson(bookmarkWidget.bkmData))
+end
+mel_tp = {
     bookmarks = nil,
+    filter = "",
+    bookmarksFiltered = nil,
     bookmarkTemplate = bookmarksList.data,
     configPath = "",
     configOverride = nil,
@@ -31,46 +102,6 @@ mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configPath = metagui.inputData.configPath
 sb:logInfo(metagui.inputData.configPath)
 mel_tp.configOverride = root:assetJson(mel_tp.configPath)
-local function OnTpTargetSelect(self, bookmarkWidget)
-    mel_tp.selected = bookmarkWidget.bkmData
-    if type(mel_tp.selected.warpAction) == "string" then
-        lblBkmName:setText("")
-        lblBkmLocType:setText("Special system alias signature")
-    elseif mel_tp.selected.warpAction[1] == "player" then
-        lblBkmName:setText("")
-        lblBkmLocType:setText("Player signature")
-    elseif mel_tp.selected.warpAction[1] == "object" then
-        lblBkmName:setText("")
-        lblBkmLocType:setText("Object Uuid signature")
-    else
-        local warpTarget = mel_tp.selected.warpAction[1]
-        local coord = WorldIdToObject(nil, warpTarget)
-        if coord == nil then
-            lblBkmName:setText("")
-            lblBkmLocType:setText("")
-        else
-            if coord.location ~= nil then
-                local name = celestial:planetName(coord)
-                local planetParams = celestial:visitableParameters(coord)
-                if name ~= nil then
-                    lblBkmName:setText(name)
-                end
-                if planetParams ~= nil then
-                    lblBkmLocType:setText(planetParams.typeName)
-                end
-            else
-                local instanceId = coord
-                if instanceId.instance ~= nil then
-                    lblBkmName:setText(instanceId.instance)
-                end
-                if instanceId.level ~= "-" then
-                    lblBkmLocType:setText("Level ${instanceId.level}")
-                end
-            end
-        end
-    end
-    lblDump:setText(sb:printJson(bookmarkWidget.bkmData))
-end
 local function populateBookmarks(self)
     bookmarksList:clearChildren()
     local ____opt_0 = mel_tp.configOverride
@@ -89,47 +120,55 @@ local function populateBookmarks(self)
         includePlayerBookmarks = ____temp_13,
         destinations = ____opt_8 and ____opt_8.destinations or nil
     }
-    if finalTpConfig.includePlayerBookmarks and mel_tp.bookmarks ~= nil then
-        __TS__ArrayForEach(
-            mel_tp.bookmarks,
-            function(____, bookmark, index)
-                local currentBookmark = mel_tp.bookmarkTemplate
-                local iconPath = ""
-                if bookmark.icon ~= nil then
-                    iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
+    if finalTpConfig.includePlayerBookmarks then
+        local filteredBookmarks
+        if mel_tp.filter ~= "" then
+            filteredBookmarks = mel_tp.bookmarks
+        else
+            filteredBookmarks = mel_tp.bookmarksFiltered
+        end
+        if filteredBookmarks ~= nil then
+            __TS__ArrayForEach(
+                filteredBookmarks,
+                function(____, bookmark, index)
+                    local currentBookmark = mel_tp.bookmarkTemplate
+                    local iconPath = ""
+                    if bookmark.icon ~= nil then
+                        iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
+                    end
+                    local bkmData = {
+                        warpAction = bookmark.target,
+                        name = bookmark.bookmarkName or "???",
+                        planetName = bookmark.targetName or "",
+                        icon = iconPath,
+                        deploy = false
+                    }
+                    currentBookmark.id = currentBookmark.id .. tostring(index)
+                    currentBookmark.children[1].id = currentBookmark.children[1].id .. tostring(index)
+                    currentBookmark.children[2].id = currentBookmark.children[2].id .. tostring(index)
+                    currentBookmark.children[3].id = currentBookmark.children[3].id .. tostring(index)
+                    currentBookmark.children[1].file = bkmData.icon
+                    currentBookmark.children[2].text = bkmData.name
+                    currentBookmark.children[3].text = bkmData.planetName
+                    local addedBookmark = bookmarksList:addChild(currentBookmark)
+                    addedBookmark.onSelected = OnTpTargetSelect
+                    addedBookmark.bkmData = bkmData
                 end
-                local bkmData = {
-                    warpAction = bookmark.target,
-                    name = bookmark.bookmarkName or "???",
-                    planetName = bookmark.targetName or "",
-                    icon = iconPath,
-                    deploy = false
-                }
-                currentBookmark.id = currentBookmark.id .. tostring(index)
-                currentBookmark.children[1].id = currentBookmark.children[1].id .. tostring(index)
-                currentBookmark.children[2].id = currentBookmark.children[2].id .. tostring(index)
-                currentBookmark.children[3].id = currentBookmark.children[3].id .. tostring(index)
-                currentBookmark.children[1].file = bkmData.icon
-                currentBookmark.children[2].text = bkmData.name
-                currentBookmark.children[3].text = bkmData.planetName
-                local addedBookmark = bookmarksList:addChild(currentBookmark)
-                addedBookmark.onSelected = OnTpTargetSelect
-                addedBookmark.bkmData = bkmData
-            end
-        )
+            )
+        end
     end
     if finalTpConfig.destinations ~= nil then
         __TS__ArrayForEach(
             finalTpConfig.destinations,
             function(____, dest, index)
-                local destination = JsonToDestination(nil, dest)
+                local destination = mel_tp_util:JsonToDestination(dest)
                 if destination.prerequisiteQuest and player:hasCompletedQuest(destination.prerequisiteQuest) == false then
                     return
                 end
                 if destination.warpAction == WarpAlias.OrbitedWorld then
                     local shipLocation = celestial:shipLocation()
-                    local locationType = getSpaceLocationType(nil, shipLocation)
-                    if tostring(locationType) ~= "CelestialCoordinate" then
+                    local locationType = mel_tp_util:getSpaceLocationType(shipLocation)
+                    if locationType ~= "CelestialCoordinate" then
                         return
                     end
                 end
@@ -149,14 +188,10 @@ local function populateBookmarks(self)
                     end
                 end
                 if finalTpConfig.includePartyMembers == true then
-                    local ____opt_14 = mel_tp.dialogConfig
-                    local beamPartyMember = ____opt_14 and ____opt_14.mel_tp_dialog.beamPartyMemberLabel
-                    local ____opt_16 = mel_tp.dialogConfig
-                    local deployPartyMember = ____opt_16 and ____opt_16.mel_tp_dialog.deployPartyMemberLabel
-                    local ____opt_18 = mel_tp.dialogConfig
-                    local beamPartyMemberIcon = ____opt_18 and ____opt_18.mel_tp_dialog.beamPartyMemberIcon
-                    local ____opt_20 = mel_tp.dialogConfig
-                    local deployPartyMemberIcon = ____opt_20 and ____opt_20.mel_tp_dialog.deployPartyMemberIcon
+                    local beamPartyMember = mel_tp.dialogConfig.mel_tp_dialog.beamPartyMemberLabel
+                    local deployPartyMember = mel_tp.dialogConfig.mel_tp_dialog.deployPartyMemberLabel
+                    local beamPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog.beamPartyMemberIcon
+                    local deployPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog.deployPartyMemberIcon
                 end
                 local bkmData = {
                     warpAction = destination.warpAction,
@@ -178,18 +213,22 @@ local function populateBookmarks(self)
     end
     metagui:queueFrameRedraw()
 end
-if mel_tp.bookmarks ~= nil then
-    mel_tp.bookmarks = sortArrayByProperty(nil, mel_tp.bookmarks, "bookmarkName", false)
+txtboxFilter.onEnter = function(self)
+    player:say(sb:printJson(txtboxFilter.text))
 end
-populateBookmarks(nil)
-btnDumpTp.onClick = function(self)
-    lblDebug:setText(sb:printJson(mel_tp.bookmarks))
+txtboxFilter.onEscape = function(self)
+    btnResetFilter:onClick()
+end
+btnResetFilter.onClick = function(self)
+    txtboxFilter:setText("")
+    mel_tp.bookmarksFiltered = nil
+    populateBookmarks(nil)
 end
 btnSortByPlanet.onClick = function(self)
     if mel_tp.bookmarks == nil then
         return
     end
-    mel_tp.bookmarks = sortArrayByProperty(nil, mel_tp.bookmarks, "targetName", false)
+    mel_tp.bookmarks = mel_tp_util:sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
     populateBookmarks(nil)
 end
 btnTeleport.onClick = function(self)
@@ -198,8 +237,8 @@ btnTeleport.onClick = function(self)
         lblDump:setText("No target selected")
         return
     end
-    local warpTarget = TargetToWarpCommand(nil, mel_tp.selected.warpAction)
-    lblDump:setText("Stringified warp target: " .. warpTarget)
+    local warpTarget = mel_tp_util:TargetToWarpCommand(mel_tp.selected.warpAction)
+    lblDump:setText("Stringified warp target: " .. tostring(warpTarget))
     widget:playSound("/sfx/interface/ship_confirm1.ogg")
     player:warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
     pane:dismiss()
@@ -212,4 +251,8 @@ btnFallback.onClick = function(self)
     )
     pane:dismiss()
 end
+if mel_tp.bookmarks ~= nil then
+    mel_tp.bookmarks = mel_tp_util:sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
+end
+populateBookmarks(nil)
 return ____exports

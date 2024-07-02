@@ -16,7 +16,7 @@
     { "type": "layout", "mode": "vertical", "align": 0, "children":
       [
         { 
-          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
+          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, "align": 0, 
           "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
             { "type": "image", "id":"tpIcon", "file": ""},
             {"type":"label", "id":"tpName", "text": "name"},
@@ -33,11 +33,16 @@
       ]
     },
     [ 
-      { "size" : 80 },
+      { "size" : 100 },
+      {
+        "type": "textBox",
+        "caption": "filter",
+        "id": "txtboxFilter"
+      },
       { 
         "type" : "button",
-        "caption" : "Dump teleports",
-        "id" : "btnDumpTp"
+        "caption" : "Reset filter",
+        "id" : "btnResetFilter"
       },
       { 
         "type" : "button", 
@@ -54,7 +59,7 @@
           {"type":"label", "id":"lblBkmHazards", "text": ""},
           {"type": "layout", "id": "listHazards", "children": [],
             "data": {
-              "type": "image", "file": ""
+              "type": "image", "file": "", "noAutoCrop" : true, "toolTip": ""
             }
           }
         ] 
@@ -62,7 +67,6 @@
       { 
         "type" : "button",
         "caption" : "Default Teleport Dialog",
-        "color" : "accent",
         "id" : "btnFallback"
       },
       { 

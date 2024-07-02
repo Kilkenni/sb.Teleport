@@ -1,5 +1,6 @@
 //Primitive C++ types
 declare type int = number & { __brand: "int" }
+declare type unsigned = number & { __brand: "unsigned" }
 declare type float = number & { __brand: "float" }
 declare type double = number & { __brand: "double" }
 
@@ -70,9 +71,10 @@ type SpawnTargetX = string //string(number)
 declare type SpawnTarget = SpawnTargetUniqueEntity|SpawnTargetPosition|SpawnTargetX|undefined
 
 declare enum WarpAlias {
-  "Return", //returns to previous location (unclear)
+  "Return", //returns to previous location
   "OrbitedWorld", //does Warp Down when over a planet
-  "OwnShip"
+  "OwnShip", //player's Ship World
+  "Nowhere" //same world. Can be used to teleport locally when combined with SpawnTarget
 }
 
 declare type BookmarkTarget = [
@@ -138,9 +140,9 @@ declare interface VisitableParametersJson {
   worldSize: Vec2I, //actually, Vec2U, so it's unsigned (non-negative)
   gravity: float, //default: 1.0
   airless: boolean, //default: false
-  weatherPool: JSON, //[double,string][]. Weather types with their probabilities
-  environmentStatusEffects: JSON, //string[]. May be empty. Write better description?
-  overrideTech: JSON; //string[]. May be empty. Write better description?
+  weatherPool: [double, string][], //[double,string][]. Weather types with their probabilities
+  environmentStatusEffects: string[], //string[]. May be empty. Write better description?
+  overrideTech: string[]; //string[]. May be empty. Write better description?
   globalDirectives: JSON, //Directives[] in JSON form. May be empty. Write better description?
   beamUpRule: "Nowhere"|"Surface"|"Anywhere"|"AnywhereWithWarning", //default: "Surface". BeamUpRuleNames
   disableDeathDrops: boolean, //default: false

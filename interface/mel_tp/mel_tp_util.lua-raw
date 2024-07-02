@@ -47,29 +47,29 @@ SystemLocationType.FloatingDungeon = 4
 SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
 local function getSpaceLocationType(self, destination)
     if destination == nil then
-        return SystemLocationType.null
+        return SystemLocationType[0]
     end
     if type(destination[1]) == "string" then
         if destination[1] == "object" then
-            return SystemLocationType.FloatingDungeon
+            return SystemLocationType[4]
         end
         if destination[1] == "orbit" then
-            return SystemLocationType.CelestialOrbit
+            return SystemLocationType[2]
         end
         if destination[1] == "coordinate" then
-            return SystemLocationType.CelestialCoordinate
+            return SystemLocationType[1]
         end
         sb:logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
-        return SystemLocationType.null
+        return SystemLocationType[0]
     end
     if __TS__TypeOf(destination[1]) == __TS__TypeOf(destination[2]) then
-        return SystemLocationType.Space
+        return SystemLocationType[3]
     end
     sb:logError(
         "GetSpaceLocationType: can't identify location type: %s",
         {sb:printJson(destination)}
     )
-    return SystemLocationType.null
+    return SystemLocationType[0]
 end
 --- Returns stringified CelestialCoordinate back into object
 -- 
@@ -122,13 +122,6 @@ local function ObjectToWorldId(self, target)
         )
     end
 end
-local function WorldIdFullToString(self, target)
-    return sb:printJson(target)
-end
-local function parseWorldIdFull(self, target)
-    local trimBrackets = __TS__StringSubstring(target, 1, #target - 1)
-    return __TS__StringSplit(trimBrackets, ",")
-end
 local function IsBookmarkInstance(self, target)
     return __TS__StringIncludes(target[1], "InstanceWorld")
 end
@@ -164,14 +157,37 @@ local function TargetToWarpCommand(self, target)
     if target[1] == "object" then
         return "Player:" .. target[2]
     else
-        return ((("[" .. tostring(target[1])) .. ", ") .. tostring(target[2])) .. "]"
+        return (tostring(target[1]) .. "=") .. tostring(target[2])
     end
 end
-____exports.sortArrayByProperty = sortArrayByProperty
-____exports.getSpaceLocationType = getSpaceLocationType
-____exports.WorldIdToObject = WorldIdToObject
-____exports.ObjectToWorldId = ObjectToWorldId
-____exports.parseWorldIdFull = parseWorldIdFull
-____exports.JsonToDestination = JsonToDestination
-____exports.TargetToWarpCommand = TargetToWarpCommand
+local function FilterBookmarks(self, bookmarks, filter)
+    if filter == "" then
+        return bookmarks
+    end
+    local filteredBookmarks = {}
+    __TS__ArrayForEach(
+        bookmarks,
+        function(____, bkm, index)
+            if __TS__StringIncludes(
+                string.lower(bkm.bookmarkName),
+                string.lower(filter)
+            ) or __TS__StringIncludes(
+                string.lower(bkm.targetName),
+                string.lower(filter)
+            ) then
+                filteredBookmarks[#filteredBookmarks + 1] = bkm
+            end
+        end
+    )
+    return filteredBookmarks
+end
+____exports.mel_tp_util = {
+    sortArrayByProperty = sortArrayByProperty,
+    getSpaceLocationType = getSpaceLocationType,
+    WorldIdToObject = WorldIdToObject,
+    ObjectToWorldId = ObjectToWorldId,
+    JsonToDestination = JsonToDestination,
+    TargetToWarpCommand = TargetToWarpCommand,
+    FilterBookmarks = FilterBookmarks
+}
 return ____exports

@@ -1,4 +1,3 @@
-local ____exports = {}
 ---@diagnostic disable: undefined-global
 --- Sorts array by certain property
 -- 
@@ -6,7 +5,7 @@ local ____exports = {}
 -- @param propertyName Key to sort objects
 -- @param descending If true, sort in descending alphabet order. If false, sort in ascending order.
 -- @returns
-local function sortArrayByProperty(self, array, propertyName, descending)
+local function sortArrayByProperty(array, propertyName, descending)
     if descending == nil then
         descending = false
     end
@@ -18,42 +17,30 @@ local function sortArrayByProperty(self, array, propertyName, descending)
         return sortedArray
     end
     if descending == false then
-        sortedArray = __TS__ArraySort(
-            sortedArray,
-            function(____, elem1, elem2)
-                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and -1 or 1
-            end
-        )
+      table.sort(sortedArray,
+        function(elem1, elem2)
+          return elem1[propertyName].lower() < elem2[propertyName].lower()
+        end
+      )
     else
-        sortedArray = __TS__ArraySort(
-            sortedArray,
-            function(____, elem1, elem2)
-                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and 1 or -1
-            end
-        )
+      table.sort(sortedArray,
+        function(elem1, elem2)
+          return elem1[propertyName].lower() > elem2[propertyName].lower()
+        end
+      )
     end
     return sortedArray
 end
 
 local SystemLocationType = {
-  "nil",
+  nil,
   "CelestialCoordinate",
   "CelestialOrbit",
   "Space",
   "FloatingDungeon"
 }
--- SystemLocationType.null = 0
--- SystemLocationType[SystemLocationType.null] = "nil"
--- SystemLocationType.CelestialCoordinate = 1
--- SystemLocationType[SystemLocationType.CelestialCoordinate] = "CelestialCoordinate"
--- SystemLocationType.CelestialOrbit = 2
--- SystemLocationType[SystemLocationType.CelestialOrbit] = "CelestialOrbit"
--- SystemLocationType.Space = 3
--- SystemLocationType[SystemLocationType.Space] = "Space"
--- SystemLocationType.FloatingDungeon = 4
--- SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
 
-function getSpaceLocationType(destination)
+local function getSpaceLocationType(destination)
   if destination == nil then
     return SystemLocationType[1]
   end
@@ -114,7 +101,7 @@ end
 -- 
 -- @param target Can parse CelestialWorld or InstanceWorld
 -- @returns CelestialCoordinate or null
-function WorldIdToObject(target)
+local function WorldIdToObject(target)
   --debug
   -- sb.logInfo("[log] Trying to convert to CelestialCoordinate: "..sb.print(target))
   if(target == nil) then
@@ -158,7 +145,7 @@ end
 -- 
 -- @param target
 -- @returns
-function ObjectToWorldId(target)
+local function ObjectToWorldId(target)
     if target.location ~= nil then
       --CelestialCoordinate
         local targetCoord = target
@@ -191,7 +178,7 @@ local function IsBookmarkInstance(target)
   end
 end
 
-function JsonToDestination(destJson)
+local function JsonToDestination(destJson)
   local warpTarget
   if string.find(destJson.warpAction, "InstanceWorld") == nil then
     --WarpAlias
@@ -216,7 +203,7 @@ function JsonToDestination(destJson)
   }
 end
 
-function TargetToWarpCommand(target)
+local function TargetToWarpCommand(target)
   if type(target) == "string" then
     --WarpAlias
       return target
@@ -231,11 +218,27 @@ function TargetToWarpCommand(target)
   end
 end
 
+local function FilterBookmarks(bookmarks, filter)
+  if filter == "" then
+      return bookmarks
+  end
+  local filteredBookmarks = {}
+  for index, bkm in ipairs(bookmarks) do
+    if(string.find(string.lower(bkm.bookmarkName), string.lower(filter)) ~= nil or string.find(string.lower(bkm.targetName), string.lower(filter)) ~= nil) then
+      filteredBookmarks[#filteredBookmarks + 1] = bkm
+    end
+  end
 
--- ____exports.sortArrayByProperty = sortArrayByProperty
-____exports.getSpaceLocationType = getSpaceLocationType
-____exports.WorldIdToObject = WorldIdToObject
-____exports.ObjectToWorldId = ObjectToWorldId
-____exports.JsonToDestination = JsonToDestination
-____exports.TargetToWarpCommand = TargetToWarpCommand
-return ____exports
+  return filteredBookmarks
+end
+
+local mel_tp_util = {
+  sortArrayByProperty = sortArrayByProperty,
+  getSpaceLocationType = getSpaceLocationType,
+  WorldIdToObject = WorldIdToObject,
+  ObjectToWorldId = ObjectToWorldId,
+  JsonToDestination = JsonToDestination,
+  TargetToWarpCommand = TargetToWarpCommand,
+  FilterBookmarks = FilterBookmarks
+}
+return mel_tp_util

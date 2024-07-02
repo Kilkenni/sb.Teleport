@@ -15,10 +15,10 @@
   "children" : [
     { "mode" : "vertical" },
     [
-      { "type": "image", "id":"bkmIcon", "file": ""},
-      {"type":"label", "id":"bkmName", "text": "name"},
-      {"type": "label", "id":"bkmPlanet", "text": "planet"},
-      { "type": "label", "id" : "lblDump", "text" : ""}
+      { "type": "image", "id":"bkmIcon", "file": "" },
+      { "type": "label", "id":"bkmName", "text": "name" },
+      { "type": "label", "id":"bkmPlanet", "text": "planet" },
+      { "type": "label", "id" : "lblDump", "text" : "" }
     ],
     [ 
       { "size" : 80, "mode":"horisontal" },

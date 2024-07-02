@@ -7,12 +7,14 @@
 // declare interface metagui {}
 
 declare const bookmarksList
-declare const btnDumpTp
+declare const txtboxFilter
+declare const btnResetFilter
 declare const btnSortByPlanet
 
 declare const bookmarkInfo
 declare const lblBkmName
-declare const lblBkmLocType
+declare const lblBkmHazards
+declare const listHazards
 
 declare const btnTeleport
 declare const btnFallback
@@ -29,17 +31,25 @@ declare interface tpItem {
   data: {target:string}
 }
 
+declare interface hazardItem {
+  //type: "image",
+  file: string,
+  //noAutoCrop: true,
+  toolTip: string
+}
 
 export {
   metagui,
 
   bookmarksList,
-  btnDumpTp,
+  txtboxFilter,
+  btnResetFilter,
   btnSortByPlanet,
 
   bookmarkInfo,
   lblBkmName,
-  lblBkmLocType,
+  lblBkmHazards,
+  listHazards,
 
   btnFallback,
   btnTeleport,
@@ -47,4 +57,4 @@ export {
   lblDump,
 };
 
-export type {tpItem};
+export type {tpItem, hazardItem};

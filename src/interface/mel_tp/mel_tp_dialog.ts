@@ -1,8 +1,8 @@
 //require "/scripts/util.lua"
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnFallback, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tp_dialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
+import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, lblDebug, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui";
+import {mel_tp_util} from "./mel_tp_util";
 
 export interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
@@ -16,14 +16,18 @@ export interface Destination {
 
 const mel_tp:{
   bookmarks: Bookmark[]|undefined,
+  filter: string,
+  bookmarksFiltered: Bookmark[]|undefined
   bookmarkTemplate: tpItem,
   configPath: string,
   configOverride: TeleportConfig|undefined,
   selected: Destination|undefined
   animation: string,
-  dialogConfig: TpDialogConfig|undefined
+  dialogConfig: TpDialogConfig
 } = {
   bookmarks: undefined,
+  filter: "",
+  bookmarksFiltered: undefined,
   bookmarkTemplate: bookmarksList.data,
   configPath: "",
   configOverride: undefined,
@@ -43,56 +47,6 @@ mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as Teleport
     "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     "bookmarkName":"Merchant test"}
 */
-function OnTpTargetSelect(bookmarkWidget:any):void {
-  mel_tp.selected = bookmarkWidget.bkmData as Destination;
-  if(typeof mel_tp.selected.warpAction === "string") {
-    lblBkmName.setText("");
-    lblBkmLocType.setText("Special system alias signature");
-  }
-  else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
-    lblBkmName.setText("");
-    lblBkmLocType.setText("Player signature");
-  }
-  else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
-    lblBkmName.setText("");
-    lblBkmLocType.setText("Object Uuid signature");
-  }
-  else {
-    const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
-    const coord:CelestialCoordinate|InstanceWorldId|null = WorldIdToObject(warpTarget)
-    if(coord === null) {
-      lblBkmName.setText("");
-      lblBkmLocType.setText("");
-    }
-    else {
-      if((coord as CelestialCoordinate).location !== undefined) {
-        //TypeGuard: coord is a CelestialCoordinate
-        const name = celestial.planetName(coord as CelestialCoordinate);
-        const planetParams = celestial.visitableParameters(coord as CelestialCoordinate);
-        if(name !== null) {
-          lblBkmName.setText(name);
-        }
-        if(planetParams !== null) {
-          lblBkmLocType.setText(planetParams.typeName);
-          //debug line
-          // sb.logInfo(sb.printJson(planetParams as unknown as JSON));
-        }
-      }
-      else {
-        //coord is an InstanceWorldId
-        const instanceId = coord as InstanceWorldId;
-        if(instanceId.instance !== null) {
-          lblBkmName.setText(instanceId.instance);
-        }
-        if(instanceId.level !== "-") {
-          lblBkmLocType.setText("Level ${instanceId.level}");
-        }
-      }      
-    }
-  }
-  
-  lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
-};
 
 function populateBookmarks() {
   bookmarksList.clearChildren()
@@ -118,60 +72,69 @@ function populateBookmarks() {
   "target":["InstanceWorld:outpost:-:-","arkteleporter"],
   "bookmarkName":"Outpost - The Ark"}
   */
-  if(finalTpConfig.includePlayerBookmarks && mel_tp.bookmarks !== undefined) {
-    mel_tp.bookmarks.forEach((bookmark:Bookmark, index:number):void => {
-      const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-      let iconPath = "";
-      if(bookmark.icon !== undefined) {
-        iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
-      }
-  
-      const bkmData: Destination = {
-        //system = false //for special locations like ship etc
-        warpAction: bookmark.target as BookmarkTarget, //warp coords or command
-        name: bookmark.bookmarkName || "???", //default: ???
-        planetName: bookmark.targetName || "", //default: empty string
-        icon: iconPath, //default: no icon
-        deploy: false, //Deploy mech. Default: false
-        // mission: false, //Default: false
-        // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
-      };
-  
-      currentBookmark.id = currentBookmark.id + index;
-      
-      currentBookmark.children[0].id = currentBookmark.children[0].id + index;
-      currentBookmark.children[1].id = currentBookmark.children[1].id + index;
-      currentBookmark.children[2].id = currentBookmark.children[2].id + index;
-      currentBookmark.children[0].file = bkmData.icon;
-      currentBookmark.children[1].text = bkmData.name;
-      currentBookmark.children[2].text = bkmData.planetName;
-      /*
-    { "type": "listItem", "id" : "tpBookmark", "children": [
-      { "type": "image", "id":"tpIcon", "file": ""},
-      {"type":"label", "id":"tpName", "text": "name"},
-      {"type": "label", "id":"tpPlanetName", "text": "planet"}
-      ],
-      "data": {"target": null}
+  if(finalTpConfig.includePlayerBookmarks) {
+    let filteredBookmarks:Bookmark[]|undefined;
+    if(mel_tp.filter !== "") {
+      filteredBookmarks = mel_tp.bookmarks;
     }
-*/
-      const addedBookmark = bookmarksList.addChild(currentBookmark);
-      addedBookmark.onSelected = OnTpTargetSelect;
-      addedBookmark.bkmData = bkmData;
-    })
+    else {
+      filteredBookmarks = mel_tp.bookmarksFiltered;
+    }
+    if(filteredBookmarks !== undefined) {
+      filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
+        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
+        let iconPath = "";
+        if(bookmark.icon !== undefined) {
+          iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
+        }
+    
+        const bkmData: Destination = {
+          //system = false //for special locations like ship etc
+          warpAction: bookmark.target as BookmarkTarget, //warp coords or command
+          name: bookmark.bookmarkName || "???", //default: ???
+          planetName: bookmark.targetName || "", //default: empty string
+          icon: iconPath, //default: no icon
+          deploy: false, //Deploy mech. Default: false
+          // mission: false, //Default: false
+          // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
+        };
+    
+        currentBookmark.id = currentBookmark.id + index;
+        
+        currentBookmark.children[0].id = currentBookmark.children[0].id + index;
+        currentBookmark.children[1].id = currentBookmark.children[1].id + index;
+        currentBookmark.children[2].id = currentBookmark.children[2].id + index;
+        currentBookmark.children[0].file = bkmData.icon;
+        currentBookmark.children[1].text = bkmData.name;
+        currentBookmark.children[2].text = bkmData.planetName;
+        /*
+      { "type": "listItem", "id" : "tpBookmark", "children": [
+        { "type": "image", "id":"tpIcon", "file": ""},
+        {"type":"label", "id":"tpName", "text": "name"},
+        {"type": "label", "id":"tpPlanetName", "text": "planet"}
+        ],
+        "data": {"target": null}
+      }
+  */
+        const addedBookmark = bookmarksList.addChild(currentBookmark);
+        addedBookmark.onSelected = OnTpTargetSelect;
+        addedBookmark.bkmData = bkmData;
+      })
+    } 
   };
 
   //process additional locations from override config
   if(finalTpConfig.destinations !== undefined) {
     finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
-      const destination:Destination = JsonToDestination(dest);
+      const destination:Destination = mel_tp_util.JsonToDestination(dest);
       if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
         return; //Quest not complete - skip this Destination
       }
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
-        const locationType = getSpaceLocationType(shipLocation);
-        if(locationType.toString() !== "CelestialCoordinate"){
+        const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
+        if(locationType !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
         }       
       }
@@ -208,10 +171,10 @@ function populateBookmarks() {
       */
 
       if(finalTpConfig.includePartyMembers === true) {
-        const beamPartyMember = mel_tp.dialogConfig?.mel_tp_dialog["beamPartyMemberLabel"];
-        const deployPartyMember  = mel_tp.dialogConfig?.mel_tp_dialog["deployPartyMemberLabel"];
-        const beamPartyMemberIcon = mel_tp.dialogConfig?.mel_tp_dialog["beamPartyMemberIcon"];
-        const deployPartyMemberIcon = mel_tp.dialogConfig?.mel_tp_dialog["deployPartyMemberIcon"];
+        const beamPartyMember = mel_tp.dialogConfig.mel_tp_dialog["beamPartyMemberLabel"];
+        const deployPartyMember  = mel_tp.dialogConfig.mel_tp_dialog["deployPartyMemberLabel"];
+        const beamPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog["beamPartyMemberIcon"];
+        const deployPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog["deployPartyMemberIcon"];
         //add warp options for each party member
 
         //TODO find how to get party members
@@ -367,48 +330,120 @@ namespace Star {
     
 
 
-  //tpName:setText(mel_tp.bookmarks[1].bookmarkName)
-  //tpPlanetName:setText(mel_tp.bookmarks[1].targetName)
   metagui.queueFrameRedraw()
 }
 
-if(mel_tp.bookmarks !== undefined) {
-  mel_tp.bookmarks = sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as Bookmark[];
-}
-populateBookmarks()
+function displayPlanetInfo(coord: CelestialCoordinate):void {
+  const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
+  const name = celestial.planetName(coord);
+  const planetParams = celestial.visitableParameters(coord);
+  if(name !== null) {
+    lblBkmName.setText(name);
+  }
+  else {
+    lblBkmName.setText(dbErrorText);
+  }
+  if(planetParams !== null) {
+    lblBkmHazards.setText("Hazards: "+sb.printJson(planetParams.environmentStatusEffects as unknown as JSON));
+    //debug line
+    // sb.logInfo("[log] Planet visitable parameters: "..sb.printJson(planetParams as unknown as JSON));
+    if(planetParams.environmentStatusEffects.length > 0) {
+      //experimental - if at least one hazard is there, show its icon
+      const hazardTemplate:hazardItem = listHazards.data;
+      hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[0]].icon || mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon;
+      hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[0]].displayName || mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName;
 
-/*
-function init():void { 
+      listHazards.addChild(hazardTemplate)
+    }
+  }
+  else {
+    lblBkmHazards.setText(world.timeOfDay());
+  }
 }
 
-function updateGui():void {
+function OnTpTargetSelect(bookmarkWidget:any):void {
+mel_tp.selected = bookmarkWidget.bkmData as Destination;
+const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
+listHazards.clearChildren();
+
+if(typeof mel_tp.selected.warpAction === "string") {
+  if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
+    lblBkmName.setText(`Special system alias signature: ${mel_tp.selected.warpAction}`);
+    lblBkmHazards.setText(world.timeOfDay());
+  }
+  else {
+    //Special case for Orbited World: show hazards
+    const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
+    const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
+    if(shipLocation === null  || locationType !== "CelestialCoordinate") {
+      if(shipLocation === null) {
+        sb.logError(`Teleport list contains [Orbited World] but ship location is NIL}`)
+      }
+      else {
+        sb.logError(`Teleport list contains [Orbited World] but ship location is ${sb.printJson(shipLocation as unknown as JSON)}`)
+      }
+      return;
+    }
+    const coord:CelestialCoordinate = shipLocation[1] as CelestialCoordinate;
+    displayPlanetInfo(coord);
+  }
+}
+else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
+  lblBkmName.setText("Player signature");
+  lblBkmHazards.setText(world.timeOfDay());
+}
+else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
+  lblBkmName.setText("Object Uuid signature");
+  lblBkmHazards.setText(world.timeOfDay());
+}
+else {
+  const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
+  const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
+  if(coord === null) {
+    lblBkmName.setText(dbErrorText);
+    lblBkmHazards.setText(world.timeOfDay());
+  }
+  else {
+    if((coord as CelestialCoordinate).location !== undefined) {
+      //TypeGuard: coord is a CelestialCoordinate
+      displayPlanetInfo(coord as CelestialCoordinate);
+    }
+    else {
+      //coord is an InstanceWorldId
+      const instanceId = coord as InstanceWorldId;
+      if(instanceId.instance !== null) {
+        lblBkmName.setText(instanceId.instance);
+      }
+      if(instanceId.level !== "-") {
+        lblBkmHazards.setText(`Level ${instanceId.level}`);
+      }
+    }      
+  }
 }
 
-function uninit():void {
-}
-*/
+lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
+};
 
-btnDumpTp.onClick = function ():void {
-  //chat.addMessage("boop")
-  lblDebug.setText(sb.printJson(mel_tp.bookmarks as unknown as JSON))
+txtboxFilter.onEnter = function ():void {
+  player.say(sb.printJson(txtboxFilter.text));
+}
+
+txtboxFilter.onEscape = function ():void {
+  btnResetFilter.onClick();
+}
+
+btnResetFilter.onClick = function ():void {
+  txtboxFilter.setText("");
+  mel_tp.bookmarksFiltered = undefined;
+  populateBookmarks();
 }
 
 btnSortByPlanet.onClick = function ():void {
   if(mel_tp.bookmarks === undefined) {
     return;
   }
-  mel_tp.bookmarks = sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as Bookmark[];
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as Bookmark[];
   populateBookmarks();
-  // if(mel_tp.bookmarks === undefined) {
-  //   return;
-  // }
-  // mel_tp.bookmarks = mel_tp.bookmarks.sort((el1, el2) => {return el1.targetName.toLowerCase() < el2.targetName.toLowerCase()? -1 : 1 })
-  // populateBookmarks()
- //lblDump:setText(sb.printJson(sorted))
-
-  //tpName:setText(sb.printJson(mel_tp.bookmarks[1].bookmarkName))
-  //tpPlanetName:setText(mel_tp.bookmarks[1].targetName)
-  //tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.bookmarks[1].icon..".png")
 }
 
 btnTeleport.onClick = function() {
@@ -418,18 +453,7 @@ btnTeleport.onClick = function() {
     return
   }
   // let tempWarpTarget:WarpAction = mel_tp.selected.warpAction;
-  const warpTarget:WarpActionString = TargetToWarpCommand(mel_tp.selected.warpAction)
-  // if(typeof tempWarpTarget === "string"){
-  //   //WarpAction is a WarpAlias
-  //   warpTarget = tempWarpTarget;
-  // }
-  // else {
-  //   //WarpAction is an array
-  //   // const [target, spawn] = tempWarpTarget as BookmarkTarget|PlayerTarget|UuidTarget;
-    
-  //   // warpTarget = mel_tp.selected.warpAction[0]+(mel_tp.selected.warpAction[1]? "="+mel_tp.selected.warpAction[1] : "");
-  //   warpTarget = TargetToWarpCommand(tempWarpTarget as (PlayerTarget|UuidTarget|BookmarkTarget));
-  // }
+  const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
 
   lblDump.setText(`Stringified warp target: ${warpTarget}`);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
@@ -438,21 +462,19 @@ btnTeleport.onClick = function() {
 }
 
 btnFallback.onClick = function() {
-  activeItem.interact("OpenTeleportDialog", mel_tp.configPath,pane.sourceEntity());
+  activeItem.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 }
 
-//Dismissing by out-of reach is in-built in ScriptPane, so this is not needed
-/*
-function update(dt:number) {
-  if(pane.sourceEntity() === player.id()) {
-    return; //player can't be out of range of themself, baka
-  }
-  if(false) {
-    pane.dismiss()
-  }
+/**
+ * Init pane part
+ */
+
+if(mel_tp.bookmarks !== undefined) {
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as Bookmark[];
 }
-*/
+populateBookmarks()
+
 
  //EDIT BOOKMARK OPTION
 
