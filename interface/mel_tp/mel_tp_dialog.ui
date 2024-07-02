@@ -12,24 +12,26 @@
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [
-    { "mode" : "horizontal", "align": 0 },
-    [
-      { 
-        "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
-        "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
-          { "type": "image", "id":"tpIcon", "file": ""},
-          {"type":"label", "id":"tpName", "text": "name"},
-          {"type": "label", "id":"tpPlanetName", "text": "planet"}
-          ],
-          "data": {"target": null}
+    { "mode" : "horizontal"},
+    { "type": "layout", "mode": "vertical", "align": 0, "children":
+      [
+        { 
+          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, 
+          "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
+            { "type": "image", "id":"tpIcon", "file": ""},
+            {"type":"label", "id":"tpName", "text": "name"},
+            {"type": "label", "id":"tpPlanetName", "text": "planet"}
+            ],
+            "data": {"target": null}
+          },
+          "selected": null,
+          "children" : [] 
         },
-        "selected": null,
-        "children" : [] 
-      },
-      { "type" : "label", "text" : "Debug info" },
-      { "type": "label", "id" : "lblDebug", "text" : ""},
-      { "type": "label", "id" : "lblDump", "text" : ""}
-    ],
+        { "type" : "label", "text" : "Debug info" },
+        { "type": "label", "id" : "lblDebug", "text" : ""},
+        { "type": "label", "id" : "lblDump", "text" : ""}
+      ]
+    },
     [ 
       { "size" : 80 },
       { 

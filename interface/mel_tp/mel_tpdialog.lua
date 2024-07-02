@@ -21,7 +21,7 @@ mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configPath = metagui.inputData.configPath
 mel_tp.configOverride = root.assetJson(mel_tp.configPath)
 
-sb.logInfo(metagui.inputData.configPath);
+-- sb.logInfo(metagui.inputData.configPath);
 
  -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
     -- "icon":"garden",
@@ -144,23 +144,25 @@ local function populateBookmarks()
   end
 
   if finalTpConfig.destinations ~= nil then
-    for index, dest in ipairs(finalTpConfig.destinations) do
+    for index, dest in ipairs(finalTpConfig.destinations) do  
       local destination = JsonToDestination(dest)
-
-      if(destination.prerequisiteQuest ~= nil and player.hasCompletedQuest(destination.prerequisiteQuest) == false) then
-        --return
+      if(destination.prerequisiteQuest ~= nil) then
+        if(player.hasCompletedQuest(destination.prerequisiteQuest) == false) then
+          goto continue
+        end
       end
 
       if (destination.warpAction == "OrbitedWorld") then
         --allow warp only if CelestialCoordinate
         local shipLocation = celestial.shipLocation()
         local locationType = getSpaceLocationType(shipLocation)
+        sb.logInfo("Location type is "..sb.printJson(locationType))
         --debug
         lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
         if(shipLocation[1] == "coordinate") then
           lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2])))
           --debug
-          -- sb.logInfo("Location is"..sb.printJson(shipLocation[2]))
+          sb.logInfo("Location is"..sb.printJson(shipLocation))
           -- sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
           -- sb.logInfo("Planet name is"..sb.printJson(celestial.planetName(shipLocation[2])))
         end
@@ -171,12 +173,12 @@ local function populateBookmarks()
         --]]
 
         if tostring(locationType) ~= "CelestialCoordinate" then
-          return; --Warping down is available only when orbiting a planet
+          goto continue --Warping down is available only when orbiting a planet
         end
       end
 
       if destination.warpAction == "OwnShip" and player.worldId() == player.ownShipWorldId() then
-        --return --If a player is already on their ship, do not offer to warp there even if config lists it
+        goto continue --If a player is already on their ship, do not offer to warp there even if config lists it
       end
       
       local currentBookmark = mel_tp.bookmarkTemplate
@@ -212,6 +214,7 @@ local function populateBookmarks()
       local addedBookmark = bookmarksList:addChild(currentBookmark)
       addedBookmark.onSelected = OnTpTargetSelect
       addedBookmark.bkmData = bkmData
+      ::continue::
     end
   end
 

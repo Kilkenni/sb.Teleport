@@ -204,6 +204,7 @@ function JsonToDestination(destJson)
       warpTarget = arrayToString(tempTarget, "=")
     end
   end
+
   return {
       name = destJson.name,
       planetName = destJson.planetName,
@@ -211,7 +212,7 @@ function JsonToDestination(destJson)
       icon = destJson.icon,
       deploy = destJson.deploy,
       mission = destJson.mission,
-      prerequisiteQuest = tostring(destJson.prerequisiteQuest)
+      prerequisiteQuest = destJson.prerequisiteQuest
   }
 end
 
