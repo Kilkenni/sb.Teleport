@@ -8,18 +8,21 @@
     "strict": true,
     "noImplicitAny": false,
     "typeRoots": ["node-module/@types", "src/@types"],
-    "outDir": "dist/",
+    "rootDir": "./src",
+    "outDir": "./",
     "removeComments": false
   },
   "include": ["src/**/*"],
-  "exclude": ["src/@types/**/*"],
+  "exclude": [],
   "tstl": {
     "luaTarget": "5.3",
     //"sourceMapTraceback": true,
     "tstlVerbose": true,
     "noImplicitGlobalVariables": true,
     "noImplicitSelf": false,
-    "noResolvePaths": []
+    "noResolvePaths": [],
+    "extension": ".lua-raw",
+    "luaLibImport": "none"
     //"exclude": ["src/StarboundLua.ts", "src/sb_lua_callbacks/**/*", "src/sb_types/**/*"] 
   }
 }

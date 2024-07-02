@@ -1,0 +1,4 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local bookmarkState = {target = "Nowhere", targetName = "", bookmarkName = "Nowhere in particular", icon = "default"}
+return ____exports
