@@ -1,5 +1,5 @@
 //manages edit dialog for a bookmark
-import * as mel_tp_util from "./mel_tp_util";
+import * as mel_tp_util from "./mel_tp_util-tstl";
 
 const bookmarkState:Bookmark = {
   target: "Nowhere" as unknown as BookmarkTarget,

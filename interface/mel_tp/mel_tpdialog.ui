@@ -1,15 +1,14 @@
 {
   "style" : "window",
-  "size" : [320, 200],
+  "size" : [320, 400],
   "resizable" : true,
   "minSize" : [120, 64],
   "title" : "Teleporter",
   "icon" : "/interface/warping/icon.png",
-  "accentColor" : "3f3fff",
   "scripts" : ["mel_tpdialog.lua"],
   
   "openWithInventory" : false,
-  "anchor" : ["center", [-50, -50]],
+  "anchor" : ["center", [0, 0]],
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [
@@ -56,7 +55,7 @@
       },
       { 
         "type" : "button",
-        "caption" : "Default Teleport Dialog",
+        "caption" : "Vanilla UI",
         "color" : "accent",
         "id" : "btnFallback"
       },

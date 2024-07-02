@@ -31,10 +31,10 @@ local function OnTpTargetSelect(bookmarkWidget)
     lblBkmHazards:setText("Special system alias signature");
   elseif(mel_tp.selected.warpAction[1] == "player" )then
       lblBkmName:setText("")
-      lblBkmLocType:setText("Player signature")
+      lblBkmHazards:setText("Player signature")
   elseif (mel_tp.selected.warpAction[1] == "object") then
       lblBkmName:setText("")
-      lblBkmLocType:setText("Object Uuid signature")
+      lblBkmHazards:setText("Object Uuid signature")
   else
     sb.logInfo("[log] Showing info for: "..sb.printJson(mel_tp.selected.warpAction[1]))
     local warpTarget = mel_tp.selected.warpAction[1];
@@ -53,14 +53,14 @@ local function OnTpTargetSelect(bookmarkWidget)
           lblBkmName:setText("Database Error");
         end
         if planetParams ~= nil then
-            lblBkmLocType:setText(planetParams.typeName)
+          lblBkmHazards:setText(planetParams.typeName)
         else
           lblBkmHazards:setText(world.timeOfDay());
         end
         if(planetParams ~= nil) then
           lblBkmHazards:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
+          -- sb.logInfo("[log] Planet visitable parameters: "..sb.printJson(planetParams))
         end
-        sb:logInfo("[log] Planet visitable parameters: "..sb:printJson(planetParams))
       else
         --InstanceWorld
         local instanceId = coord
@@ -68,7 +68,7 @@ local function OnTpTargetSelect(bookmarkWidget)
             lblBkmName:setText(instanceId.instance)
         end
         if instanceId.level ~= "-" then
-            lblBkmLocType:setText("Level ${instanceId.level}")
+          lblBkmHazards:setText("Level ${instanceId.level}")
         end
       end
     end
@@ -140,7 +140,7 @@ local function populateBookmarks()
 
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do
-      local destination = JsonToDestination(nil, dest)
+      local destination = JsonToDestination(dest)
 
       if destination.prerequisiteQuest and player:hasCompletedQuest(destination.prerequisiteQuest) == false then
         return
@@ -292,6 +292,6 @@ function btnTeleport:onClick()
 end
 
 function btnFallback:onClick()
-  activeItem.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
+  player.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 end

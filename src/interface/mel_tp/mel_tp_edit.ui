@@ -9,7 +9,7 @@
   "scripts" : ["mel_tp_edit.lua"],
   
   "openWithInventory" : false,
-  "anchor" : ["center", [-50, -50]],
+  "anchor" : ["center", [0, 0]],
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [

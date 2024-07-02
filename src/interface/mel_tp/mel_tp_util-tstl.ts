@@ -1,4 +1,4 @@
-import {Destination} from "./mel_tp_dialog"
+import {Destination} from "./mel_tp_dialog-tstl"
 
 /**
  * Sorts array by certain property

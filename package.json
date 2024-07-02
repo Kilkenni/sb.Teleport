@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tstl",
-    "dev": "tstl --watch"
+    "dev": "tstl --watch",
+    "postbuild": "copyfiles --error --up 1 --soft --exclude '/src/@types/**/*.*' --exclude '**/*.ts' --exclude '**/*.d.ts' --verbose './src/**/*.config' './'"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
     "typescript-to-lua": "^1.25.2"
   },
   "dependencies": {
+    "copyfiles": "^2.4.1",
     "ts-brand": "^0.1.0"
   }
 }

@@ -17,7 +17,7 @@ declare module universe {
    * Gets the number of logged in clients
    * @return An integer containing the number of logged in clients
    */
-   function numberOfClients():size_t; 
+  function numberOfClients():size_t; 
   
   /** Returns whether or not the provided client ID is currently connected
    * @param clientId the client ID in question

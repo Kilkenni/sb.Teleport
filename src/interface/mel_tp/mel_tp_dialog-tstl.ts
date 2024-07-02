@@ -2,7 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnFallback, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tp_dialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util-tstl";
 
 export interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
@@ -74,9 +74,9 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
         }
         if(planetParams !== null) {
           lblBkmLocType.setText(planetParams.typeName);
+          //debug line
+          // sb.logInfo(sb.printJson(planetParams as unknown as JSON));
         }
-        //debug line
-        sb.logInfo(sb.printJson(planetParams as unknown as JSON));
       }
       else {
         //coord is an InstanceWorldId

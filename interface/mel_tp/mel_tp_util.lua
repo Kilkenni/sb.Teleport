@@ -46,7 +46,7 @@ SystemLocationType[SystemLocationType.Space] = "Space"
 SystemLocationType.FloatingDungeon = 4
 SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
 
-local function getSpaceLocationType(destination)
+function getSpaceLocationType(destination)
   if destination == nil then
     return SystemLocationType.null
   end

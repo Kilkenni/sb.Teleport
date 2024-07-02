@@ -9,7 +9,7 @@
   "scripts" : ["mel_tpdialog.lua"],
   
   "openWithInventory" : false,
-  "anchor" : ["center", [-50, -50]],
+  "anchor" : ["center", [0, -50]],
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [
