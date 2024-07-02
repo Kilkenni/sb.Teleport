@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tstl",
     "dev": "tstl --watch",
-    "postbuild": "copyfiles --error --up 1 --soft --exclude '/src/@types/**/*.*' --exclude '**/*.ts' --exclude '**/*.d.ts' --verbose './src/**/*.config' './'"
+    "postbuild": "copyfiles --error --up 1 --exclude '/src/@types/**/*.*' --exclude '**/*.ts' --exclude '**/*.d.ts' --verbose './src/**/*.config' './src/**/*.ui' './src/interface/mel_tp/hazards/**/*' './'"
   },
   "repository": {
     "type": "git",
