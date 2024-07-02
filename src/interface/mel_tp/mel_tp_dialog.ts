@@ -2,7 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, btnDumpTp, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmLocType, btnFallback, btnTeleport, lblDebug, lblDump, tpItem} from "./mel_tp_dialog.ui";
-import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, parseWorldIdFull, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
+import { sortArrayByProperty, getSpaceLocationType, WorldIdToObject, ObjectToWorldId, JsonToDestination, TargetToWarpCommand } from "./mel_tp_util";
 
 export interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
@@ -418,7 +418,7 @@ btnTeleport.onClick = function() {
     return
   }
   // let tempWarpTarget:WarpAction = mel_tp.selected.warpAction;
-  const warpTarget:string = TargetToWarpCommand(mel_tp.selected.warpAction)
+  const warpTarget:WarpActionString = TargetToWarpCommand(mel_tp.selected.warpAction)
   // if(typeof tempWarpTarget === "string"){
   //   //WarpAction is a WarpAlias
   //   warpTarget = tempWarpTarget;

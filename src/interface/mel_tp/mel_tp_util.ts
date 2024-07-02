@@ -104,14 +104,14 @@ function ObjectToWorldId(target:CelestialCoordinate|InstanceWorldId):WorldIdStri
   }
 }
 
-function WorldIdFullToString(target: BookmarkTarget):WarpToWorld {
-  return sb.printJson(target as unknown as JSON) as WarpToWorld;
-}
+// function WorldIdFullToString(target: BookmarkTarget):WarpToWorld {
+//   return sb.printJson(target as unknown as JSON) as WarpToWorld;
+// }
 
-function parseWorldIdFull(target: WarpToWorld): BookmarkTarget {
-  const trimBrackets = target.substring(1, target.length - 1);
-  return trimBrackets.split(",") as BookmarkTarget;
-}
+// function parseWorldIdFull(target: WarpToWorld): BookmarkTarget {
+//   const trimBrackets = target.substring(1, target.length - 1);
+//   return trimBrackets.split(",") as BookmarkTarget;
+// }
 
 function IsBookmarkInstance(target:BookmarkTarget):boolean {
   return target[0].includes("InstanceWorld");
@@ -143,10 +143,10 @@ function JsonToDestination(destJson: JsonDestination):Destination {
   }
 }
 
-function TargetToWarpCommand(target: WarpAction):WarpToPlayer|WarpToInstance|WarpToWorld|string {
+function TargetToWarpCommand(target: WarpAction):WarpActionString {
   if(typeof target === "string") {
     //WarpAlias
-    return target as string;
+    return target;
   }
   if(target[0] === "player") {
     return `Player:${target[1] as Uuid}`;
@@ -155,7 +155,7 @@ function TargetToWarpCommand(target: WarpAction):WarpToPlayer|WarpToInstance|War
     return `Player:${target[1] as Uuid}`; //FIXME
   }
   else {
-    return `[${target[0]}, ${target[1]}]`
+    return `${target[0]}=${target[1]}` as WarpToWorld;
   }
 }
 
@@ -164,7 +164,7 @@ export {
   getSpaceLocationType,
   WorldIdToObject,
   ObjectToWorldId,
-  parseWorldIdFull,
+  // parseWorldIdFull,
   JsonToDestination,
   TargetToWarpCommand
 }

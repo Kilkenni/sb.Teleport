@@ -85,7 +85,7 @@ declare type UuidTarget = [ "object", Uuid ]
 
 
 declare type WarpToPlayer = `Player:${Uuid}`
-declare type WarpToWorld = `[${BookmarkTarget[0]}, ${BookmarkTarget[1]|"-"}]`
+declare type WarpToWorld = `${BookmarkTarget[0]}=${BookmarkTarget[1]|"-"}`
 //Instance worlds typically have named WorldID and SpawnTarget
 declare type WarpToInstance = WarpToWorld
 

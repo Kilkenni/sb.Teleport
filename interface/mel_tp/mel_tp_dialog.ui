@@ -5,11 +5,10 @@
   "minSize" : [120, 64],
   "title" : "Teleporter",
   "icon" : "/interface/warping/icon.png",
-  "accentColor" : "3f3fff",
   "scripts" : ["mel_tpdialog.lua"],
   
   "openWithInventory" : false,
-  "anchor" : ["center", [0, -50]],
+  
   "uniqueBy" : "path",
   "uniqueMode" : "toggle", 
   "children" : [

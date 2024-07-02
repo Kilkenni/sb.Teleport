@@ -1,4 +1,5 @@
 local ____exports = {}
+---@diagnostic disable: undefined-global
 --- Sorts array by certain property
 -- 
 -- @param array Array of similar objects containing properties with string keys
@@ -34,43 +35,49 @@ local function sortArrayByProperty(self, array, propertyName, descending)
     return sortedArray
 end
 
-local SystemLocationType = SystemLocationType or ({})
-SystemLocationType.null = 0
-SystemLocationType[SystemLocationType.null] = "null"
-SystemLocationType.CelestialCoordinate = 1
-SystemLocationType[SystemLocationType.CelestialCoordinate] = "CelestialCoordinate"
-SystemLocationType.CelestialOrbit = 2
-SystemLocationType[SystemLocationType.CelestialOrbit] = "CelestialOrbit"
-SystemLocationType.Space = 3
-SystemLocationType[SystemLocationType.Space] = "Space"
-SystemLocationType.FloatingDungeon = 4
-SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
+local SystemLocationType = {
+  "nil",
+  "CelestialCoordinate",
+  "CelestialOrbit",
+  "Space",
+  "FloatingDungeon"
+}
+-- SystemLocationType.null = 0
+-- SystemLocationType[SystemLocationType.null] = "nil"
+-- SystemLocationType.CelestialCoordinate = 1
+-- SystemLocationType[SystemLocationType.CelestialCoordinate] = "CelestialCoordinate"
+-- SystemLocationType.CelestialOrbit = 2
+-- SystemLocationType[SystemLocationType.CelestialOrbit] = "CelestialOrbit"
+-- SystemLocationType.Space = 3
+-- SystemLocationType[SystemLocationType.Space] = "Space"
+-- SystemLocationType.FloatingDungeon = 4
+-- SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
 
 function getSpaceLocationType(destination)
   if destination == nil then
-    return SystemLocationType.null
+    return SystemLocationType[1]
   end
   if type(destination[1]) == "string" then
     if destination[1] == "object" then
-      return SystemLocationType.FloatingDungeon
+      return SystemLocationType[5]
     end
     if destination[1] == "orbit" then
-      return SystemLocationType.CelestialOrbit
+      return SystemLocationType[3]
     end
     if destination[1] == "coordinate" then
-      return SystemLocationType.CelestialCoordinate
+      return SystemLocationType[2]
     end
     sb.logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
-    return SystemLocationType.null
+    return SystemLocationType[1]
   end
   if type (destination[1]) == type(destination[2]) then
-    return SystemLocationType.Space
+    return SystemLocationType[4]
   end
   sb.logError(
     "GetSpaceLocationType: can't identify location type: %s",
     {sb.printJson(destination)}
   )
-  return SystemLocationType.null
+  return SystemLocationType[1]
 end
 
 local function stringToArray(inputString, separator, elemType)
@@ -204,7 +211,7 @@ function JsonToDestination(destJson)
       icon = destJson.icon,
       deploy = destJson.deploy,
       mission = destJson.mission,
-      prerequisiteQuest = destJson.prerequisiteQuest
+      prerequisiteQuest = tostring(destJson.prerequisiteQuest)
   }
 end
 
@@ -219,7 +226,7 @@ function TargetToWarpCommand(target)
   if target[1] == "object" then
       return "Player:" .. target[2]  --FIXME
   else
-      return ((("[" .. tostring(target[1])) .. ", ") .. tostring(target[2])) .. "]"
+      return ((tostring(target[1]) .. "=") .. tostring(target[2])) 
   end
 end
 

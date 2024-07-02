@@ -1,7 +1,12 @@
---- -@diagnostic disable: undefined-global
+---@diagnostic disable: undefined-global
 -- require "/scripts/util.lua"
 -- require "/scripts/vec2.lua"
 require("/interface/mel_tp/mel_tp_util.lua")
+
+-- local getSpaceLocationType = mel_tp_util.getSpaceLocationType
+-- local WorldIdToObject = mel_tp_util.WorldIdToObject
+-- local JsonToDestination = mel_tp_util.JsonToDestination
+-- local TargetToWarpCommand = mel_tp_util.TargetToWarpCommand
 
 local mel_tp = {
   bookmarks = nil,
@@ -142,8 +147,8 @@ local function populateBookmarks()
     for index, dest in ipairs(finalTpConfig.destinations) do
       local destination = JsonToDestination(dest)
 
-      if destination.prerequisiteQuest and player:hasCompletedQuest(destination.prerequisiteQuest) == false then
-        return
+      if(destination.prerequisiteQuest ~= nil and player.hasCompletedQuest(destination.prerequisiteQuest) == false) then
+        --return
       end
 
       if (destination.warpAction == "OrbitedWorld") then
@@ -154,9 +159,10 @@ local function populateBookmarks()
         lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
         if(shipLocation[1] == "coordinate") then
           lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2])))
-          sb.logInfo("Location is"..sb.printJson(shipLocation[2]))
-          sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
-          sb.logInfo("Planet name is"..sb.printJson(celestial.planetName(shipLocation[2])))
+          --debug
+          -- sb.logInfo("Location is"..sb.printJson(shipLocation[2]))
+          -- sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
+          -- sb.logInfo("Planet name is"..sb.printJson(celestial.planetName(shipLocation[2])))
         end
         --[[
         if(type(shipLocation) ~= "table" or type(shipLocation[1])== "number" or (shipLocation[2].planet and type(shipLocation[2].planet) ~= "number")) then
@@ -170,7 +176,7 @@ local function populateBookmarks()
       end
 
       if destination.warpAction == "OwnShip" and player.worldId() == player.ownShipWorldId() then
-        return --If a player is already on their ship, do not offer to warp there even if config lists it
+        --return --If a player is already on their ship, do not offer to warp there even if config lists it
       end
       
       local currentBookmark = mel_tp.bookmarkTemplate
@@ -197,7 +203,7 @@ local function populateBookmarks()
           prerequisiteQuest = destination.prerequisiteQuest or false
       }
       if bkmData.prerequisiteQuest and player.hasCompletedQuest(bkmData.prerequisiteQuest) == false then
-        return
+        --return
       end
 
       currentBookmark.children[1].file = bkmData.icon
@@ -229,7 +235,7 @@ function btnDumpTp:onClick()
     else
       sb.logInfo("[log] ship location "..sb.printJson(shipLocation[2]))
       local warpTarget = shipLocation[2];
-      local coord = WorldIdToCelestialCoordinate(warpTarget)
+      local coord = WorldIdToObject(warpTarget)
       if(coord == nil) then
         lblBkmName:setText("Database Error");
         lblBkmHazards:setText(world.timeOfDay());

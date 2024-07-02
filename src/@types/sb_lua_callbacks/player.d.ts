@@ -179,7 +179,7 @@ declare module player {
    * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation
    * @param deploy Whether to deploy player mech
    */
-  function warp(warpActionString: string, animation?: string, deploy?: boolean):void;
+  function warp(warpActionString: WarpActionString, animation?: string, deploy?: boolean):void;
 
 
   /**
