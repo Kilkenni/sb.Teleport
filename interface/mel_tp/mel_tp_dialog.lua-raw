@@ -28,9 +28,19 @@ function displayPlanetInfo(self, coord)
         lblBkmHazards:setText("Hazards: " .. sb:printJson(planetParams.environmentStatusEffects))
         if #planetParams.environmentStatusEffects > 0 then
             local hazardTemplate = listHazards.data
-            hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].icon or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
-            hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].displayName or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
-            listHazards:addChild(hazardTemplate)
+            __TS__ArrayForEach(
+                planetParams.environmentStatusEffects,
+                function(____, effect, index)
+                    if mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] ~= nil then
+                        hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon
+                        hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].displayName
+                    else
+                        hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
+                        hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
+                    end
+                    listHazards:addChild(hazardTemplate)
+                end
+            )
         end
     else
         lblBkmHazards:setText(world:timeOfDay())
@@ -171,6 +181,9 @@ local function populateBookmarks(self)
                     if locationType == nil or locationType ~= "CelestialCoordinate" then
                         return
                     end
+                    if player:worldId() ~= player:ownShipWorldId() then
+                        return
+                    end
                 end
                 if destination.warpAction == WarpAlias.OwnShip and player:worldId() == player:ownShipWorldId() then
                     return
@@ -214,7 +227,7 @@ local function populateBookmarks(self)
     metagui:queueFrameRedraw()
 end
 txtboxFilter.onEnter = function(self)
-    player:say(sb:printJson(txtboxFilter.text))
+    chat:send(sb:printJson(txtboxFilter.text))
 end
 txtboxFilter.onEscape = function(self)
     btnResetFilter:onClick()

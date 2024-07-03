@@ -134,9 +134,13 @@ function populateBookmarks() {
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
         const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
-        if(locationType === null ||locationType !== "CelestialCoordinate"){
+        if(locationType === null || locationType !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
-        }       
+        }
+        if(player.worldId() !== player.ownShipWorldId()) {
+          return; //disables warping down when not on a PLAYER's ship. TODO: find how to enable on other ships
+        }
+        
       }
       if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
         return; //If a player is already on their ship - do not offer to warp there even if config lists it
@@ -350,10 +354,17 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
     if(planetParams.environmentStatusEffects.length > 0) {
       //experimental - if at least one hazard is there, show its icon
       const hazardTemplate:hazardItem = listHazards.data;
-      hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[0]].icon || mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon;
-      hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[0]].displayName || mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName;
-
-      listHazards.addChild(hazardTemplate)
+      planetParams.environmentStatusEffects.forEach((effect, index) => {
+        if(mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] !== undefined) {
+          hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon;
+          hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].displayName;
+        } 
+        else {
+          hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon;
+          hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName;
+        }
+        listHazards.addChild(hazardTemplate);
+      })
     }
   }
   else {
@@ -425,7 +436,7 @@ lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
 };
 
 txtboxFilter.onEnter = function ():void {
-  player.say(sb.printJson(txtboxFilter.text));
+  chat.send(sb.printJson(txtboxFilter.text));
 }
 
 txtboxFilter.onEscape = function ():void {

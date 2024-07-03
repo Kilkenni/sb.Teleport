@@ -37,24 +37,30 @@ local function displayPlanetInfo(coord)
     lblBkmHazards:setText("Hazards: " .. sb.printJson(planetParams.environmentStatusEffects))
     if #planetParams.environmentStatusEffects > 0 then
       local hazardTemplate = listHazards.data
+      -- sb.logInfo(sb.printJson(hazardTemplate))
 
-      hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].icon or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
+      for index, effect in ipairs(planetParams.environmentStatusEffects) do
+        if(mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] ~= nil) then
+          hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon
+          hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].displayName
+        else
+          hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
+          hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
+        end
 
-      hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].displayName or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
-
-      listHazards:addChild(hazardTemplate)
+        listHazards:addChild(hazardTemplate)
+      end
     end
   else
     lblBkmHazards:setText(world.timeOfDay())
   end
 end
-    
 
 local function OnTpTargetSelect(bookmarkWidget)
   mel_tp.selected = bookmarkWidget.bkmData
   local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
   listHazards:clearChildren()
-  
+
   if(type(mel_tp.selected.warpAction) == "string") then
     if mel_tp.selected.warpAction ~= "OrbitedWorld" then
       lblBkmName:setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
@@ -213,6 +219,9 @@ local function populateBookmarks()
         if locationType == nil or  locationType ~= "CelestialCoordinate" then
           goto continue --Warping down is available only when orbiting a planet
         end
+        if player:worldId() ~= player:ownShipWorldId() then
+          goto continue --Disable when player is not on THEIR ship
+      end
       end
 
       if destination.warpAction == "OwnShip" and player.worldId() == player.ownShipWorldId() then
@@ -271,7 +280,7 @@ local function populateBookmarks()
 end
 
 function txtboxFilter:onEnter()
-  player.say(sb.printJson(txtboxFilter.text))
+  chat.send(sb.printJson(txtboxFilter.text))
 end
 
 function txtboxFilter:onEscape()
@@ -291,53 +300,6 @@ function btnSortByPlanet:onClick()
   mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
   populateBookmarks()
 end
-
---[[
-function btnDumpTp:onClick()
-  --lblDebug:setText(sb.printJson(mel_tp.bookmarks))
-  local shipLocation = celestial.shipLocation();
-  if(shipLocation[1] == "coordinate") then
-    if(type(shipLocation[2]) == "string") then
-      lblBkmName:setText("");
-      lblBkmHazards:setText("Entity signature");
-    else
-      sb.logInfo("[log] ship location "..sb.printJson(shipLocation[2]))
-      local warpTarget = shipLocation[2];
-      local coord = WorldIdToObject(warpTarget)
-      if(coord == nil) then
-        lblBkmName:setText("Database Error");
-        lblBkmHazards:setText(world.timeOfDay());
-      else
-        local name = celestial.planetName(coord);
-        local planetParams = celestial.visitableParameters(coord);
-        if(name ~= nil) then
-          lblBkmName:setText(name); 
-        end
-        if(planetParams ~= nil) then
-          lblBkmHazards:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
-          local config = root.assetJson("/interface/mel_tp/mel_tp.config");
-          -- sb.logInfo(sb.printJson(config.planetaryEnvironmentHazards))
-          -- listHazards:clearChildren();
-          for index, effect in ipairs(planetParams.environmentStatusEffects) do
-            local iconPath = config.planetaryEnvironmentHazards[effect] or config.planetaryEnvironmentHazards.error;
-            local newEffect = {
-              type =  "image",
-              file = iconPath,
-              tooltip = "Effect!",
-              scale = 2,
-              noAutoCrop = true,
-            }
-            listHazards:addChild(newEffect);
-          end
-        end
-        --debug line
-        --sb.logInfo(sb.printJson(planetParams));
-      end
-    end
-  end
-end
-
---]]
 
 --[[
 function btnSortByPlanet:onClick()
