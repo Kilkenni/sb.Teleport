@@ -128,13 +128,13 @@ function populateBookmarks() {
     finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
       const destination:Destination = mel_tp_util.JsonToDestination(dest);
-      if(destination.prerequisiteQuest && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
+      if(destination.prerequisiteQuest !== undefined && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
         return; //Quest not complete - skip this Destination
       }
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
         const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
         const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
-        if(locationType !== "CelestialCoordinate"){
+        if(locationType === null ||locationType !== "CelestialCoordinate"){
           return; //Warping down is available only when orbiting a planet
         }       
       }
@@ -368,7 +368,7 @@ listHazards.clearChildren();
 
 if(typeof mel_tp.selected.warpAction === "string") {
   if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
-    lblBkmName.setText(`Special system alias signature: ${mel_tp.selected.warpAction}`);
+    lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
     lblBkmHazards.setText(world.timeOfDay());
   }
   else {

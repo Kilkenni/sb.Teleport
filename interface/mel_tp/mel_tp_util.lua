@@ -232,7 +232,7 @@ local function FilterBookmarks(bookmarks, filter)
   return filteredBookmarks
 end
 
-local mel_tp_util = {
+mel_tp_util = {
   sortArrayByProperty = sortArrayByProperty,
   getSpaceLocationType = getSpaceLocationType,
   WorldIdToObject = WorldIdToObject,

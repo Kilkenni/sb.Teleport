@@ -5,7 +5,7 @@
   "minSize" : [120, 64],
   "title" : "Teleporter",
   "icon" : "/interface/warping/icon.png",
-  "scripts" : ["mel_tpdialog.lua"],
+  "scripts" : ["mel_tp_dialog.lua"],
   
   "openWithInventory" : false,
   

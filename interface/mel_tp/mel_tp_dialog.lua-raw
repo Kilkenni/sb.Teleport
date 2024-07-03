@@ -42,7 +42,7 @@ function OnTpTargetSelect(self, bookmarkWidget)
     listHazards:clearChildren()
     if type(mel_tp.selected.warpAction) == "string" then
         if mel_tp.selected.warpAction ~= WarpAlias.OrbitedWorld then
-            lblBkmName:setText("Special system alias signature: " .. tostring(mel_tp.selected.warpAction))
+            lblBkmName:setText("Special system alias signature " .. sb:printJson(mel_tp.selected.warpAction))
             lblBkmHazards:setText(world:timeOfDay())
         else
             local shipLocation = celestial:shipLocation()
@@ -162,13 +162,13 @@ local function populateBookmarks(self)
             finalTpConfig.destinations,
             function(____, dest, index)
                 local destination = mel_tp_util:JsonToDestination(dest)
-                if destination.prerequisiteQuest and player:hasCompletedQuest(destination.prerequisiteQuest) == false then
+                if destination.prerequisiteQuest ~= nil and player:hasCompletedQuest(destination.prerequisiteQuest) == false then
                     return
                 end
                 if destination.warpAction == WarpAlias.OrbitedWorld then
                     local shipLocation = celestial:shipLocation()
                     local locationType = mel_tp_util:getSpaceLocationType(shipLocation)
-                    if locationType ~= "CelestialCoordinate" then
+                    if locationType == nil or locationType ~= "CelestialCoordinate" then
                         return
                     end
                 end

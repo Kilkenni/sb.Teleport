@@ -2,7 +2,7 @@
 
 A proof-of-concept mod that uses some minor sorcery to reimagine Teleportation UI.
 
-Works entirety on vanilla Lua callbacks.
+Works entirely on vanilla Lua callbacks.
 (and ocassionally hazelnut chocolate)
 
 Work in progress (currently can parse player bookmarks and additional destinations from vanilla teleporter .configs). Planned features will probably be available in Issues. Soon :tm:

@@ -1,20 +1,17 @@
----@diagnostic disable: undefined-global
--- require "/scripts/util.lua"
--- require "/scripts/vec2.lua"
-require("/interface/mel_tp/mel_tp_util.lua")
+--@diagnostic disable: undefined-global
 
--- local getSpaceLocationType = mel_tp_util.getSpaceLocationType
--- local WorldIdToObject = mel_tp_util.WorldIdToObject
--- local JsonToDestination = mel_tp_util.JsonToDestination
--- local TargetToWarpCommand = mel_tp_util.TargetToWarpCommand
+require("/interface/mel_tp/mel_tp_util.lua")
 
 local mel_tp = {
   bookmarks = nil,
+  filter = "",
+  bookmarksFiltered = nil,
   bookmarkTemplate = bookmarksList.data,
-  configPath = nil,
+  configPath = "",
   configOverride = nil,
   selected = nil,
-  animation = "default"
+  animation = "default",
+  dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config")
 }
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
@@ -27,57 +24,86 @@ mel_tp.configOverride = root.assetJson(mel_tp.configPath)
     -- "icon":"garden",
     -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     -- "bookmarkName":"Merchant test"}
+local function displayPlanetInfo(coord)
+  local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
+  local name = celestial.planetName(coord)
+  local planetParams = celestial.visitableParameters(coord)
+  if name ~= nil then
+    lblBkmName:setText(name)
+  else
+    lblBkmName:setText(dbErrorText)
+  end
+  if planetParams ~= nil then
+    lblBkmHazards:setText("Hazards: " .. sb.printJson(planetParams.environmentStatusEffects))
+    if #planetParams.environmentStatusEffects > 0 then
+      local hazardTemplate = listHazards.data
+
+      hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].icon or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.icon
+
+      hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[planetParams.environmentStatusEffects[1]].displayName or mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName
+
+      listHazards:addChild(hazardTemplate)
+    end
+  else
+    lblBkmHazards:setText(world.timeOfDay())
+  end
+end
+    
 
 local function OnTpTargetSelect(bookmarkWidget)
   mel_tp.selected = bookmarkWidget.bkmData
+  local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
+  listHazards:clearChildren()
   
   if(type(mel_tp.selected.warpAction) == "string") then
-    lblBkmName:setText("");
-    lblBkmHazards:setText("Special system alias signature");
+    if mel_tp.selected.warpAction ~= "OrbitedWorld" then
+      lblBkmName:setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
+      lblBkmHazards:setText(world.timeOfDay())
+    else
+      local shipLocation = celestial.shipLocation()
+      local locationType = mel_tp_util.getSpaceLocationType(shipLocation)
+      if shipLocation == nil or locationType ~= "CelestialCoordinate" then
+        if shipLocation == nil then
+            sb.logError("Teleport list contains [Orbited World] but ship location is NIL}")
+        else
+            sb.logError("Teleport list contains [Orbited World] but ship location is " .. sb.printJson(shipLocation))
+        end
+        return
+      end
+      local coord = shipLocation[2]
+      displayPlanetInfo(coord)
+    end
   elseif(mel_tp.selected.warpAction[1] == "player" )then
-      lblBkmName:setText("")
-      lblBkmHazards:setText("Player signature")
-  elseif (mel_tp.selected.warpAction[1] == "object") then
-      lblBkmName:setText("")
-      lblBkmHazards:setText("Object Uuid signature")
+    lblBkmName:setText("Player signature")
+    lblBkmHazards:setText(world.timeOfDay())
+  elseif mel_tp.selected.warpAction[1] == "object" then
+    lblBkmName:setText("Object Uuid signature")
+    lblBkmHazards:setText(world.timeOfDay())
   else
-    sb.logInfo("[log] Showing info for: "..sb.printJson(mel_tp.selected.warpAction[1]))
-    local warpTarget = mel_tp.selected.warpAction[1];
-    local coord = WorldIdToObject(warpTarget)
-    if(coord == nil) then
-      lblBkmName:setText("Database Error");
-      lblBkmHazards:setText(world.timeOfDay());
+    -- sb.logInfo("[log] Showing info for: "..sb.printJson(mel_tp.selected.warpAction[1]))
+    local warpTarget = mel_tp.selected.warpAction[1]
+    local coord = mel_tp_util.WorldIdToObject(warpTarget)
+    if coord == nil then
+      lblBkmName:setText(dbErrorText)
+      lblBkmHazards:setText(world.timeOfDay())
     else
       if coord.location ~= nil then
         -- CelestialCoordinate
-        local name = celestial.planetName(coord)
-        local planetParams = celestial.visitableParameters(coord)
-        if name ~= nil then
-          lblBkmName:setText(name)
-        else
-          lblBkmName:setText("Database Error");
-        end
-        if planetParams ~= nil then
-          lblBkmHazards:setText(planetParams.typeName)
-        else
-          lblBkmHazards:setText(world.timeOfDay());
-        end
-        if(planetParams ~= nil) then
-          lblBkmHazards:setText("Hazards: "..sb.printJson(planetParams.environmentStatusEffects));
-          -- sb.logInfo("[log] Planet visitable parameters: "..sb.printJson(planetParams))
-        end
+        displayPlanetInfo(coord)
       else
         --InstanceWorld
         local instanceId = coord
         if instanceId.instance ~= nil then
-            lblBkmName:setText(instanceId.instance)
+          lblBkmName:setText(instanceId.instance)
         end
         if instanceId.level ~= "-" then
-          lblBkmHazards:setText("Level ${instanceId.level}")
+          lblBkmHazards:setText("Level " .. tostring(instanceId.level))
         end
       end
     end
+
   end
+  --debug
   lblDump:setText(sb.printJson(bookmarkWidget.bkmData))
 end
 
@@ -100,52 +126,61 @@ local function populateBookmarks()
     destinations = ____opt_8 and ____opt_8.destinations or nil
   }
 
-  if finalTpConfig.includePlayerBookmarks and mel_tp.bookmarks ~= nil then
-    for index, bookmark in ipairs(mel_tp.bookmarks) do
-      local currentBookmark = mel_tp.bookmarkTemplate
-      local iconPath = ""
-      if bookmark.icon ~= nil then
+  -- if finalTpConfig.includePlayerBookmarks and mel_tp.bookmarks ~= nil then
+  if finalTpConfig.includePlayerBookmarks then
+    local filteredBookmarks
+    if mel_tp.filter ~= "" then
+      filteredBookmarks = mel_tp.bookmarks
+    else
+      filteredBookmarks = mel_tp.bookmarksFiltered
+    end
+    if filteredBookmarks ~= nil then
+      for index, bookmark in ipairs(filteredBookmarks) do
+        local currentBookmark = mel_tp.bookmarkTemplate
+        local iconPath = ""
+        if bookmark.icon ~= nil then
           iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
-      end
-      local bkmData = {
-          --system = false --for special locations like ship etc
-          warpAction = bookmark.target,
-          name = bookmark.bookmarkName or "???",
-          planetName = bookmark.targetName or "",
-          icon = iconPath,
-          deploy = false
-      }
-  
-      -- { "type": "listItem", "id" : "tpBookmark", "children": [
-      --   { "type": "image", "id":"tpIcon", "file": ""},
-      --   {"type":"label", "id":"tpName", "text": "name"},
-      --   {"type": "label", "id":"tpPlanetName", "text": "planet"}
-      --   ],
-      --   "data": {"target": null}
-      -- }
+        end
+        local bkmData = {
+            --system = false --for special locations like ship etc
+            warpAction = bookmark.target,
+            name = bookmark.bookmarkName or "???",
+            planetName = bookmark.targetName or "",
+            icon = iconPath,
+            deploy = false
+        }
+    
+        -- { "type": "listItem", "id" : "tpBookmark", "children": [
+        --   { "type": "image", "id":"tpIcon", "file": ""},
+        --   {"type":"label", "id":"tpName", "text": "name"},
+        --   {"type": "label", "id":"tpPlanetName", "text": "planet"}
+        --   ],
+        --   "data": {"target": null}
+        -- }
 
-  
-      currentBookmark.id = currentBookmark.id .. index
-      -- tpName:setText(sb.printJson(mel_tp.data[1].bookmarkName))
-      -- tpPlanetName:setText(mel_tp.data[1].targetName)
-      -- tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.data[1].icon..".png")
-      
-      currentBookmark.children[1].id = currentBookmark.children[1].id .. index
-      currentBookmark.children[2].id = currentBookmark.children[2].id .. index
-      currentBookmark.children[3].id = currentBookmark.children[3].id .. index
-      currentBookmark.children[1].file = bkmData.icon
-      currentBookmark.children[2].text = bkmData.name
-      currentBookmark.children[3].text = bkmData.planetName
-      -- currentBookmark.bkmData = bkmData
-      local addedBookmark = bookmarksList:addChild(currentBookmark)
-      addedBookmark.onSelected = OnTpTargetSelect
-      addedBookmark.bkmData = bkmData
+    
+        currentBookmark.id = currentBookmark.id .. index
+        -- tpName:setText(sb.printJson(mel_tp.data[1].bookmarkName))
+        -- tpPlanetName:setText(mel_tp.data[1].targetName)
+        -- tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.data[1].icon..".png")
+        
+        currentBookmark.children[1].id = currentBookmark.children[1].id .. index
+        currentBookmark.children[2].id = currentBookmark.children[2].id .. index
+        currentBookmark.children[3].id = currentBookmark.children[3].id .. index
+        currentBookmark.children[1].file = bkmData.icon
+        currentBookmark.children[2].text = bkmData.name
+        currentBookmark.children[3].text = bkmData.planetName
+        -- currentBookmark.bkmData = bkmData
+        local addedBookmark = bookmarksList:addChild(currentBookmark)
+        addedBookmark.onSelected = OnTpTargetSelect
+        addedBookmark.bkmData = bkmData
+      end
     end
   end
 
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do  
-      local destination = JsonToDestination(dest)
+      local destination = mel_tp_util.JsonToDestination(dest)
       if(destination.prerequisiteQuest ~= nil) then
         if(player.hasCompletedQuest(destination.prerequisiteQuest) == false) then
           goto continue
@@ -155,24 +190,27 @@ local function populateBookmarks()
       if (destination.warpAction == "OrbitedWorld") then
         --allow warp only if CelestialCoordinate
         local shipLocation = celestial.shipLocation()
-        local locationType = getSpaceLocationType(shipLocation)
-        sb.logInfo("Location type is "..sb.printJson(locationType))
+        local locationType = mel_tp_util.getSpaceLocationType(shipLocation)
+        
         --debug
+        --[[
+        sb.logInfo("Location type is "..sb.printJson(locationType))
         lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
+
         if(shipLocation[1] == "coordinate") then
           lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2])))
           --debug
           sb.logInfo("Location is"..sb.printJson(shipLocation))
-          -- sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
-          -- sb.logInfo("Planet name is"..sb.printJson(celestial.planetName(shipLocation[2])))
         end
+        --]]
+
         --[[
         if(type(shipLocation) ~= "table" or type(shipLocation[1])== "number" or (shipLocation[2].planet and type(shipLocation[2].planet) ~= "number")) then
           return; 
         end 
         --]]
 
-        if tostring(locationType) ~= "CelestialCoordinate" then
+        if locationType == nil or  locationType ~= "CelestialCoordinate" then
           goto continue --Warping down is available only when orbiting a planet
         end
       end
@@ -189,12 +227,26 @@ local function populateBookmarks()
 
       --Special: for mission teleports when in a party
       if destination.mission == true and type(destination.warpAction) ~= "string" then
+        --if the warpAction is for an instance world, set the uuid to the team uuid -- or so the source code claims
+        --we assume it is BookmarkTarget since Json configs can't teleport to dynamic objects or players, and it's not Alias
         local warpAction = destination.warpAction
         if (string.find(warpAction[1], "InstanceWorld") ~= nil) then
           local teamUuid = "" --TODO FIX
           destination.warpAction = {warpAction[1], teamUuid}
         end
       end
+
+      if finalTpConfig.includePartyMembers == true then
+        local beamPartyMember = mel_tp.dialogConfig.mel_tp_dialog.beamPartyMemberLabel
+        local deployPartyMember = mel_tp.dialogConfig.mel_tp_dialog.deployPartyMemberLabel
+        local beamPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog.beamPartyMemberIcon
+        local deployPartyMemberIcon = mel_tp.dialogConfig.mel_tp_dialog.deployPartyMemberIcon
+
+        --add warp options for each party member
+
+        --TODO find how to get party members
+    end
+
       local bkmData = {
           warpAction = destination.warpAction,
           name = destination.name or "???",
@@ -204,9 +256,6 @@ local function populateBookmarks()
           mission = destination.mission or false,
           prerequisiteQuest = destination.prerequisiteQuest or false
       }
-      if bkmData.prerequisiteQuest and player.hasCompletedQuest(bkmData.prerequisiteQuest) == false then
-        --return
-      end
 
       currentBookmark.children[1].file = bkmData.icon
       currentBookmark.children[2].text = bkmData.name
@@ -221,13 +270,29 @@ local function populateBookmarks()
   metagui.queueFrameRedraw()
 end
 
---[[  FIX THIS
-if mel_tp.bookmarks ~= nil then
-  mel_tp.bookmarks = sortArrayByProperty(nil, mel_tp.bookmarks, "bookmarkName", false)
+function txtboxFilter:onEnter()
+  player.say(sb.printJson(txtboxFilter.text))
 end
---]]
-populateBookmarks()
 
+function txtboxFilter:onEscape()
+  btnResetFilter:onClick()
+end
+
+function btnResetFilter:onClick()
+  txtboxFilter:setText("")
+  mel_tp.bookmarksFiltered = nil
+  populateBookmarks()
+end
+
+function btnSortByPlanet:onClick()
+  if mel_tp.bookmarks == nil then
+    return
+  end
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
+  populateBookmarks()
+end
+
+--[[
 function btnDumpTp:onClick()
   --lblDebug:setText(sb.printJson(mel_tp.bookmarks))
   local shipLocation = celestial.shipLocation();
@@ -269,17 +334,17 @@ function btnDumpTp:onClick()
         --sb.logInfo(sb.printJson(planetParams));
       end
     end
-    -- lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2]))..world.timeOfDay())
-    -- sb.logInfo("Location is "..sb.printJson(shipLocation[2]))
-    -- sb.logInfo("Planet size is "..sb.printJson(celestial.planetSize(shipLocation[2])))
-    -- sb.logInfo("Planet name is "..sb.printJson(celestial.planetName(shipLocation[2])))
   end
 end
 
+--]]
+
+--[[
 function btnSortByPlanet:onClick()
   table.sort(mel_tp.data, function(el1, el2) return el1.targetName:upper() < el2.targetName:upper() end)
   populateBookmarks()
 end
+--]]
 
 function btnTeleport:onClick()
   if(mel_tp.selected == nil) then
@@ -287,7 +352,7 @@ function btnTeleport:onClick()
     lblDump:setText("No target selected")
     return
   end
-  local warpTarget = TargetToWarpCommand(mel_tp.selected.warpAction)
+  local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
   --[[
   if(type(warpTarget) ~= "string") then
     warpTarget = mel_tp.selected.warpAction[1]..tostring(mel_tp.selected.warpAction[2] and "=" .. tostring(mel_tp.selected.warpAction[2]) or "")
@@ -304,3 +369,8 @@ function btnFallback:onClick()
   player.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 end
+
+if mel_tp.bookmarks ~= nil then
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
+end
+populateBookmarks()
