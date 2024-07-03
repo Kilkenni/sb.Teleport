@@ -114,7 +114,7 @@ declare module player {
   //CHAT
 
   /**
-   * Triggers chat message as if the player themselves said it
+   * Triggers chat message as if the player said it
    * @param message 
    */
   function say(message:string):void;
