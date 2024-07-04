@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local displayPlanetInfo, OnTpTargetSelect, mel_tp
+local clearPlanetInfo, displayPlanetInfo, OnTpTargetSelect, mel_tp
 local ____mel_tp_dialog_2Eui_2Ejs = require("./mel_tp_dialog.ui.js")
 local metagui = ____mel_tp_dialog_2Eui_2Ejs.metagui
 local bookmarksList = ____mel_tp_dialog_2Eui_2Ejs.bookmarksList
@@ -16,7 +16,13 @@ local btnDeploy = ____mel_tp_dialog_2Eui_2Ejs.btnDeploy
 local lblDump = ____mel_tp_dialog_2Eui_2Ejs.lblDump
 local ____mel_tp_util = require("interface.mel_tp.mel_tp_util")
 local mel_tp_util = ____mel_tp_util.default
+function clearPlanetInfo()
+    lblBkmName.setText("")
+    lblBkmHazards.setText("")
+    listHazards.clearChildren()
+end
 function displayPlanetInfo(coord)
+    clearPlanetInfo()
     local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
     local name = celestial.planetName(coord)
     local planetParams = celestial.visitableParameters(coord)
@@ -47,7 +53,7 @@ end
 function OnTpTargetSelect(bookmarkWidget)
     mel_tp.selected = bookmarkWidget.bkmData
     local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
-    listHazards.clearChildren()
+    clearPlanetInfo()
     if type(mel_tp.selected.warpAction) == "string" then
         if mel_tp.selected.warpAction ~= WarpAlias.OrbitedWorld then
             lblBkmName.setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
@@ -55,15 +61,25 @@ function OnTpTargetSelect(bookmarkWidget)
         else
             local shipLocation = celestial.shipLocation()
             local locationType = mel_tp_util.getSpaceLocationType(shipLocation)
-            if shipLocation == nil or locationType ~= "CelestialCoordinate" then
-                if shipLocation == nil then
-                    sb.logError("Teleport list contains [Orbited World] but ship location is NIL}")
-                else
-                    sb.logError("Teleport list contains [Orbited World] but ship location is " .. sb.printJson(shipLocation))
-                end
+            if locationType == nil or shipLocation == nil then
+                sb.logError("Teleport list contains [Orbited World] but ship location is NIL}")
                 return
             end
-            local coord = shipLocation[2]
+            if locationType ~= "CelestialCoordinate" then
+                local systemLocations = celestial.systemObjects()
+                local maybeUuid
+                if locationType == "FloatingDungeon" then
+                    maybeUuid = shipLocation[2]
+                end
+                if maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or mel_tp.selected.deploy ~= true then
+                    sb.logError("Teleport list contains [Orbited World] but ship location is " .. sb.printJson(shipLocation))
+                    return
+                end
+            end
+            local coord
+            if locationType == "CelestialCoordinate" then
+                coord = shipLocation[2]
+            end
             displayPlanetInfo(coord)
         end
     elseif mel_tp.selected.warpAction[1] == "player" then
