@@ -17,6 +17,7 @@ declare const lblBkmHazards
 declare const listHazards
 
 declare const btnTeleport
+declare const btnDeploy
 declare const btnFallback
 declare const lblDebug
 declare const lblDump
@@ -53,6 +54,7 @@ export {
 
   btnFallback,
   btnTeleport,
+  btnDeploy,
   lblDebug,
   lblDump,
 };

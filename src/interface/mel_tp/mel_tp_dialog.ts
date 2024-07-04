@@ -1,7 +1,7 @@
 //require "/scripts/util.lua"
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, lblDebug, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
+import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 import mel_tp_util from "./mel_tp_util";
 
 export interface Destination {
@@ -499,6 +499,17 @@ btnTeleport.onClick = function() {
   lblDump.setText(`Stringified warp target: ${warpTarget}`);
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
+  pane.dismiss();
+}
+
+btnDeploy.onClick = function() {
+  if(mel_tp.selected == undefined) {
+    widget.playSound("/sfx/interface/clickon_error.ogg")  
+    lblDump.setText("No target selected")
+    return
+  }
+  //TODO
+
   pane.dismiss();
 }
 

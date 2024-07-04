@@ -65,8 +65,14 @@
       "spacer",
       { 
         "type" : "button",
-        "caption" : "Default Teleport Dialog",
+        "caption" : "Vanilla Dialog",
         "id" : "btnFallback"
+      },
+      { 
+        "type" : "button",
+        "caption" : "Teleport",
+        "color" : "accent",
+        "id" : "btnDeploy"
       },
       { 
         "type" : "button",

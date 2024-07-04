@@ -12,6 +12,7 @@ local lblBkmHazards = ____mel_tp_dialog_2Eui_2Ejs.lblBkmHazards
 local listHazards = ____mel_tp_dialog_2Eui_2Ejs.listHazards
 local btnFallback = ____mel_tp_dialog_2Eui_2Ejs.btnFallback
 local btnTeleport = ____mel_tp_dialog_2Eui_2Ejs.btnTeleport
+local btnDeploy = ____mel_tp_dialog_2Eui_2Ejs.btnDeploy
 local lblDump = ____mel_tp_dialog_2Eui_2Ejs.lblDump
 local ____mel_tp_util = require("interface.mel_tp.mel_tp_util")
 local mel_tp_util = ____mel_tp_util.default
@@ -261,6 +262,14 @@ btnTeleport.onClick = function()
     lblDump.setText("Stringified warp target: " .. tostring(warpTarget))
     widget.playSound("/sfx/interface/ship_confirm1.ogg")
     player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
+    pane.dismiss()
+end
+btnDeploy.onClick = function()
+    if mel_tp.selected == nil then
+        widget.playSound("/sfx/interface/clickon_error.ogg")
+        lblDump.setText("No target selected")
+        return
+    end
     pane.dismiss()
 end
 btnFallback.onClick = function()
