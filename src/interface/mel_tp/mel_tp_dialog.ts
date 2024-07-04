@@ -2,7 +2,7 @@
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
 import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, lblDebug, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
-import {mel_tp_util} from "./mel_tp_util";
+import mel_tp_util from "./mel_tp_util";
 
 export interface Destination {
   name : string, //equivalent of Bookmark.bookmarkName. Default: ""
@@ -82,21 +82,37 @@ function populateBookmarks() {
       //Skip unavailable destinations in config
       const destination:Destination = mel_tp_util.JsonToDestination(dest);
       if(destination.prerequisiteQuest !== undefined && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
-        return; //Quest not complete - skip this Destination
+        continue; //Quest not complete - skip this Destination
       }
       if(destination.warpAction === WarpAlias.OrbitedWorld) {
-        const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
-        const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
-        if(locationType === null || locationType !== "CelestialCoordinate"){
-          return; //Warping down is available only when orbiting a planet
-        }
         if(player.worldId() !== player.ownShipWorldId()) {
-          return; //disables warping down when not on a PLAYER's ship. TODO: find how to enable on other ships
+          continue; //disables warping down when not on a PLAYER's ship. TODO: find how to enable on other ships
         }
-        
+        const shipLocation: SystemLocationJson = celestial.shipLocation(); 
+        const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
+
+        if(locationType === null || shipLocation === null){
+          continue; //Warping down is unavailable when location is of unknown type
+        }
+        if(locationType !== "CelestialCoordinate") {
+          //location is not a CelestialCoordinate
+          const systemLocations = celestial.systemObjects();
+          let maybeUuid;
+          if(locationType === "FloatingDungeon"){
+            maybeUuid = shipLocation[1] as Uuid;
+         }         
+          // sb.logWarn(sb.printJson(systemLocations as unknown as JSON))
+          // sb.logWarn(sb.print(maybeUuid))
+          // sb.logWarn(sb.print(locationType))
+          if(maybeUuid === undefined || mel_tp_util.TableContains(systemLocations, maybeUuid) === false || destination.deploy !== true) {
+            //location is not FLoatingDungeon OR current system locations have no such Uuid OR deploy is not activated
+            continue; //Warping down is available only when orbiting a planet or floating dungeon
+          }
+        }    
       }
+
       if(destination.warpAction === WarpAlias.OwnShip && player.worldId() === player.ownShipWorldId()) {
-        return; //If a player is already on their ship - do not offer to warp there even if config lists it
+        continue; //If a player is already on their ship - do not offer to warp there even if config lists it
       }
 
       //Add destination from config to TP targets

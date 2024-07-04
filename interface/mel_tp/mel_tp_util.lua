@@ -237,6 +237,20 @@ local function FilterBookmarks(bookmarks, filter)
   return filteredBookmarks
 end
 
+--- Standard check if a table contains an element.
+-- 
+-- @param table
+-- @param element
+-- @returns true of false
+local function TableContains(____table, element)
+    for ____, value in ipairs(____table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+
 mel_tp_util = {
   sortArrayByProperty = sortArrayByProperty,
   getSpaceLocationType = getSpaceLocationType,
@@ -244,6 +258,7 @@ mel_tp_util = {
   ObjectToWorldId = ObjectToWorldId,
   JsonToDestination = JsonToDestination,
   TargetToWarpCommand = TargetToWarpCommand,
-  FilterBookmarks = FilterBookmarks
+  FilterBookmarks = FilterBookmarks,
+  TableContains = TableContains
 }
 return mel_tp_util

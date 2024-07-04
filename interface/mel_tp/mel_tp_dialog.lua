@@ -137,43 +137,43 @@ local function populateBookmarks()
       local destination = mel_tp_util.JsonToDestination(dest)
       if(destination.prerequisiteQuest ~= nil) then
         if(player.hasCompletedQuest(destination.prerequisiteQuest) == false) then
-          goto continue
+          goto __continue4
         end
       end
 
       if (destination.warpAction == "OrbitedWorld") then
-        --allow warp only if CelestialCoordinate
+        if player:worldId() ~= player:ownShipWorldId() then
+          goto __continue4 --Disable when player is not on THEIR ship
+        end
+
         local shipLocation = celestial.shipLocation()
         local locationType = mel_tp_util.getSpaceLocationType(shipLocation)
+        -- sb.logWarn(sb.printJson(celestial.systemObjects()))
+        -- sb.logWarn(sb.printJson(celestial.shipLocation()))
+        if locationType == nil then
+          goto __continue4 --Warping down is unavailable when location is of unknown type
+        end
+        if locationType ~= "CelestialCoordinate" then
+          local systemLocations = celestial.systemObjects();
+          local maybeUuid = nil
+          if(locationType == "FloatingDungeon") then
+            maybeUuid = shipLocation[2]
+          end
+          
+          -- sb.logWarn(sb.printJson(systemLocations))
+          -- sb.logWarn(sb.print(maybeUuid))
+          -- sb.logWarn(locationType)
+          if(maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or destination.deploy ~= true) then
+            --location is not FLoatingDungeon OR current system locations have no such Uuid or no command to deploy mech
+            
+            goto __continue4 --Warping down is available only when orbiting a planet or floating dungeon
+          end
+        end
         
-        --debug
-        --[[
-        sb.logInfo("Location type is "..sb.printJson(locationType))
-        lblDump:setText(sb.printJson(shipLocation) or sb.print(shipLocation))
-
-        if(shipLocation[1] == "coordinate") then
-          lblDebug:setText(sb.printJson(celestial.planetName(shipLocation[2])))
-          --debug
-          sb.logInfo("Location is"..sb.printJson(shipLocation))
-        end
-        --]]
-
-        --[[
-        if(type(shipLocation) ~= "table" or type(shipLocation[1])== "number" or (shipLocation[2].planet and type(shipLocation[2].planet) ~= "number")) then
-          return; 
-        end 
-        --]]
-
-        if locationType == nil or  locationType ~= "CelestialCoordinate" then
-          goto continue --Warping down is available only when orbiting a planet
-        end
-        if player:worldId() ~= player:ownShipWorldId() then
-          goto continue --Disable when player is not on THEIR ship
-      end
       end
 
       if destination.warpAction == "OwnShip" and player.worldId() == player.ownShipWorldId() then
-        goto continue --If a player is already on their ship, do not offer to warp there even if config lists it
+        goto __continue4 --If a player is already on their ship, do not offer to warp there even if config lists it
       end
       
       local currentBookmark = mel_tp.bookmarkTemplate
@@ -220,7 +220,7 @@ local function populateBookmarks()
       local addedBookmark = bookmarksList:addChild(currentBookmark)
       addedBookmark.onSelected = OnTpTargetSelect
       addedBookmark.bkmData = bkmData
-      ::continue::
+      ::__continue4::
     end
   end
 
@@ -302,11 +302,15 @@ function btnResetFilter:onClick()
 end
 
 function btnSortByPlanet:onClick()
+  sb.logWarn(sb.printJson(celestial.systemObjects()))
+  sb.logWarn(sb.printJson(celestial.shipLocation()))
+  --[[
   if mel_tp.bookmarks == nil then
     return
   end
   mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
   populateBookmarks()
+  --]]
 end
 
 --[[

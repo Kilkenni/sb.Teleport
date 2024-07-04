@@ -41,15 +41,14 @@
       { 
         "type" : "button",
         "caption" : "Reset filter",
-        "id" : "btnResetFilter"
+        "id" : "btnResetFilter",
+        "color" : "accent"
       },
       { 
         "type" : "button", 
         "caption" : "Sort by planet", 
-        "id": "btnSortByPlanet",
-        "color" : "accent"
+        "id": "btnSortByPlanet"
       },
-      "spacer",
       { 
         "type" : "scrollArea", "id":"bookmarkInfo", "scrollDirections" : [0, 1], "scrollBars" : true, 
         "data" : {},
@@ -63,6 +62,7 @@
           }
         ] 
       },
+      "spacer",
       { 
         "type" : "button",
         "caption" : "Default Teleport Dialog",

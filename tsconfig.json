@@ -19,7 +19,7 @@
     //"sourceMapTraceback": true,
     "tstlVerbose": true,
     "noImplicitGlobalVariables": true,
-    "noImplicitSelf": false,
+    "noImplicitSelf": true,
     "noResolvePaths": ["./mel_tp_dialog.ui.js"],
     "extension": ".lua-raw",
     "luaLibImport": "none"

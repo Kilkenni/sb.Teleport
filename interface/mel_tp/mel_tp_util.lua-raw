@@ -6,7 +6,7 @@ local ____exports = {}
 -- @param propertyName Key to sort objects
 -- @param descending If true, sort in descending alphabet order. If false, sort in ascending order.
 -- @returns
-local function sortArrayByProperty(self, array, propertyName, descending)
+local function sortArrayByProperty(array, propertyName, descending)
     if descending == nil then
         descending = false
     end
@@ -21,14 +21,14 @@ local function sortArrayByProperty(self, array, propertyName, descending)
         sortedArray = __TS__ArraySort(
             sortedArray,
             function(____, elem1, elem2)
-                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and -1 or 1
+                return elem1[propertyName].toLowerCase() < elem2[propertyName].toLowerCase() and -1 or 1
             end
         )
     else
         sortedArray = __TS__ArraySort(
             sortedArray,
             function(____, elem1, elem2)
-                return elem1[propertyName]:toLowerCase() < elem2[propertyName]:toLowerCase() and 1 or -1
+                return elem1[propertyName].toLowerCase() < elem2[propertyName].toLowerCase() and 1 or -1
             end
         )
     end
@@ -45,7 +45,7 @@ SystemLocationType.Space = 3
 SystemLocationType[SystemLocationType.Space] = "Space"
 SystemLocationType.FloatingDungeon = 4
 SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
-local function getSpaceLocationType(self, destination)
+local function getSpaceLocationType(destination)
     if destination == nil then
         return SystemLocationType[0]
     end
@@ -59,15 +59,15 @@ local function getSpaceLocationType(self, destination)
         if destination[1] == "coordinate" then
             return SystemLocationType[1]
         end
-        sb:logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
+        sb.logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
         return SystemLocationType[0]
     end
     if __TS__TypeOf(destination[1]) == __TS__TypeOf(destination[2]) then
         return SystemLocationType[3]
     end
-    sb:logError(
+    sb.logError(
         "GetSpaceLocationType: can't identify location type: %s",
-        {sb:printJson(destination)}
+        {sb.printJson(destination)}
     )
     return SystemLocationType[0]
 end
@@ -75,7 +75,7 @@ end
 -- 
 -- @param target Can parse CelestialWorld or InstanceWorld
 -- @returns CelestialCoordinate or null
-local function WorldIdToObject(self, target)
+local function WorldIdToObject(target)
     if string.sub(target, 1, 1) ~= "C" and string.sub(target, 1, 1) ~= "I" then
         return nil
     end
@@ -107,7 +107,7 @@ end
 -- 
 -- @param target
 -- @returns
-local function ObjectToWorldId(self, target)
+local function ObjectToWorldId(target)
     if target.location ~= nil then
         local targetCoord = target
         return "CelestialWorld:" .. __TS__ArrayJoin(
@@ -122,10 +122,10 @@ local function ObjectToWorldId(self, target)
         )
     end
 end
-local function IsBookmarkInstance(self, target)
+local function IsBookmarkInstance(target)
     return __TS__StringIncludes(target[1], "InstanceWorld")
 end
-local function JsonToDestination(self, destJson)
+local function JsonToDestination(destJson)
     local warpTarget
     if __TS__StringIncludes(destJson.warpAction, "InstanceWorld") == false then
         warpTarget = destJson.warpAction
@@ -147,7 +147,7 @@ local function JsonToDestination(self, destJson)
         prerequisiteQuest = destJson.prerequisiteQuest
     }
 end
-local function TargetToWarpCommand(self, target)
+local function TargetToWarpCommand(target)
     if type(target) == "string" then
         return target
     end
@@ -165,7 +165,7 @@ end
 -- @param bookmarks
 -- @param filter string
 -- @returns undefined for empty filter, new array otherwise
-local function FilterBookmarks(self, bookmarks, filter)
+local function FilterBookmarks(bookmarks, filter)
     if filter == "" then
         return nil
     end
@@ -183,13 +183,28 @@ local function FilterBookmarks(self, bookmarks, filter)
     end
     return filteredBookmarks
 end
-____exports.mel_tp_util = {
+--- Standard check if a table contains an element.
+-- 
+-- @param table
+-- @param element
+-- @returns true of false
+local function TableContains(____table, element)
+    for ____, value in ipairs(____table) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+local mel_tp_util = {
     sortArrayByProperty = sortArrayByProperty,
     getSpaceLocationType = getSpaceLocationType,
     WorldIdToObject = WorldIdToObject,
     ObjectToWorldId = ObjectToWorldId,
     JsonToDestination = JsonToDestination,
     TargetToWarpCommand = TargetToWarpCommand,
-    FilterBookmarks = FilterBookmarks
+    FilterBookmarks = FilterBookmarks,
+    TableContains = TableContains
 }
+____exports.default = mel_tp_util
 return ____exports

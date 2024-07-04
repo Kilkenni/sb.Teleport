@@ -114,7 +114,7 @@ declare module player {
   //CHAT
 
   /**
-   * Triggers chat message as if the player said it. Is not (currently?) shown in chat window.
+   * Only available in OpenSb! Triggers chat message as if the player said it. Is not (currently?) shown in chat window.
    * @param message 
    */
   function say(message:string):void;

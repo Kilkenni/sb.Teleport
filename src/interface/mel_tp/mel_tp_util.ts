@@ -179,7 +179,22 @@ function FilterBookmarks(bookmarks: Bookmark[], filter:string):Bookmark[]|undefi
   return filteredBookmarks;
 }
 
-export const mel_tp_util =  {
+/**
+ * Standard check if a table contains an element.
+ * @param table 
+ * @param element 
+ * @returns true of false
+ */
+const TableContains = function (table:any[], element:any) {
+  for(const value of table) {
+    if(value === element ){
+      return true;
+    }
+  }
+  return false;
+}
+
+const mel_tp_util =  {
   sortArrayByProperty,
   getSpaceLocationType,
   WorldIdToObject,
@@ -187,5 +202,8 @@ export const mel_tp_util =  {
   // parseWorldIdFull,
   JsonToDestination,
   TargetToWarpCommand,
-  FilterBookmarks
+  FilterBookmarks,
+  TableContains
 }
+
+export default mel_tp_util;
