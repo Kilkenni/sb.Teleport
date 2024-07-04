@@ -160,25 +160,27 @@ local function TargetToWarpCommand(self, target)
         return (tostring(target[1]) .. "=") .. tostring(target[2])
     end
 end
+--- Filters bookmarks that have "filter" in bookmarkName or targetName
+-- 
+-- @param bookmarks
+-- @param filter string
+-- @returns undefined for empty filter, new array otherwise
 local function FilterBookmarks(self, bookmarks, filter)
     if filter == "" then
-        return bookmarks
+        return nil
     end
     local filteredBookmarks = {}
-    __TS__ArrayForEach(
-        bookmarks,
-        function(____, bkm, index)
-            if __TS__StringIncludes(
-                string.lower(bkm.bookmarkName),
-                string.lower(filter)
-            ) or __TS__StringIncludes(
-                string.lower(bkm.targetName),
-                string.lower(filter)
-            ) then
-                filteredBookmarks[#filteredBookmarks + 1] = bkm
-            end
+    for ____, bkm in ipairs(bookmarks) do
+        if __TS__StringIncludes(
+            string.lower(bkm.bookmarkName),
+            string.lower(filter)
+        ) or __TS__StringIncludes(
+            string.lower(bkm.targetName),
+            string.lower(filter)
+        ) then
+            filteredBookmarks[#filteredBookmarks + 1] = bkm
         end
-    )
+    end
     return filteredBookmarks
 end
 ____exports.mel_tp_util = {

@@ -218,9 +218,14 @@ local function TargetToWarpCommand(target)
   end
 end
 
+--- Filters bookmarks that have "filter" in bookmarkName or targetName
+-- 
+-- @param bookmarks
+-- @param filter string
+-- @returns nil for empty filter, new array otherwise
 local function FilterBookmarks(bookmarks, filter)
   if filter == "" then
-      return bookmarks
+      return nil
   end
   local filteredBookmarks = {}
   for index, bkm in ipairs(bookmarks) do

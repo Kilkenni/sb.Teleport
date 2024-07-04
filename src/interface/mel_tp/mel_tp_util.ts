@@ -159,16 +159,23 @@ function TargetToWarpCommand(target: WarpAction):WarpActionString {
   }
 }
 
+/**
+ * Filters bookmarks that have "filter" in bookmarkName or targetName
+ * @param bookmarks 
+ * @param filter string
+ * @returns undefined for empty filter, new array otherwise
+ */
 function FilterBookmarks(bookmarks: Bookmark[], filter:string):Bookmark[]|undefined {
   if(filter === "") {
-    return bookmarks;
+    return undefined;
   }
   let filteredBookmarks:Bookmark[] = [];
-  bookmarks.forEach((bkm: Bookmark, index: number) => {
+  for(const bkm of bookmarks) {
+  // bookmarks.forEach((bkm: Bookmark, index: number) => {
     if(bkm.bookmarkName.toLowerCase().includes(filter.toLowerCase()) || bkm.targetName.toLowerCase().includes(filter.toLowerCase())) {
       filteredBookmarks.push(bkm);
     }
-  });
+  }//);
   return filteredBookmarks;
 }
 

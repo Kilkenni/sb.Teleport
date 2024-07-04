@@ -17,10 +17,10 @@
       [
         { 
           "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "scrollBars" : true, "align": 0, 
-          "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
-            {"type": "image", "id":"tpIcon", "file": "", "noAutoCrop": true},
-            {"type":"label", "id":"tpName", "text": "name"},
-            {"type": "label", "id":"tpPlanetName", "text": "planet"}
+          "data" : { "type": "listItem", "selectionGroup": "tpItems", "children": [
+            {"type": "image", "file": "", "noAutoCrop": true},
+            {"type":"label", "text": "name"},
+            {"type": "label", "text": "planet"}
             ],
             "data": {"target": null}
           },

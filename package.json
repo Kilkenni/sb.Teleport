@@ -7,7 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "echo Copy non-TS files verbatim to output dir && copyfiles --error --up 1 --exclude './src/@types/**/*.*' -e './src/**/*.ts' -e './**/*.d.ts' --verbose './src/**/*' './'",
     "build": "tstl",
-    "postbuild": "copyfiles --error --up 1 --exclude './src/@types/**/*.*' -e './src/**/*.ts' -e './**/*.d.ts' --verbose './src/**/*' './'",
     "dev": "tstl --watch"
   },
   "repository": {

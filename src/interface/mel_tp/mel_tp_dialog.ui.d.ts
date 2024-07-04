@@ -22,11 +22,11 @@ declare const lblDebug
 declare const lblDump
 declare const metagui
 declare interface tpItem {
-  id: string,
+  type: "listItem",
   children: [
-    {id: string, file: string},
-    {id: string, text: string},
-    {id: string, text: string},
+    {type: "image", file: string},
+    {type: "label", text: string},
+    {type: "label", text: string},
 ],
   data: {target:string}
 }

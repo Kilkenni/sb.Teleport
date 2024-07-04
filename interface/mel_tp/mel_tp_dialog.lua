@@ -257,14 +257,14 @@ local function populateBookmarks()
         -- }
 
     
-        currentBookmark.id = currentBookmark.id .. index
+        -- currentBookmark.id = currentBookmark.id .. index
         -- tpName:setText(sb.printJson(mel_tp.data[1].bookmarkName))
         -- tpPlanetName:setText(mel_tp.data[1].targetName)
         -- tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.data[1].icon..".png")
         
-        currentBookmark.children[1].id = currentBookmark.children[1].id .. index
-        currentBookmark.children[2].id = currentBookmark.children[2].id .. index
-        currentBookmark.children[3].id = currentBookmark.children[3].id .. index
+        -- currentBookmark.children[1].id = currentBookmark.children[1].id .. index
+        -- currentBookmark.children[2].id = currentBookmark.children[2].id .. index
+        -- currentBookmark.children[3].id = currentBookmark.children[3].id .. index
         currentBookmark.children[1].file = bkmData.icon
         currentBookmark.children[2].text = bkmData.name
         currentBookmark.children[3].text = bkmData.planetName
@@ -280,7 +280,14 @@ local function populateBookmarks()
 end
 
 function txtboxFilter:onEnter()
-  chat.send(sb.printJson(txtboxFilter.text))
+  mel_tp.filter = txtboxFilter.text
+  if mel_tp.bookmarks == nil then
+    return
+  end
+  mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
+  populateBookmarks(nil)
+  player:say(sb.printJson(txtboxFilter.text))
+  -- chat.send(sb.printJson(txtboxFilter.text))
 end
 
 function txtboxFilter:onEscape()
@@ -288,6 +295,7 @@ function txtboxFilter:onEscape()
 end
 
 function btnResetFilter:onClick()
+  mel_tp.filter = ""
   txtboxFilter:setText("")
   mel_tp.bookmarksFiltered = nil
   populateBookmarks()

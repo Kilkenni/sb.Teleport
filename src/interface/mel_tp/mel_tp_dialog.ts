@@ -75,7 +75,10 @@ function populateBookmarks() {
    //process additional locations from override config
   
   if(finalTpConfig.destinations !== undefined) {
-    finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
+    for(const dest of finalTpConfig.destinations) {
+
+    // }
+    // finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
       const destination:Destination = mel_tp_util.JsonToDestination(dest);
       if(destination.prerequisiteQuest !== undefined && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
@@ -180,7 +183,7 @@ function populateBookmarks() {
       const addedBookmark = bookmarksList.addChild(currentBookmark);
       addedBookmark.onSelected = OnTpTargetSelect;
       addedBookmark.bkmData = bkmData;
-    })
+    }//)
   }
 
 
@@ -193,7 +196,8 @@ function populateBookmarks() {
       filteredBookmarks = mel_tp.bookmarksFiltered;
     }
     if(filteredBookmarks !== undefined) {
-      filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
+        for(const bookmark of filteredBookmarks) {
+      // filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
         const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
         let iconPath = "";
         if(bookmark.icon !== undefined) {
@@ -211,11 +215,11 @@ function populateBookmarks() {
           // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
         };
     
-        currentBookmark.id = currentBookmark.id + index;
+        // currentBookmark.id = currentBookmark.id + index;
         
-        currentBookmark.children[0].id = currentBookmark.children[0].id + index;
-        currentBookmark.children[1].id = currentBookmark.children[1].id + index;
-        currentBookmark.children[2].id = currentBookmark.children[2].id + index;
+        // currentBookmark.children[0].id = currentBookmark.children[0].id + index;
+        // currentBookmark.children[1].id = currentBookmark.children[1].id + index;
+        // currentBookmark.children[2].id = currentBookmark.children[2].id + index;
         currentBookmark.children[0].file = bkmData.icon;
         currentBookmark.children[1].text = bkmData.name;
         currentBookmark.children[2].text = bkmData.planetName;
@@ -231,7 +235,7 @@ function populateBookmarks() {
         const addedBookmark = bookmarksList.addChild(currentBookmark);
         addedBookmark.onSelected = OnTpTargetSelect;
         addedBookmark.bkmData = bkmData;
-      })
+      }
     } 
   };
  
@@ -355,7 +359,8 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
     if(planetParams.environmentStatusEffects.length > 0) {
       //experimental - if at least one hazard is there, show its icon
       const hazardTemplate:hazardItem = listHazards.data;
-      planetParams.environmentStatusEffects.forEach((effect, index) => {
+      for(const effect of planetParams.environmentStatusEffects) {
+      // planetParams.environmentStatusEffects.forEach((effect, index) => {
         if(mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] !== undefined) {
           hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon;
           hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].displayName;
@@ -365,7 +370,7 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
           hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName;
         }
         listHazards.addChild(hazardTemplate);
-      })
+      }//)
     }
   }
   else {
@@ -437,7 +442,14 @@ lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
 };
 
 txtboxFilter.onEnter = function ():void {
-  chat.send(sb.printJson(txtboxFilter.text));
+  mel_tp.filter = txtboxFilter.text;
+  if(mel_tp.bookmarks === undefined) {
+    return;
+  }
+  mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
+  populateBookmarks();
+  player.say(sb.printJson(txtboxFilter.text))
+  // chat.send(sb.printJson(txtboxFilter.text));
 }
 
 txtboxFilter.onEscape = function ():void {
@@ -445,7 +457,8 @@ txtboxFilter.onEscape = function ():void {
 }
 
 btnResetFilter.onClick = function ():void {
-  txtboxFilter.setText("");
+  mel_tp.filter = "";
+  txtboxFilter.setText(mel_tp.filter);
   mel_tp.bookmarksFiltered = undefined;
   populateBookmarks();
 }
