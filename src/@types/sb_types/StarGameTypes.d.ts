@@ -20,10 +20,30 @@ declare type size_t = number & { __brand: "long unsigned int"};
 declare type Uuid = string;
 declare type EntityId = number & { __brand: "int32_t" };
 
+declare type RpcPromise<T> = unknown; //FIXME better description
+
 //Lua-specific wrappers
 declare type LuaFunction = Function
 declare type LuaTable = Record<string, any>|any[]
 declare type LuaValue = null|boolean|int|float|string|LuaTable|LuaFunction //TODO |LuaThread|LuaUserData;
+
+/* StarChat */
+
+declare enum ChatSendMode {
+  "Broadcast",
+  "Local",
+  "Party"
+}
+
+declare enum MessageContextModeNames {
+  "Local",
+  "Party",
+  "Broadcast",
+  "Whisper",
+  "CommandResult",
+  "RadioMessage",
+  "World"
+}
 
 /* StarSkyTypes */
 
@@ -47,6 +67,17 @@ declare enum WarpPhaseNames {
   "slowingdown",
   "maintain",
   "speedingup"
+}
+
+/* StarPlayerUniverseMap */
+
+declare type OrbitTarget = CelestialCoordinate|Uuid;
+
+declare interface OrbitBookmark {
+  target: OrbitTarget, //<bookmarkType> Holds target of bookmark in parsed form. UniverseMap only.
+  targetName: string, //Name of the planet, dungeon instance, etc
+  bookmarkName: string, //Human-readable name. Can be edited by the player.
+  icon: string,
 }
 
 /* StarWarping */
@@ -82,6 +113,13 @@ declare type BookmarkTarget = [
   SpawnTarget,
 ]
 
+declare interface TeleportBookmark {
+  target: BookmarkTarget, //<bookmarkType> Holds target of bookmark in parsed form. Can be used as a, well, target for warping.
+  targetName: string, //Name of the planet, dungeon instance, etc
+  bookmarkName: string, //Human-readable name. Can be edited by the player.
+  icon: string,
+}
+
 declare type PlayerTarget = ["player", Uuid]
 declare type UuidTarget = [ "object", Uuid ]
 
@@ -101,8 +139,8 @@ type WarpActionString = WarpAlias|WarpToPlayer|WarpToWorld
 
 declare interface CelestialCoordinate {
   location: [int, int, int],
-  planet: int,
-  satellite: int
+  planet: int, //non-negative
+  satellite: int //non-negative
 }
 
 declare interface CelestialOrbit {

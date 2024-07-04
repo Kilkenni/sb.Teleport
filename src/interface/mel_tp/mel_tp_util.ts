@@ -165,11 +165,11 @@ function TargetToWarpCommand(target: WarpAction):WarpActionString {
  * @param filter string
  * @returns undefined for empty filter, new array otherwise
  */
-function FilterBookmarks(bookmarks: Bookmark[], filter:string):Bookmark[]|undefined {
+function FilterBookmarks(bookmarks: TeleportBookmark[], filter:string):TeleportBookmark[]|undefined {
   if(filter === "") {
     return undefined;
   }
-  let filteredBookmarks:Bookmark[] = [];
+  let filteredBookmarks:TeleportBookmark[] = [];
   for(const bkm of bookmarks) {
   // bookmarks.forEach((bkm: Bookmark, index: number) => {
     if(bkm.bookmarkName.toLowerCase().includes(filter.toLowerCase()) || bkm.targetName.toLowerCase().includes(filter.toLowerCase())) {

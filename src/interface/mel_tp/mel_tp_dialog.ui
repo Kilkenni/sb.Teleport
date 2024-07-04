@@ -1,6 +1,6 @@
 {
   "style" : "window",
-  "size" : [320, 200],
+  "size" : [320, 400],
   "resizable" : true,
   "minSize" : [120, 64],
   "title" : "Teleporter",

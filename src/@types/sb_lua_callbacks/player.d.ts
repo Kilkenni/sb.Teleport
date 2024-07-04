@@ -144,45 +144,7 @@ declare module player {
    */
   function ownShipWorldId():string;
 
-  //BOOKMARKS
-
-  function worldHasOrbitBookmark(coords: JSON):boolean;
-
-  function orbitBookmarks():[Vec3I, JSON][];
-
-  function systemBookmarks(coords: JSON):JSON[];
-
-  function addOrbitBookmark(system: JSON, bookmarkConfig: Bookmark):void;
-
-  function removeOrbitBookmark(system: JSON, bookmarkConfig:Bookmark):void;
-
-  /**
-   * Lists all of the player's teleport bookmarks.
-   */
-  function teleportBookmarks():Bookmark[];
-
-  /**
-   * Adds the specified bookmark to the player's bookmark list and returns `true` if the bookmark was successfully added (and was not already known) and `false` otherwise.
-   * @param bookmarkConfig
-   */
-  function addTeleportBookmark(bookmarkConfig:Bookmark):boolean;
-
-  /**
-   * Removes the specified teleport bookmark.
-   * @param bookmarkConfig
-   */
-  function removeTeleportBoookmark(bookmarkConfig:Bookmark):boolean;
-
-  /**
-   * Immediately warps the player to the specified warp target, optionally using the specified warp animation and deployment. 
-   * @param warpActionString
-   * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation
-   * @param deploy Whether to deploy player mech
-   */
-  function warp(warpActionString: WarpActionString, animation?: string, deploy?: boolean):void;
-
-
-  /**
+  /*
 
 
 #### `Json` player.getProperty(`String` name, `Json` default)
@@ -208,31 +170,33 @@ Adds the specified object to the player's scanned objects.
 Removes the specified object from the player's scanned objects.
 
 ---
+*/
+  /**
+   * Triggers an interact action on the player as if they had initiated an interaction and the result had returned the specified interaction type and configuration. Can be used to e.g. open GUI windows normally triggered by player interaction with entities.
+   * @param interactionType 
+   * @param config 
+   * @param sourceEntityId 
+   */
+  function interact(interactionType: string, config: JSON, sourceEntityId?: EntityId):void;
 
-#### `void` player.interact(`String` interactionType, `Json` config, [`EntityId` sourceEntityId])
+  /**
+   * @returns Returns a JSON object containing information about the player's current ship upgrades including "shipLevel", "maxFuel", "crewSize" and a list of "capabilities".
+   */
+  function shipUpgrades():JSON;
+  
+  /**
+   * Applies the specified ship upgrades to the player's ship.
+   * @param shipUpgrades 
+   */
+  function upgradeShip(shipUpgrades:JSON):void;
 
-Triggers an interact action on the player as if they had initiated an interaction and the result had returned the specified interaction type and configuration. Can be used to e.g. open GUI windows normally triggered by player interaction with entities.
+  /**
+   * Sets the specified universe flag on the player's current universe.
+   * @param flagName 
+   */
+  function setUniverseFlag(flagName:string):void;
 
----
-
-#### `Json` player.shipUpgrades()
-
-Returns a JSON object containing information about the player's current ship upgrades including "shipLevel", "maxFuel", "crewSize" and a list of "capabilities".
-
----
-
-#### `void` player.upgradeShip(`Json` shipUpgrades)
-
-Applies the specified ship upgrades to the player's ship.
-
----
-
-#### `void` player.setUniverseFlag(`String` flagName)
-
-Sets the specified universe flag on the player's current universe.
-
----
-
+/*
 #### `void` player.giveBlueprint(`ItemDecriptor` item)
 
 Teaches the player any recipes which can be used to craft the specified item.
@@ -244,73 +208,81 @@ Teaches the player any recipes which can be used to craft the specified item.
 Returns `true` if the player knows one or more recipes to create the specified item and `false` otherwise.
 
 ---
+*/
 
-#### `void` player.makeTechAvailable(`String` tech)
+  //TECH
 
-Adds the specified tech to the player's list of available (unlockable) techs.
+  /**
+   * Adds the specified tech to the player's list of available (unlockable) techs.
+   * @param tech 
+   */
+  function makeTechAvailable(tech: string):void;
 
----
+  /**
+   * Removes the specified tech from player's list of available (unlockable) techs.
+   * @param tech 
+   */
+  function makeTechUnavailable(tech: string):void;
 
-#### `void` player.makeTechUnavailable(`String` tech)
+  /**
+   * Unlocks the specified tech, allowing it to be equipped through the tech GUI.
+   * @param tech 
+   */
+  function enableTech(tech: string):void;
 
-Removes the specified tech from player's list of available (unlockable) techs.
+  /**
+   * Equips the specified tech.
+   * @param tech 
+   */
+  function equipTech(tech: string):void;
 
----
+  /**
+   * Unequips the specified tech.
+   * @param tech 
+   */
+  function unequipTech(tech: string):void;
 
-#### `void` player.enableTech(`String` tech)
+  /**
+   * @returns Returns a list of the techs currently available to the player.
+   */
+  function availableTechs():string[];
 
-Unlocks the specified tech, allowing it to be equipped through the tech GUI.
+  /**
+   * @returns Returns a list of the techs currently unlocked by the player.
+   */
+  function enabledTechs():string[];
 
----
+  /**
+   * Returns the name of the tech the player has currently equipped in the specified slot, or `nil` if no tech is equipped in that slot.
+   * @param slot 
+   * @returns Returns the name of the tech the player has currently equipped in the slot, or `nil` if none.
+   */
+  function equippedTech(slot:string):string;
 
-#### `void` player.equipTech(`String` tech)
+  //CURRENCY
 
-Equips the specified tech.
+  /**
+   * @param currencyName 
+   * @returns Returns the player's current total reserves of the specified currency.
+   */
+  function currency(currencyName:string):unsigned;
 
----
+  /**
+   * Increases the player's reserve of the specified currency by the specified amount.
+   * @param currencyName 
+   * @param amount 
+   */
+  function addCurrency(currencyName:string, amount:unsigned):void;
 
-#### `void` player.unequipTech(`String` tech)
+  /**
+   * Attempts to consume the specified amount of the specified currency
+   * @param currencyName 
+   * @param amount 
+   * @returns `true` if successful and `false` otherwise.
+   */
+  function consumeCurrency(currencyName: string, amount:unsigned):boolean;
 
-Unequips the specified tech.
-
----
-
-#### `JsonArray` player.availableTechs()
-
-Returns a list of the techs currently available to the player.
-
----
-
-#### `JsonArray` player.enabledTechs()
-
-Returns a list of the techs currently unlocked by the player.
-
----
-
-#### `String` player.equippedTech(`String` slot)
-
-Returns the name of the tech the player has currently equipped in the specified slot, or `nil` if no tech is equipped in that slot.
-
----
-
-#### `unsigned` player.currency(`String` currencyName)
-
-Returns the player's current total reserves of the specified currency.
-
----
-
-#### `void` player.addCurrency(`String` currencyName, `unsigned` amount)
-
-Increases the player's reserve of the specified currency by the specified amount.
-
----
-
-#### `bool` player.consumeCurrency(`String` currencyName, `unsigned` amount)
-
-Attempts to consume the specified amount of the specified currency and returns `true` if successful and `false` otherwise.
-
----
-
+/*
 #### `void` player.cleanupItems()
 
 Triggers an immediate cleanup of the player's inventory, removing item stacks with 0 quantity. May rarely be required in special cases of making several sequential modifications to the player's inventory within a single tick.
@@ -504,31 +476,37 @@ Returns `true` if the player is marked as having completed the intro instance an
 Sets whether the player is marked as having completed the intro instance.
 
 ---
+*/
+  //TELEPORT
 
-#### `void` player.warp(`String` warpAction, [`String` animation], [`bool` deploy])
+  /**
+   * Immediately warps the player to the specified warp target, optionally using the specified warp animation and deployment. 
+   * @param warpActionString
+   * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation
+   * @param deploy Whether to deploy player mech
+   */
+  function warp(warpActionString: WarpActionString, animation?: string, deploy?: boolean):void;
 
-Immediately warps the player to the specified warp target, optionally using the specified warp animation and deployment.
+  /**
+   * @returns Returns whether the player has a deployable mech.
+   */
+  function canDeploy():boolean;
 
----
+  /**
+   * @returns Returns whether the player is currently deployed.
+   */
+  function isDeployed():boolean;
 
-#### `bool` player.canDeploy()
+  //DIALOGUE
 
-Returns whether the player has a deployable mech.
+  /**
+   * Displays a confirmation dialog to the player with the specified dialog configuration
+   * @param dialogConfig
+   * @returns `RpcPromise` which can be used to retrieve the player's response to that dialog.
+   */
+  function confirm(dialogConfig:JSON):RpcPromise<unknown>;
 
----
-
-#### `bool` player.isDeployed()
-
-Returns whether the player is currently deployed.
-
----
-
-#### `RpcPromise` player.confirm(`Json` dialogConfig)
-
-Displays a confirmation dialog to the player with the specified dialog configuration and returns an `RpcPromise` which can be used to retrieve the player's response to that dialog.
-
----
-
+/*
 #### `void` player.playCinematic(`Json` cinematic, [`bool` unique])
 
 Triggers the specified cinematic to be displayed for the player. If unique is `true` the cinematic will only be shown to that player once.
@@ -539,70 +517,82 @@ Triggers the specified cinematic to be displayed for the player. If unique is `t
 
 Triggers the specified event on the player with the specified fields. Used to record data e.g. for achievements.
 
----
+*/
 
-#### `bool` player.worldHasOrbitBookmark(`Json` coordinate)
+  //BOOKMARKS
 
-Returns whether the player has a bookmark for the specified celestial coordinate.
-
----
-
-#### `List<pair<Vec3I, Json>>` player.orbitBookmarks()
-
-Returns a list of orbit bookmarks with their system coordinates.
-
----
-
-#### `List<Json>` player.systemBookmarks(`Json` systemCoordinate)
-
-Returns a list of orbit bookmarks in the specified system.
-
----
-
-#### `bool` player.addOrbitBookmark(`Json` systemCoordinate, `Json` bookmarkConfig)
-
-Adds the specified bookmark to the player's bookmark list and returns `true` if the bookmark was successfully added (and was not already known) and `false` otherwise.
-
----
-
-#### `bool` player.removeOrbitBookmark(`Json` systemCoordinate, `Json` bookmarkConfig)
-
-Removes the specified bookmark from the player's bookmark list and returns `true` if the bookmark was successfully removed and `false` otherwise.
-
----
-
-#### `List<Json>` player.teleportBookmarks()
-
-Lists all of the player's teleport bookmarks.
-
----
-
-#### `bool` player.addTeleportBookmark(`Json` bookmarkConfig)
-
-Adds the specified bookmark to the player's bookmark list and returns `true` if the bookmark was successfully added (and was not already known) and `false` otherwise.
-
----
-
-#### `bool` player.removeTeleportBoookmark(`Json` bookmarkConfig)
-
-Removes the specified teleport bookmark.
-
----
-
-#### `bool` player.isMapped(`Json` coordinate)
-
-Returns whether the player has previously visited the specified coordinate.
-
----
-
-#### `Json` player.mappedObjects(`Json` systemCoordinate)
-
-Returns uuid, type, and orbits for all system objects in the specified system;
-
----
-
-#### `List<String>` player.collectables(`String` collectionName)
-
-Returns a list of names of the collectables the player has unlocked in the specified collection.
+  /**
+   * @param coords 
+   * @returns Returns whether the player has a bookmark for the specified celestial coordinate.
    */
+  function worldHasOrbitBookmark(coords: CelestialCoordinate):boolean;
+
+  /**
+   * @returns Returns a list of orbit bookmarks with their system coordinates.
+   */
+  function orbitBookmarks():[Vec3I, OrbitBookmark][];
+
+  /**
+   * @param systemCoordinate 
+   * @returns Returns a list of orbit bookmarks in the specified system.
+   */
+  function systemBookmarks(systemCoordinate: CelestialCoordinate):OrbitBookmark[];
+
+  /**
+   * Adds the specified Orbit (Universe Map) bookmark to the player's bookmark list.
+   * @param system 
+   * @param bookmarkConfig 
+   * @returns `true` if the bookmark was successfully added (and was not already known) and `false` otherwise.
+   */
+  function addOrbitBookmark(system: CelestialCoordinate, bookmarkConfig: OrbitBookmark):void;
+
+  /**
+   * Removes the specified Orbit bookmark from the player's bookmark list
+   * @param system 
+   * @param bookmarkConfig 
+   * @returns `true` if the bookmark was successfully removed and `false` otherwise.
+   */
+  function removeOrbitBookmark(system: CelestialCoordinate, bookmarkConfig:OrbitBookmark):void;
+
+  /**
+   * Lists all of the player's teleport bookmarks.
+   */
+  function teleportBookmarks():TeleportBookmark[];
+
+  /**
+   * Adds the specified bookmark to the player's bookmark list
+   * @param bookmarkConfig
+   * @returns `true` if the bookmark was successfully added (and was not already known) and `false` otherwise.
+   */
+  function addTeleportBookmark(bookmarkConfig:TeleportBookmark):boolean;
+
+  /**
+   * Removes the specified teleport bookmark.
+   * @param bookmarkConfig
+   * @returns
+   */
+  function removeTeleportBoookmark(bookmarkConfig:TeleportBookmark):boolean;
+
+  //VISITED SYSTEMS
+
+  /**
+   * @param coordinate 
+   * @returns Returns whether the player has previously visited the specified coordinate.
+   */
+  function isMapped(coordinate: JSON):boolean;
+
+  /**
+   * @param systemCoordinate 
+   * @returns Returns uuid, type, and orbits for all system objects in the specified system;
+   */
+  function mappedObjects(systemCoordinate: JSON):JSON;
+
+  //COLLECTIONS
+
+  /**
+   * @param collectionName 
+   * @returns Returns a list of names of the collectables the player has unlocked in the specified collection.
+   */
+  function collectables(collectionName:string):string[];
+
 }

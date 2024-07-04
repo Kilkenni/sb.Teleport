@@ -15,9 +15,9 @@ export interface Destination {
 }
 
 const mel_tp:{
-  bookmarks: Bookmark[]|undefined,
+  bookmarks: TeleportBookmark[]|undefined,
   filter: string,
-  bookmarksFiltered: Bookmark[]|undefined
+  bookmarksFiltered: TeleportBookmark[]|undefined
   bookmarkTemplate: tpItem,
   configPath: string,
   configOverride: TeleportConfig|undefined,
@@ -35,7 +35,7 @@ const mel_tp:{
   animation: "default",
   dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig
 };
-mel_tp.bookmarks = player.teleportBookmarks() as Bookmark[];
+mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 mel_tp.bookmarkTemplate = bookmarksList.data;
 mel_tp.configPath = metagui.inputData.configPath as string;
 sb.logInfo(metagui.inputData.configPath);
@@ -204,7 +204,7 @@ function populateBookmarks() {
 
 
   if(finalTpConfig.includePlayerBookmarks) {
-    let filteredBookmarks:Bookmark[]|undefined;
+    let filteredBookmarks:TeleportBookmark[]|undefined;
     if(mel_tp.filter === "") {
       filteredBookmarks = mel_tp.bookmarks;
     }
@@ -483,7 +483,7 @@ btnSortByPlanet.onClick = function ():void {
   if(mel_tp.bookmarks === undefined) {
     return;
   }
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as Bookmark[];
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as TeleportBookmark[];
   populateBookmarks();
 }
 
@@ -523,7 +523,7 @@ btnFallback.onClick = function() {
  */
 
 if(mel_tp.bookmarks !== undefined) {
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as Bookmark[];
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
 }
 populateBookmarks()
 
