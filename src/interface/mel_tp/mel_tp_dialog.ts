@@ -72,58 +72,8 @@ function populateBookmarks() {
   "target":["InstanceWorld:outpost:-:-","arkteleporter"],
   "bookmarkName":"Outpost - The Ark"}
   */
-  if(finalTpConfig.includePlayerBookmarks) {
-    let filteredBookmarks:Bookmark[]|undefined;
-    if(mel_tp.filter !== "") {
-      filteredBookmarks = mel_tp.bookmarks;
-    }
-    else {
-      filteredBookmarks = mel_tp.bookmarksFiltered;
-    }
-    if(filteredBookmarks !== undefined) {
-      filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
-        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-        let iconPath = "";
-        if(bookmark.icon !== undefined) {
-          iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
-        }
-    
-        const bkmData: Destination = {
-          //system = false //for special locations like ship etc
-          warpAction: bookmark.target as BookmarkTarget, //warp coords or command
-          name: bookmark.bookmarkName || "???", //default: ???
-          planetName: bookmark.targetName || "", //default: empty string
-          icon: iconPath, //default: no icon
-          deploy: false, //Deploy mech. Default: false
-          // mission: false, //Default: false
-          // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
-        };
-    
-        currentBookmark.id = currentBookmark.id + index;
-        
-        currentBookmark.children[0].id = currentBookmark.children[0].id + index;
-        currentBookmark.children[1].id = currentBookmark.children[1].id + index;
-        currentBookmark.children[2].id = currentBookmark.children[2].id + index;
-        currentBookmark.children[0].file = bkmData.icon;
-        currentBookmark.children[1].text = bkmData.name;
-        currentBookmark.children[2].text = bkmData.planetName;
-        /*
-      { "type": "listItem", "id" : "tpBookmark", "children": [
-        { "type": "image", "id":"tpIcon", "file": ""},
-        {"type":"label", "id":"tpName", "text": "name"},
-        {"type": "label", "id":"tpPlanetName", "text": "planet"}
-        ],
-        "data": {"target": null}
-      }
-  */
-        const addedBookmark = bookmarksList.addChild(currentBookmark);
-        addedBookmark.onSelected = OnTpTargetSelect;
-        addedBookmark.bkmData = bkmData;
-      })
-    } 
-  };
-
-  //process additional locations from override config
+   //process additional locations from override config
+  
   if(finalTpConfig.destinations !== undefined) {
     finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
@@ -233,6 +183,57 @@ function populateBookmarks() {
     })
   }
 
+
+  if(finalTpConfig.includePlayerBookmarks) {
+    let filteredBookmarks:Bookmark[]|undefined;
+    if(mel_tp.filter === "") {
+      filteredBookmarks = mel_tp.bookmarks;
+    }
+    else {
+      filteredBookmarks = mel_tp.bookmarksFiltered;
+    }
+    if(filteredBookmarks !== undefined) {
+      filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
+        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
+        let iconPath = "";
+        if(bookmark.icon !== undefined) {
+          iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
+        }
+    
+        const bkmData: Destination = {
+          //system = false //for special locations like ship etc
+          warpAction: bookmark.target as BookmarkTarget, //warp coords or command
+          name: bookmark.bookmarkName || "???", //default: ???
+          planetName: bookmark.targetName || "", //default: empty string
+          icon: iconPath, //default: no icon
+          deploy: false, //Deploy mech. Default: false
+          // mission: false, //Default: false
+          // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
+        };
+    
+        currentBookmark.id = currentBookmark.id + index;
+        
+        currentBookmark.children[0].id = currentBookmark.children[0].id + index;
+        currentBookmark.children[1].id = currentBookmark.children[1].id + index;
+        currentBookmark.children[2].id = currentBookmark.children[2].id + index;
+        currentBookmark.children[0].file = bkmData.icon;
+        currentBookmark.children[1].text = bkmData.name;
+        currentBookmark.children[2].text = bkmData.planetName;
+        /*
+      { "type": "listItem", "id" : "tpBookmark", "children": [
+        { "type": "image", "id":"tpIcon", "file": ""},
+        {"type":"label", "id":"tpName", "text": "name"},
+        {"type": "label", "id":"tpPlanetName", "text": "planet"}
+        ],
+        "data": {"target": null}
+      }
+  */
+        const addedBookmark = bookmarksList.addChild(currentBookmark);
+        addedBookmark.onSelected = OnTpTargetSelect;
+        addedBookmark.bkmData = bkmData;
+      })
+    } 
+  };
  
   //GENERATING WINDOW
 /*

@@ -132,58 +132,6 @@ local function populateBookmarks()
     destinations = ____opt_8 and ____opt_8.destinations or nil
   }
 
-  -- if finalTpConfig.includePlayerBookmarks and mel_tp.bookmarks ~= nil then
-  if finalTpConfig.includePlayerBookmarks then
-    local filteredBookmarks
-    if mel_tp.filter ~= "" then
-      filteredBookmarks = mel_tp.bookmarks
-    else
-      filteredBookmarks = mel_tp.bookmarksFiltered
-    end
-    if filteredBookmarks ~= nil then
-      for index, bookmark in ipairs(filteredBookmarks) do
-        local currentBookmark = mel_tp.bookmarkTemplate
-        local iconPath = ""
-        if bookmark.icon ~= nil then
-          iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
-        end
-        local bkmData = {
-            --system = false --for special locations like ship etc
-            warpAction = bookmark.target,
-            name = bookmark.bookmarkName or "???",
-            planetName = bookmark.targetName or "",
-            icon = iconPath,
-            deploy = false
-        }
-    
-        -- { "type": "listItem", "id" : "tpBookmark", "children": [
-        --   { "type": "image", "id":"tpIcon", "file": ""},
-        --   {"type":"label", "id":"tpName", "text": "name"},
-        --   {"type": "label", "id":"tpPlanetName", "text": "planet"}
-        --   ],
-        --   "data": {"target": null}
-        -- }
-
-    
-        currentBookmark.id = currentBookmark.id .. index
-        -- tpName:setText(sb.printJson(mel_tp.data[1].bookmarkName))
-        -- tpPlanetName:setText(mel_tp.data[1].targetName)
-        -- tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.data[1].icon..".png")
-        
-        currentBookmark.children[1].id = currentBookmark.children[1].id .. index
-        currentBookmark.children[2].id = currentBookmark.children[2].id .. index
-        currentBookmark.children[3].id = currentBookmark.children[3].id .. index
-        currentBookmark.children[1].file = bkmData.icon
-        currentBookmark.children[2].text = bkmData.name
-        currentBookmark.children[3].text = bkmData.planetName
-        -- currentBookmark.bkmData = bkmData
-        local addedBookmark = bookmarksList:addChild(currentBookmark)
-        addedBookmark.onSelected = OnTpTargetSelect
-        addedBookmark.bkmData = bkmData
-      end
-    end
-  end
-
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do  
       local destination = mel_tp_util.JsonToDestination(dest)
@@ -273,6 +221,58 @@ local function populateBookmarks()
       addedBookmark.onSelected = OnTpTargetSelect
       addedBookmark.bkmData = bkmData
       ::continue::
+    end
+  end
+
+  -- player Bookmarks
+  if finalTpConfig.includePlayerBookmarks then
+    local filteredBookmarks
+    if mel_tp.filter == "" then
+      filteredBookmarks = mel_tp.bookmarks
+    else
+      filteredBookmarks = mel_tp.bookmarksFiltered
+    end
+    if filteredBookmarks ~= nil then
+      for index, bookmark in ipairs(filteredBookmarks) do
+        local currentBookmark = mel_tp.bookmarkTemplate
+        local iconPath = ""
+        if bookmark.icon ~= nil then
+          iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
+        end
+        local bkmData = {
+            --system = false --for special locations like ship etc
+            warpAction = bookmark.target,
+            name = bookmark.bookmarkName or "???",
+            planetName = bookmark.targetName or "",
+            icon = iconPath,
+            deploy = false
+        }
+    
+        -- { "type": "listItem", "id" : "tpBookmark", "children": [
+        --   { "type": "image", "id":"tpIcon", "file": ""},
+        --   {"type":"label", "id":"tpName", "text": "name"},
+        --   {"type": "label", "id":"tpPlanetName", "text": "planet"}
+        --   ],
+        --   "data": {"target": null}
+        -- }
+
+    
+        currentBookmark.id = currentBookmark.id .. index
+        -- tpName:setText(sb.printJson(mel_tp.data[1].bookmarkName))
+        -- tpPlanetName:setText(mel_tp.data[1].targetName)
+        -- tpIcon:setFile("/interface/bookmarks/icons/" .. mel_tp.data[1].icon..".png")
+        
+        currentBookmark.children[1].id = currentBookmark.children[1].id .. index
+        currentBookmark.children[2].id = currentBookmark.children[2].id .. index
+        currentBookmark.children[3].id = currentBookmark.children[3].id .. index
+        currentBookmark.children[1].file = bkmData.icon
+        currentBookmark.children[2].text = bkmData.name
+        currentBookmark.children[3].text = bkmData.planetName
+        -- currentBookmark.bkmData = bkmData
+        local addedBookmark = bookmarksList:addChild(currentBookmark)
+        addedBookmark.onSelected = OnTpTargetSelect
+        addedBookmark.bkmData = bkmData
+      end
     end
   end
 

@@ -20,7 +20,7 @@
     "tstlVerbose": true,
     "noImplicitGlobalVariables": true,
     "noImplicitSelf": false,
-    "noResolvePaths": [],
+    "noResolvePaths": ["**/*.ui"],
     "extension": ".lua-raw",
     "luaLibImport": "none"
     //"exclude": ["src/StarboundLua.ts", "src/sb_lua_callbacks/**/*", "src/sb_types/**/*"] 

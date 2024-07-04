@@ -130,43 +130,6 @@ local function populateBookmarks(self)
         includePlayerBookmarks = ____temp_13,
         destinations = ____opt_8 and ____opt_8.destinations or nil
     }
-    if finalTpConfig.includePlayerBookmarks then
-        local filteredBookmarks
-        if mel_tp.filter ~= "" then
-            filteredBookmarks = mel_tp.bookmarks
-        else
-            filteredBookmarks = mel_tp.bookmarksFiltered
-        end
-        if filteredBookmarks ~= nil then
-            __TS__ArrayForEach(
-                filteredBookmarks,
-                function(____, bookmark, index)
-                    local currentBookmark = mel_tp.bookmarkTemplate
-                    local iconPath = ""
-                    if bookmark.icon ~= nil then
-                        iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
-                    end
-                    local bkmData = {
-                        warpAction = bookmark.target,
-                        name = bookmark.bookmarkName or "???",
-                        planetName = bookmark.targetName or "",
-                        icon = iconPath,
-                        deploy = false
-                    }
-                    currentBookmark.id = currentBookmark.id .. tostring(index)
-                    currentBookmark.children[1].id = currentBookmark.children[1].id .. tostring(index)
-                    currentBookmark.children[2].id = currentBookmark.children[2].id .. tostring(index)
-                    currentBookmark.children[3].id = currentBookmark.children[3].id .. tostring(index)
-                    currentBookmark.children[1].file = bkmData.icon
-                    currentBookmark.children[2].text = bkmData.name
-                    currentBookmark.children[3].text = bkmData.planetName
-                    local addedBookmark = bookmarksList:addChild(currentBookmark)
-                    addedBookmark.onSelected = OnTpTargetSelect
-                    addedBookmark.bkmData = bkmData
-                end
-            )
-        end
-    end
     if finalTpConfig.destinations ~= nil then
         __TS__ArrayForEach(
             finalTpConfig.destinations,
@@ -223,6 +186,43 @@ local function populateBookmarks(self)
                 addedBookmark.bkmData = bkmData
             end
         )
+    end
+    if finalTpConfig.includePlayerBookmarks then
+        local filteredBookmarks
+        if mel_tp.filter == "" then
+            filteredBookmarks = mel_tp.bookmarks
+        else
+            filteredBookmarks = mel_tp.bookmarksFiltered
+        end
+        if filteredBookmarks ~= nil then
+            __TS__ArrayForEach(
+                filteredBookmarks,
+                function(____, bookmark, index)
+                    local currentBookmark = mel_tp.bookmarkTemplate
+                    local iconPath = ""
+                    if bookmark.icon ~= nil then
+                        iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
+                    end
+                    local bkmData = {
+                        warpAction = bookmark.target,
+                        name = bookmark.bookmarkName or "???",
+                        planetName = bookmark.targetName or "",
+                        icon = iconPath,
+                        deploy = false
+                    }
+                    currentBookmark.id = currentBookmark.id .. tostring(index)
+                    currentBookmark.children[1].id = currentBookmark.children[1].id .. tostring(index)
+                    currentBookmark.children[2].id = currentBookmark.children[2].id .. tostring(index)
+                    currentBookmark.children[3].id = currentBookmark.children[3].id .. tostring(index)
+                    currentBookmark.children[1].file = bkmData.icon
+                    currentBookmark.children[2].text = bkmData.name
+                    currentBookmark.children[3].text = bkmData.planetName
+                    local addedBookmark = bookmarksList:addChild(currentBookmark)
+                    addedBookmark.onSelected = OnTpTargetSelect
+                    addedBookmark.bkmData = bkmData
+                end
+            )
+        end
     end
     metagui:queueFrameRedraw()
 end

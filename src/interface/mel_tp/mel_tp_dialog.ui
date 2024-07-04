@@ -15,27 +15,20 @@
     { "mode" : "horizontal"},
     { "type": "layout", "mode": "vertical", "align": 0, "children":
       [
-        { "type": "layout", "mode": "horizontal", "align": 0, "children":
-        [
-          { "type": "layout", "mode": "vertical", "align": 0, "children":
-          [
-            { 
-              "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [0, 1], "scrollBars" : true, "align": 0, 
-              "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
-                { "type": "image", "id":"tpIcon", "file": ""},
-                {"type":"label", "id":"tpName", "text": "name"},
-                {"type": "label", "id":"tpPlanetName", "text": "planet"}
-                ],
-                "data": {"target": null}
-              },
-              "selected": null,
-              "children" : [] 
-            },
-            { "type" : "label", "text" : "Debug info" },
-            { "type": "label", "id" : "lblDebug", "text" : ""},
-            { "type": "label", "id" : "lblDump", "text" : ""}
-          ]}
-        ]}
+        { 
+          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "scrollBars" : true, "align": 0, 
+          "data" : { "type": "listItem", "id" : "tpBookmark", "selectionGroup": "tpItems", "children": [
+            {"type": "image", "id":"tpIcon", "file": "", "noAutoCrop": true},
+            {"type":"label", "id":"tpName", "text": "name"},
+            {"type": "label", "id":"tpPlanetName", "text": "planet"}
+            ],
+            "data": {"target": null}
+          },
+          "children" : [] 
+        },
+        { "type" : "label", "text" : "Debug info" },
+        { "type": "label", "id" : "lblDebug", "text" : ""},
+        { "type": "label", "id" : "lblDump", "text" : ""}    
       ]
     },
     [ 

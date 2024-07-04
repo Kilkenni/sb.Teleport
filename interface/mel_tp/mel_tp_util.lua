@@ -18,14 +18,14 @@ local function sortArrayByProperty(array, propertyName, descending)
     end
     if descending == false then
       table.sort(sortedArray,
-        function(elem1, elem2)
-          return elem1[propertyName].lower() < elem2[propertyName].lower()
+        function(elem1, elem2) 
+          return (string.lower(elem1[propertyName]) < string.lower(elem2[propertyName]) )
         end
       )
     else
       table.sort(sortedArray,
         function(elem1, elem2)
-          return elem1[propertyName].lower() > elem2[propertyName].lower()
+          return ( string.lower(elem1[propertyName]) > string.lower(elem2[propertyName]) )
         end
       )
     end
