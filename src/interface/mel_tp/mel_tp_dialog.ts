@@ -1,7 +1,7 @@
 //require "/scripts/util.lua"
 //require "/scripts/vec2.lua"
 // import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, lblDebug, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui";
+import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, lblDebug, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 import {mel_tp_util} from "./mel_tp_util";
 
 export interface Destination {
