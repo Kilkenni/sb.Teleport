@@ -1,4 +1,3 @@
----@diagnostic disable: undefined-global
 --- Sorts array by certain property
 -- 
 -- @param array Array of similar objects containing properties with string keys
@@ -33,29 +32,32 @@ local function sortArrayByProperty(array, propertyName, descending)
 end
 
 local SystemLocationType = {
-  nil,
   "CelestialCoordinate",
   "CelestialOrbit",
   "Space",
   "FloatingDungeon"
 }
 
+--- Detects type of space location within a space system
+-- 
+-- @param destination some location in space (normally, that of a player ship)
+-- @returns
 local function getSpaceLocationType(destination)
   if destination == nil then
-    return SystemLocationType[1]
+    return nil
   end
   if type(destination[1]) == "string" then
-    if destination[1] == "object" then
-      return SystemLocationType[5]
+    if destination[1] == "coordinate" then
+      return SystemLocationType[1]
     end
     if destination[1] == "orbit" then
-      return SystemLocationType[3]
-    end
-    if destination[1] == "coordinate" then
       return SystemLocationType[2]
     end
+    if destination[1] == "object" then
+      return SystemLocationType[3]
+    end
     sb.logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
-    return SystemLocationType[1]
+    return nil
   end
   if type (destination[1]) == type(destination[2]) then
     return SystemLocationType[4]
@@ -64,7 +66,7 @@ local function getSpaceLocationType(destination)
     "GetSpaceLocationType: can't identify location type: %s",
     {sb.printJson(destination)}
   )
-  return SystemLocationType[1]
+  return nil
 end
 
 local function stringToArray(inputString, separator, elemType)
@@ -102,8 +104,6 @@ end
 -- @param target Can parse CelestialWorld or InstanceWorld
 -- @returns CelestialCoordinate or null
 local function WorldIdToObject(target)
-  --debug
-  -- sb.logInfo("[log] Trying to convert to CelestialCoordinate: "..sb.print(target))
   if(target == nil) then
     return nil
   end
@@ -117,8 +117,6 @@ local function WorldIdToObject(target)
   if string.sub(target, 1, 1) == "C" then
     local tempTarget = string.gsub(target, "CelestialWorld:", "")
     local parsedTarget = stringToArray(tempTarget, ":", "number")
-    --debug
-  -- sb.logInfo("[Log] parsed "..sb.printJson(parsedTarget))
     local targetCoordinate = {
         location = {
           parsedTarget[1],

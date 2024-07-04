@@ -25,36 +25,40 @@ function sortArrayByProperty(array:Record<string, any>[], propertyName: string, 
   return sortedArray;
 }
 
-enum SystemLocationType {
-  null, //0
-  "CelestialCoordinate", //1
-  "CelestialOrbit", //2
-  "Space", //3
-  "FloatingDungeon" //4
-}
+const SystemLocationType = [
+  "CelestialCoordinate", //0
+  "CelestialOrbit", //1
+  "FloatingDungeon", //2
+  "Space" //3
+]
 
+/**
+ * Detects type of space location within a space system
+ * @param destination some location in space (normally, that of a player ship)
+ * @returns 
+ */
 function getSpaceLocationType(destination:SystemLocationJson):string|null {
   if(destination === null) {
-    return SystemLocationType[0];
+    return null;
   }
   if(typeof destination[0] === "string") {
-    if(destination[0] === "object") {
-      return SystemLocationType[4];
+    if(destination[0] === "coordinate") {
+      return SystemLocationType[0];
     }
     if(destination[0] === "orbit") {
-      return SystemLocationType[2];
-    }
-    if(destination[0] === "coordinate") {
       return SystemLocationType[1];
     }
+    if(destination[0] === "object") {
+      return SystemLocationType[2];
+    }  
     sb.logError(`GetSpaceLocationType: can't identify type, first element is %s`, [destination[0]]);
-    return SystemLocationType[0];
+    return null;
   }
   if(typeof destination[0] === typeof destination[1]) {
     return SystemLocationType[3];
   }
   sb.logError(`GetSpaceLocationType: can't identify location type: %s`, [sb.printJson(destination as unknown as JSON)]);
-  return SystemLocationType[0];
+  return null;
 }
 
 /**

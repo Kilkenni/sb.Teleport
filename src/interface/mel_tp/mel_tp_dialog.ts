@@ -358,7 +358,14 @@ namespace Star {
   metagui.queueFrameRedraw()
 }
 
+function clearPlanetInfo():void {
+  lblBkmName.setText("");
+  lblBkmHazards.setText("");
+  listHazards.clearChildren();
+}
+
 function displayPlanetInfo(coord: CelestialCoordinate):void {
+  clearPlanetInfo();
   const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
   const name = celestial.planetName(coord);
   const planetParams = celestial.visitableParameters(coord);
@@ -395,66 +402,81 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
 }
 
 function OnTpTargetSelect(bookmarkWidget:any):void {
-mel_tp.selected = bookmarkWidget.bkmData as Destination;
-const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
-listHazards.clearChildren();
+  mel_tp.selected = bookmarkWidget.bkmData as Destination;
+  const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
+  clearPlanetInfo();
 
-if(typeof mel_tp.selected.warpAction === "string") {
-  if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
-    lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
-    lblBkmHazards.setText(world.timeOfDay());
-  }
-  else {
-    //Special case for Orbited World: show hazards
-    const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate
-    const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
-    if(shipLocation === null  || locationType !== "CelestialCoordinate") {
-      if(shipLocation === null) {
-        sb.logError(`Teleport list contains [Orbited World] but ship location is NIL}`)
-      }
-      else {
-        sb.logError(`Teleport list contains [Orbited World] but ship location is ${sb.printJson(shipLocation as unknown as JSON)}`)
-      }
-      return;
-    }
-    const coord:CelestialCoordinate = shipLocation[1] as CelestialCoordinate;
-    displayPlanetInfo(coord);
-  }
-}
-else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
-  lblBkmName.setText("Player signature");
-  lblBkmHazards.setText(world.timeOfDay());
-}
-else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
-  lblBkmName.setText("Object Uuid signature");
-  lblBkmHazards.setText(world.timeOfDay());
-}
-else {
-  const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
-  const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
-  if(coord === null) {
-    lblBkmName.setText(dbErrorText);
-    lblBkmHazards.setText(world.timeOfDay());
-  }
-  else {
-    if((coord as CelestialCoordinate).location !== undefined) {
-      //TypeGuard: coord is a CelestialCoordinate
-      displayPlanetInfo(coord as CelestialCoordinate);
+  if(typeof mel_tp.selected.warpAction === "string") {
+    if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
+      lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
+      lblBkmHazards.setText(world.timeOfDay());
     }
     else {
-      //coord is an InstanceWorldId
-      const instanceId = coord as InstanceWorldId;
-      if(instanceId.instance !== null) {
-        lblBkmName.setText(instanceId.instance);
-      }
-      if(instanceId.level !== "-") {
-        lblBkmHazards.setText(`Level ${instanceId.level}`);
-      }
-    }      
-  }
-}
+      //Special case for Orbited World: show hazards
+      const shipLocation: SystemLocationJson = celestial.shipLocation(); //allow warp only if CelestialCoordinate or FloatingDungeon
+      const locationType = mel_tp_util.getSpaceLocationType(shipLocation);
 
-lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
+      if(locationType === null || shipLocation === null){
+        sb.logError(`Teleport list contains [Orbited World] but ship location is NIL}`);
+        return;
+      }
+      if(locationType !== "CelestialCoordinate") {
+        //location is not a CelestialCoordinate
+        const systemLocations = celestial.systemObjects();
+        let maybeUuid;
+        if(locationType === "FloatingDungeon"){
+          maybeUuid = shipLocation[1] as Uuid;
+        }         
+
+        if(maybeUuid === undefined || mel_tp_util.TableContains(systemLocations, maybeUuid) === false || mel_tp.selected.deploy !== true) {
+          //location is not FloatingDungeon OR current system locations have no such Uuid OR deploy is not activated
+          sb.logError(`Teleport list contains [Orbited World] but ship location is ${sb.printJson(shipLocation as unknown as JSON)}`)
+          return;
+        }
+      }
+
+      let coord;
+      if(locationType === "CelestialCoordinate") {
+        coord = shipLocation[1] as CelestialCoordinate;
+      }
+      
+      displayPlanetInfo(coord);
+    }
+  }
+  else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
+    lblBkmName.setText("Player signature");
+    lblBkmHazards.setText(world.timeOfDay());
+  }
+  else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
+    lblBkmName.setText("Object Uuid signature");
+    lblBkmHazards.setText(world.timeOfDay());
+  }
+  else {
+    const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
+    const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
+    if(coord === null) {
+      lblBkmName.setText(dbErrorText);
+      lblBkmHazards.setText(world.timeOfDay());
+    }
+    else {
+      if((coord as CelestialCoordinate).location !== undefined) {
+        //TypeGuard: coord is a CelestialCoordinate
+        displayPlanetInfo(coord as CelestialCoordinate);
+      }
+      else {
+        //coord is an InstanceWorldId
+        const instanceId = coord as InstanceWorldId;
+        if(instanceId.instance !== null) {
+          lblBkmName.setText(instanceId.instance);
+        }
+        if(instanceId.level !== "-") {
+          lblBkmHazards.setText(`Level ${instanceId.level}`);
+        }
+      }      
+    }
+  }
+
+  lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
 };
 
 txtboxFilter.onEnter = function ():void {
@@ -504,9 +526,9 @@ btnTeleport.onClick = function() {
 
 btnDeploy.onClick = function() {
   if(mel_tp.selected == undefined) {
-    widget.playSound("/sfx/interface/clickon_error.ogg")  
-    lblDump.setText("No target selected")
-    return
+    widget.playSound("/sfx/interface/clickon_error.ogg");
+    lblDump.setText("No target selected");
+    return;
   }
   //TODO
 

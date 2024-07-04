@@ -34,42 +34,36 @@ local function sortArrayByProperty(array, propertyName, descending)
     end
     return sortedArray
 end
-local SystemLocationType = SystemLocationType or ({})
-SystemLocationType.null = 0
-SystemLocationType[SystemLocationType.null] = "null"
-SystemLocationType.CelestialCoordinate = 1
-SystemLocationType[SystemLocationType.CelestialCoordinate] = "CelestialCoordinate"
-SystemLocationType.CelestialOrbit = 2
-SystemLocationType[SystemLocationType.CelestialOrbit] = "CelestialOrbit"
-SystemLocationType.Space = 3
-SystemLocationType[SystemLocationType.Space] = "Space"
-SystemLocationType.FloatingDungeon = 4
-SystemLocationType[SystemLocationType.FloatingDungeon] = "FloatingDungeon"
+local SystemLocationType = {"CelestialCoordinate", "CelestialOrbit", "FloatingDungeon", "Space"}
+--- Detects type of space location within a space system
+-- 
+-- @param destination some location in space (normally, that of a player ship)
+-- @returns
 local function getSpaceLocationType(destination)
     if destination == nil then
-        return SystemLocationType[0]
+        return nil
     end
     if type(destination[1]) == "string" then
-        if destination[1] == "object" then
-            return SystemLocationType[4]
+        if destination[1] == "coordinate" then
+            return SystemLocationType[1]
         end
         if destination[1] == "orbit" then
             return SystemLocationType[2]
         end
-        if destination[1] == "coordinate" then
-            return SystemLocationType[1]
+        if destination[1] == "object" then
+            return SystemLocationType[3]
         end
         sb.logError("GetSpaceLocationType: can't identify type, first element is %s", {destination[0]})
-        return SystemLocationType[0]
+        return nil
     end
     if __TS__TypeOf(destination[1]) == __TS__TypeOf(destination[2]) then
-        return SystemLocationType[3]
+        return SystemLocationType[4]
     end
     sb.logError(
         "GetSpaceLocationType: can't identify location type: %s",
         {sb.printJson(destination)}
     )
-    return SystemLocationType[0]
+    return nil
 end
 --- Returns stringified CelestialCoordinate back into object
 -- 
