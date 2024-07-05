@@ -12,6 +12,8 @@ Download as a folder and drop to `StarboundLocation/mods`. If you don't need acc
 
 ## Usage
 
+Enable `/admin` mode. Spawn modified teleporter core: `/spawnitem handheldteleporter 1`. Use it. Activation time has been decreased to almost instant to simplify tests. Original Handheld Teleporter mod, if present, should be disabled!
+
 Dialog tries its best to filter out all irrelevant destinations. Examples:
 
 - When on the player ship, "Warp to ship" is disabled
@@ -31,7 +33,6 @@ Source Typescript files (`*.ts`) are transpiled into `*.lua-raw`. The reason of 
 
 ## Known Issues
 
-- Bookmarks are centered, should be aligned to top
 - No edit and deletion available in new window (yet)
 - Tooltips on hazard icons in planet info don't show
 - Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, needs verification. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
