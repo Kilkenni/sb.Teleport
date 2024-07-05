@@ -37,6 +37,7 @@ Source Typescript files (`*.ts`) are transpiled into `*.lua-raw`. The reason of 
 - Tooltips on hazard icons in planet info don't show
 - Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, needs verification. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
 
+- Possibly cannot warp down if a player is NOT on their own ship. Needs verification.
 - Cannot warp to party members via this dialog. Seems to be a limitation of vanilla Lua callbacks.
 - Cannot warp in mission dungeon to party members already present in the dungeon. Likewise.
 
@@ -51,6 +52,7 @@ Uses MetaGUI for quick window prototyping. Thus, requires either [Stardust Core]
 ## Useful links
 
 [Stardust MetaGUI help](https://github.com/zetaPRIME/sb.StardustSuite/tree/master/StardustLib/sys/metagui)
+
 [Typescript to Lua transpiler](https://typescripttolua.github.io/docs/getting-started)
 
 ## Credits and Kudos
