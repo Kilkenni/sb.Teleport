@@ -317,8 +317,6 @@ function txtboxFilter:onEnter()
   end
   mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
   populateBookmarks(nil)
-  -- player.say(sb.printJson(txtboxFilter.text))
-  -- chat.send(sb.printJson(txtboxFilter.text))
 end
 
 function txtboxFilter:onEscape()
