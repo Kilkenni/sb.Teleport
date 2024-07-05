@@ -34,8 +34,8 @@ end
 local SystemLocationType = {
   "CelestialCoordinate",
   "CelestialOrbit",
-  "Space",
-  "FloatingDungeon"
+  "FloatingDungeon",
+  "Space"
 }
 
 --- Detects type of space location within a space system

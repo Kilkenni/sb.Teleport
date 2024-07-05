@@ -1,6 +1,6 @@
 {
   "style" : "window",
-  "size" : [320, 400],
+  "size" : [320, 300],
   "resizable" : true,
   "minSize" : [120, 64],
   "title" : "Teleporter",
@@ -16,7 +16,7 @@
     { "type": "layout", "mode": "vertical", "align": 0, "children":
       [
         { 
-          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "scrollBars" : true, "align": 0, 
+          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "expandMode": [2, 2], "scrollBars" : true, "align": 0, 
           "data" : { "type": "listItem", "selectionGroup": "tpItems", "children": [
             {"type": "image", "file": "", "noAutoCrop": true},
             {"type":"label", "text": "name"},
@@ -50,10 +50,10 @@
         "id": "btnSortByPlanet"
       },
       { 
-        "type" : "scrollArea", "id":"bookmarkInfo", "scrollDirections" : [0, 1], "scrollBars" : true, 
+        "type" : "scrollArea", "id":"bookmarkInfo", "scrollDirections" : [0, 1], "expandMode": [0, 2], "scrollBars" : true, 
         "data" : {},
         "children" : [
-          {"type":"label", "id":"lblBkmName", "text": "???"},
+          {"type":"label", "id":"lblBkmName", "text": ""},
           {"type":"label", "id":"lblBkmHazards", "text": ""},
           {"type": "layout", "id": "listHazards", "mode": "horizontal", "children": [],
             "data": {
@@ -62,7 +62,7 @@
           }
         ] 
       },
-      "spacer",
+      {"type": "spacer", "size": 10, "expandMode": [1, 1]},
       { 
         "type" : "button",
         "caption" : "Vanilla Dialog",

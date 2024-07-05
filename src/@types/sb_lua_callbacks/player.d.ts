@@ -482,7 +482,7 @@ Sets whether the player is marked as having completed the intro instance.
   /**
    * Immediately warps the player to the specified warp target, optionally using the specified warp animation and deployment. 
    * @param warpActionString
-   * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation
+   * @param animation Use "default" to get default teleport animation. Full list in assets/player/playereffects.animation, but generally it's 'default', 'beam' or 'deploy'
    * @param deploy Whether to deploy player mech
    */
   function warp(warpActionString: WarpActionString, animation?: string, deploy?: boolean):void;

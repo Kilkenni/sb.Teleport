@@ -41,6 +41,11 @@ mel_tp.configPath = metagui.inputData.configPath as string;
 sb.logInfo(metagui.inputData.configPath);
 mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
 
+const inactiveColor = "ff0000"; //red
+if(player.canDeploy() === false) {
+  btnDeploy.color = inactiveColor;
+}
+
 /*
   {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
     "icon":"garden",
@@ -530,8 +535,14 @@ btnDeploy.onClick = function() {
     lblDump.setText("No target selected");
     return;
   }
-  //TODO
+  if(player.canDeploy() === false) {
+    widget.playSound("/sfx/interface/clickon_error.ogg");
+    lblDump.setText("No mech to deploy");
+    return;
+  }
 
+  const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
+  player.warp(warpTarget, "deploy", true);
   pane.dismiss();
 }
 

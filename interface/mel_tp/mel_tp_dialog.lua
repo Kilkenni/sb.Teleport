@@ -18,6 +18,11 @@ mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configPath = metagui.inputData.configPath
 mel_tp.configOverride = root.assetJson(mel_tp.configPath)
 
+local inactiveColor = "ff0000"
+if player.canDeploy() == false then
+    btnDeploy.color = inactiveColor
+end
+
 -- sb.logInfo(metagui.inputData.configPath);
 
  -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
@@ -180,6 +185,11 @@ local function populateBookmarks()
           -- sb.logWarn(locationType)
           if(maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or destination.deploy ~= true) then
             --location is not FLoatingDungeon OR current system locations have no such Uuid or no command to deploy mech
+            sb.logWarn(sb.printJson(shipLocation))
+            sb.logWarn(locationType)
+            sb.logWarn(sb.print(maybeUuid))
+            sb.logWarn(sb.printJson(systemLocations))
+            sb.logWarn("Deploy mech? "..sb.print(deploy))
             
             goto __continue4 --Warping down is available only when orbiting a planet or floating dungeon
           end
@@ -335,7 +345,14 @@ function btnDeploy:onClick()
     lblDump:setText("No target selected")
     return
   end
-  --TODO
+  if player.canDeploy() == false then
+    widget.playSound("/sfx/interface/clickon_error.ogg")
+    lblDump:setText("No mech to deploy")
+    return
+  end
+  
+  local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
+    player.warp(warpTarget, "deploy", true)
   pane.dismiss()
 end
 
