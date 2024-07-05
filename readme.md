@@ -10,6 +10,15 @@ Work in progress. Planned features will probably be available in Issues. Soon :t
 
 Download as a folder and drop to `StarboundLocation/mods`. `/src` folder can be safely removed if you don't need access to source.
 
+## Usage
+
+Dialog tries its best to filter out all irrelevant destinations. Examples:
+
+- When on the player ship, "Warp to ship" is disabled
+- When in space, warp option without the mech is disabled
+- Quest-related destinations are disabled until unlocked
+- Unlike in vanilla dialog, you can deploy mech anywhere you can teleport. However, if a player has no mech (yet), the button will be red and deactivated.
+
 ## Development
 
 Source code is written in Typescript. Since Starbound doesn't deal with Typescript, it's converted into Lua with [TSTL](https://typescripttolua.github.io/) (Typescript-To-Lua transpiler). The command you'll need for that is `npm run build`.
@@ -24,9 +33,11 @@ Source Typescript files (`*.ts`) are transpiled into `*.lua-raw`. The reason of 
 
 - Bookmarks are centered, should be aligned to top
 - No edit and deletion available in new window (yet)
-- Scroll occasionally doesn't work properly (specific to OpenSb only?)
 - Tooltips on hazard icons in planet info don't show
 - Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, needs verification. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
+
+- Cannot warp to party members via this dialog. Seems to be a limitation of vanilla Lua callbacks.
+- Cannot warp in mission dungeon to party members already present in the dungeon. Likewise.
 
 ## License
 
@@ -39,10 +50,11 @@ Uses MetaGUI for quick window prototyping. Thus, requires either [Stardust Core]
 ## Useful links
 
 [Stardust MetaGUI help](https://github.com/zetaPRIME/sb.StardustSuite/tree/master/StardustLib/sys/metagui)
+[Typescript to Lua transpiler](https://typescripttolua.github.io/docs/getting-started)
 
 ## Credits and Kudos
 
-Used v6's [Handheld Teleporter](https://steamcommunity.com/workshop/filedetails/?id=751199367) as quick hack for triggering the pane
+Used v6's [Handheld Teleporter](https://steamcommunity.com/workshop/filedetails/?id=751199367) as quick hack for debugging
 
 Thanks to [zetaPRIME](https://github.com/zetaPRIME) for help with Stardust MetaGUI
 Thanks to Zygan for some friendly Lua advice
