@@ -32,7 +32,6 @@ function displayPlanetInfo(coord)
         lblBkmName.setText(dbErrorText)
     end
     if planetParams ~= nil then
-        lblBkmHazards.setText("Hazards: " .. sb.printJson(planetParams.environmentStatusEffects))
         if #planetParams.environmentStatusEffects > 0 then
             local hazardTemplate = listHazards.data
             for ____, effect in ipairs(planetParams.environmentStatusEffects) do
@@ -126,7 +125,7 @@ mel_tp.bookmarkTemplate = bookmarksList.data
 mel_tp.configPath = metagui.inputData.configPath
 sb.logInfo(metagui.inputData.configPath)
 mel_tp.configOverride = root.assetJson(mel_tp.configPath)
-local inactiveColor = "d3d3d3"
+local inactiveColor = "ff0000"
 if player.canDeploy() == false then
     btnDeploy.color = inactiveColor
 end
@@ -296,7 +295,7 @@ btnDeploy.onClick = function()
         return
     end
     local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
-    player.warp(warpTarget, mel_tp.animation, true)
+    player.warp(warpTarget, "deploy", true)
     pane.dismiss()
 end
 btnFallback.onClick = function()

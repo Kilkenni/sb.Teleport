@@ -46,7 +46,8 @@ local function displayPlanetInfo(coord)
     lblBkmName:setText(dbErrorText)
   end
   if planetParams ~= nil then
-    lblBkmHazards:setText("Hazards: " .. sb.printJson(planetParams.environmentStatusEffects))
+    --debug
+    -- lblBkmHazards:setText("Hazards: " .. sb.printJson(planetParams.environmentStatusEffects))
     if #planetParams.environmentStatusEffects > 0 then
       local hazardTemplate = listHazards.data
 

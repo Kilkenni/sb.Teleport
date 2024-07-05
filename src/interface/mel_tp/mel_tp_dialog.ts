@@ -1,7 +1,7 @@
-//require "/scripts/util.lua"
-//require "/scripts/vec2.lua"
-// import {pane, player, sb, widget, SbTypes} from "../../../src_sb_typedefs/StarboundLua";
-import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, bookmarkInfo, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
+/**
+ * This module handles main Teleport ScriptPane constructed with MetaGUI
+ */
+import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 import mel_tp_util from "./mel_tp_util";
 
 export interface Destination {
@@ -81,9 +81,6 @@ function populateBookmarks() {
   
   if(finalTpConfig.destinations !== undefined) {
     for(const dest of finalTpConfig.destinations) {
-
-    // }
-    // finalTpConfig.destinations.forEach((dest:JsonDestination, index:number):void => {
       //Skip unavailable destinations in config
       const destination:Destination = mel_tp_util.JsonToDestination(dest);
       if(destination.prerequisiteQuest !== undefined && player.hasCompletedQuest(destination.prerequisiteQuest) === false) {
@@ -204,7 +201,7 @@ function populateBookmarks() {
       const addedBookmark = bookmarksList.addChild(currentBookmark);
       addedBookmark.onSelected = OnTpTargetSelect;
       addedBookmark.bkmData = bkmData;
-    }//)
+    }
   }
 
 
@@ -217,8 +214,7 @@ function populateBookmarks() {
       filteredBookmarks = mel_tp.bookmarksFiltered;
     }
     if(filteredBookmarks !== undefined) {
-        for(const bookmark of filteredBookmarks) {
-      // filteredBookmarks.forEach((bookmark:Bookmark, index:number):void => {
+      for(const bookmark of filteredBookmarks) {
         const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
         let iconPath = "";
         if(bookmark.icon !== undefined) {
@@ -236,23 +232,19 @@ function populateBookmarks() {
           // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
         };
     
-        // currentBookmark.id = currentBookmark.id + index;
-        
-        // currentBookmark.children[0].id = currentBookmark.children[0].id + index;
-        // currentBookmark.children[1].id = currentBookmark.children[1].id + index;
-        // currentBookmark.children[2].id = currentBookmark.children[2].id + index;
+        /*
+        { "type": "listItem", "children": [
+          { "type": "image", "file": ""},
+          {"type":"label", "text": "name"},
+          {"type": "label", "text": "planet"}
+          ],
+          "data": {"target": null}
+        }
+        */
         currentBookmark.children[0].file = bkmData.icon;
         currentBookmark.children[1].text = bkmData.name;
         currentBookmark.children[2].text = bkmData.planetName;
-        /*
-      { "type": "listItem", "id" : "tpBookmark", "children": [
-        { "type": "image", "id":"tpIcon", "file": ""},
-        {"type":"label", "id":"tpName", "text": "name"},
-        {"type": "label", "id":"tpPlanetName", "text": "planet"}
-        ],
-        "data": {"target": null}
-      }
-  */
+      
         const addedBookmark = bookmarksList.addChild(currentBookmark);
         addedBookmark.onSelected = OnTpTargetSelect;
         addedBookmark.bkmData = bkmData;
@@ -358,8 +350,6 @@ namespace Star {
   }
   */
     
-
-
   metagui.queueFrameRedraw()
 }
 
@@ -381,14 +371,13 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
     lblBkmName.setText(dbErrorText);
   }
   if(planetParams !== null) {
-    lblBkmHazards.setText("Hazards: "+sb.printJson(planetParams.environmentStatusEffects as unknown as JSON));
-    //debug line
+    //debug
+    // lblBkmHazards.setText("Hazards: "+sb.printJson(planetParams.environmentStatusEffects as unknown as JSON));
     // sb.logInfo("[log] Planet visitable parameters: "..sb.printJson(planetParams as unknown as JSON));
     if(planetParams.environmentStatusEffects.length > 0) {
       //experimental - if at least one hazard is there, show its icon
       const hazardTemplate:hazardItem = listHazards.data;
       for(const effect of planetParams.environmentStatusEffects) {
-      // planetParams.environmentStatusEffects.forEach((effect, index) => {
         if(mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] !== undefined) {
           hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon;
           hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].displayName;
@@ -398,7 +387,7 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
           hazardTemplate.toolTip = mel_tp.dialogConfig.planetaryEnvironmentHazards.error.displayName;
         }
         listHazards.addChild(hazardTemplate);
-      }//)
+      }
     }
   }
   else {

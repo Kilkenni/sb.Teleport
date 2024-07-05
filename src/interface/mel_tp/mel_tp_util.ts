@@ -175,11 +175,10 @@ function FilterBookmarks(bookmarks: TeleportBookmark[], filter:string):TeleportB
   }
   let filteredBookmarks:TeleportBookmark[] = [];
   for(const bkm of bookmarks) {
-  // bookmarks.forEach((bkm: Bookmark, index: number) => {
     if(bkm.bookmarkName.toLowerCase().includes(filter.toLowerCase()) || bkm.targetName.toLowerCase().includes(filter.toLowerCase())) {
       filteredBookmarks.push(bkm);
     }
-  }//);
+  }
   return filteredBookmarks;
 }
 

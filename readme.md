@@ -8,7 +8,7 @@ Work in progress. Planned features will probably be available in Issues. Soon :t
 
 ## Installation
 
-Download as a folder and drop to `StarboundLocation/mods`. `/src` folder can be safely removed if you don't need access to source.
+Download as a folder and drop to `StarboundLocation/mods`. If you don't need access to source,`/src` folder can be safely removed.
 
 ## Usage
 

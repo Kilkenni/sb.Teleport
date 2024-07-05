@@ -162,7 +162,7 @@ declare interface CelestialOrbit {
 declare type SystemLocationJson = ["coordinate", CelestialCoordinate]|
 ["orbit", CelestialOrbit]|["object", Uuid]|Vec2F|null;
 
-declare interface CelestialParametersJson { //TODO: Needs better description than that
+declare interface CelestialParametersJson { //FIXME: Needs better description than that
   imageScale?: float,
   smallImage?: string, //example: "/celestial/system/planet_small.png"
   description?: string, //example: "Tier 2 Planet"
@@ -179,8 +179,8 @@ declare interface VisitableParametersJson {
   gravity: float, //default: 1.0
   airless: boolean, //default: false
   weatherPool: [double, string][], //[double,string][]. Weather types with their probabilities
-  environmentStatusEffects: string[], //string[]. May be empty. Write better description?
-  overrideTech: string[]; //string[]. May be empty. Write better description?
+  environmentStatusEffects: string[], //May be empty. Write better description?
+  overrideTech: string[]; //May be empty. Write better description?
   globalDirectives: JSON, //Directives[] in JSON form. May be empty. Write better description?
   beamUpRule: "Nowhere"|"Surface"|"Anywhere"|"AnywhereWithWarning", //default: "Surface". BeamUpRuleNames
   disableDeathDrops: boolean, //default: false

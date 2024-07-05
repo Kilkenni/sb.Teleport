@@ -1,6 +1,6 @@
 {
   "name": "sb.teleport",
-  "version": "0.2.0",
+  "version": "0.3",
   "description": "A proof-of-concept mod that uses some minor sorcery to reimagine Teleportation UI.",
   "main": "readme.md",
   "scripts": {

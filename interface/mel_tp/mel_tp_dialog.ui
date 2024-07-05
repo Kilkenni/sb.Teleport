@@ -1,6 +1,6 @@
 {
   "style" : "window",
-  "size" : [320, 300],
+  "size" : [360, 300],
   "resizable" : true,
   "minSize" : [120, 64],
   "title" : "Teleporter",
@@ -13,10 +13,11 @@
   "uniqueMode" : "toggle", 
   "children" : [
     { "mode" : "horizontal"},
-    { "type": "layout", "mode": "vertical", "align": 0, "children":
+    { "type": "layout", "mode": "vertical", "align": 0, "expandMode": [1, 2], "children":
       [
+        {"type": "spacer", "size": 8, "expandMode": [0, 0]},
         { 
-          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "expandMode": [2, 2], "scrollBars" : true, "align": 0, 
+          "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "expandMode": [1, 2], "scrollBars" : true, "align": 0, 
           "data" : { "type": "listItem", "selectionGroup": "tpItems", "children": [
             {"type": "image", "file": "", "noAutoCrop": true},
             {"type":"label", "text": "name"},
@@ -26,13 +27,16 @@
           },
           "children" : [] 
         },
-        { "type" : "label", "text" : "Debug info" },
-        { "type": "label", "id" : "lblDebug", "text" : ""},
-        { "type": "label", "id" : "lblDump", "text" : ""}    
+        {"type": "spacer", "size": 8, "expandMode": [1, 0]},
+        { "type": "panel", "mode": "vertical", "align": 0, "size": [10, 70], "expandMode": [1, 0], "children": [
+          { "type": "label", "text" : "Debug info" },
+          { "type": "label", "id" : "lblDebug", "text" : ""},
+          { "type": "label", "id" : "lblDump", "text" : ""} 
+        ] }  
       ]
     },
     [ 
-      { "size" : 100 },
+      { "size" : 120 },
       {
         "type": "textBox",
         "caption": "filter",
@@ -49,23 +53,24 @@
         "caption" : "Sort by planet", 
         "id": "btnSortByPlanet"
       },
+      {"type": "spacer", "size": 8, "expandMode": [0, 0]},
       { 
-        "type" : "scrollArea", "id":"bookmarkInfo", "scrollDirections" : [0, 1], "expandMode": [0, 2], "scrollBars" : true, 
+        "type" : "panel", "id":"bookmarkInfo","expandMode": [2, 1], "align": 0, "style" : "convex", "padding" : 2,
         "data" : {},
         "children" : [
-          {"type":"label", "id":"lblBkmName", "text": ""},
-          {"type":"label", "id":"lblBkmHazards", "text": ""},
-          {"type": "layout", "id": "listHazards", "mode": "horizontal", "children": [],
-            "data": {
-              "type": "image", "file": "", "noAutoCrop" : true, "toolTip": ""
-            }
-          }
+          {"type": "spacer", "size": 8, "expandMode": [0, 0]},
+          {"type":"label", "id":"lblBkmName", "text": "", "fontSize" : 9, "size": [20, 24], "expandMode": [2, 1], "align": "center"},    
+          {"type": "layout", "id": "listHazards", "mode": "horizontal", "align": 0, "style": "concave", "expandMode": [2, 1], "children": [],
+            "data": { "type": "image", "file": "", "toolTip": "", "noAutoCrop" : true}
+          },
+          {"type":"label", "id":"lblBkmHazards", "text": "", "size": [20, 10], "expandMode": [2, 0]},
+          {"type": "spacer", "expandMode": [2, 2]}
         ] 
       },
-      {"type": "spacer", "size": 10, "expandMode": [1, 1]},
+      {"type": "spacer", "size": 10, "expandMode": [0, 0]},
       { 
         "type" : "button",
-        "caption" : "Vanilla Dialog",
+        "caption" : "Vanilla Dialog >>",
         "id" : "btnFallback"
       },
       { 
