@@ -29,6 +29,20 @@ declare module world {
    * @returns Returns the duration of a day on the current world.
    */
   function dayLength():float;
+
+  //OBJECTS
+/*
+  Json WorldEntityCallbacks::getObjectParameter(World* world, EntityId entityId, String const& parameterName, Maybe<Json> const& defaultValue) {
+    Json val = Json();
+
+    if (auto objectEntity = as<Object>(world->entity(entityId))) {
+      val = objectEntity->configValue(parameterName);
+      if (!val && defaultValue)
+        val = *defaultValue;
+    }
+
+    return val;
+  }*/
 }
 
 

@@ -14,17 +14,27 @@ export interface Destination {
   prerequisiteQuest? : any, //if the player has not completed the quest, destination is not available
 }
 
+declare interface MetaguiTpData {
+  configPath?: string, //path to teleport.config. Similar to interactData on vanilla teleporters
+  paneIcon?: string, //path to custom icon for teleport window
+  paneTitle?: string, //cutom title for teleport window
+}
+
 const mel_tp:{
+  paneIcon: string,
+  paneTitle: string,
   bookmarks: TeleportBookmark[]|undefined,
   filter: string,
   bookmarksFiltered: TeleportBookmark[]|undefined
   bookmarkTemplate: tpItem,
   configPath: string,
-  configOverride: TeleportConfig|undefined,
-  selected: Destination|undefined
+  configOverride?: TeleportConfig,
+  selected: Destination|undefined,
   animation: string,
   dialogConfig: TpDialogConfig
 } = {
+  paneIcon: "/interface/warping/icon.png",
+  paneTitle: "Teleporter",
   bookmarks: undefined,
   filter: "",
   bookmarksFiltered: undefined,
@@ -37,14 +47,25 @@ const mel_tp:{
 };
 mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 mel_tp.bookmarkTemplate = bookmarksList.data;
-mel_tp.configPath = metagui.inputData.configPath as string;
-sb.logInfo(metagui.inputData.configPath);
-mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
+const sourceEntity = pane.sourceEntity();
+// sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
+const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
+if(metaguiTpData !== undefined) {
+  mel_tp.configPath = metaguiTpData.configPath || "";
+  mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon;
+  mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
+}
+if(mel_tp.configPath !== undefined) {
+  mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
+}
 
 const inactiveColor = "ff0000"; //red
 if(player.canDeploy() === false) {
   btnDeploy.color = inactiveColor;
 }
+
+metagui.setTitle(mel_tp.paneTitle);
+metagui.setIcon(mel_tp.paneIcon);
 
 /*
   {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",

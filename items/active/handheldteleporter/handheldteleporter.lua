@@ -46,10 +46,13 @@ function update(dt, fireMode, shiftHeld, moves)
 		if self.consumed >= max-1 then
 
       -- activeItem.interact("OpenTeleportDialog", "/interface/warping/warpcoreteleporter.config", activeItem.ownerEntityId())
-      local tpConfigPath = root.itemConfig(item.descriptor()).config.interactData
       
       --sb.logInfo(sb.printJson(tpConfig))
-			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_dialog.ui", data = {configPath = tpConfigPath} }, activeItem.ownerEntityId())
+			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_dialog.ui", data = {
+        configPath = root.itemConfig(item.descriptor()).config.interactData,
+        paneIcon = root.itemConfig(item.descriptor()).config.inventoryIcon,
+        paneTitle = root.itemConfig(item.descriptor()).config.shortdescription
+      } }, activeItem.ownerEntityId())
 			self.consumed = 0
 		end
 		if fireMode ~= "primary" or status.resourceLocked("energy") then

@@ -3,6 +3,8 @@
 require("/interface/mel_tp/mel_tp_util.lua")
 
 local mel_tp = {
+  paneIcon = "/interface/warping/icon.png",
+  paneTitle = "Teleporter",
   bookmarks = nil,
   filter = "",
   bookmarksFiltered = nil,
@@ -15,20 +17,31 @@ local mel_tp = {
 }
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
-mel_tp.configPath = metagui.inputData.configPath
-mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+local sourceEntity = pane.sourceEntity()
+-- sb.logInfo(sb.printJson(sourceEntity))
+local metaguiTpData = metagui.inputData
+if metaguiTpData ~= nil then
+    mel_tp.configPath = metaguiTpData.configPath or ""
+    mel_tp.paneIcon = metaguiTpData.paneIcon or mel_tp.paneIcon
+    mel_tp.paneTitle = metaguiTpData.paneTitle or mel_tp.paneTitle
+end
+if mel_tp.configPath ~= nil then
+    mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+end
 
 local inactiveColor = "ff0000"
 if player.canDeploy() == false then
     btnDeploy.color = inactiveColor
 end
 
--- sb.logInfo(metagui.inputData.configPath);
+metagui.setTitle(mel_tp.paneTitle);
+metagui.setIcon(mel_tp.paneIcon);
 
  -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
     -- "icon":"garden",
     -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     -- "bookmarkName":"Merchant test"}
+
 local function clearPlanetInfo()
   lblBkmName:setText("")
   lblBkmHazards:setText("")

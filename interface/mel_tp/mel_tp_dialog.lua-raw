@@ -110,6 +110,8 @@ function OnTpTargetSelect(bookmarkWidget)
     lblDump.setText(sb.printJson(bookmarkWidget.bkmData))
 end
 mel_tp = {
+    paneIcon = "/interface/warping/icon.png",
+    paneTitle = "Teleporter",
     bookmarks = nil,
     filter = "",
     bookmarksFiltered = nil,
@@ -122,13 +124,22 @@ mel_tp = {
 }
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
-mel_tp.configPath = metagui.inputData.configPath
-sb.logInfo(metagui.inputData.configPath)
-mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+local sourceEntity = pane.sourceEntity()
+local metaguiTpData = metagui.inputData
+if metaguiTpData ~= nil then
+    mel_tp.configPath = metaguiTpData.configPath or ""
+    mel_tp.paneIcon = metaguiTpData.paneIcon or mel_tp.paneIcon
+    mel_tp.paneTitle = metaguiTpData.paneTitle or mel_tp.paneTitle
+end
+if mel_tp.configPath ~= nil then
+    mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+end
 local inactiveColor = "ff0000"
 if player.canDeploy() == false then
     btnDeploy.color = inactiveColor
 end
+metagui.setTitle(mel_tp.paneTitle)
+metagui.setIcon(mel_tp.paneIcon)
 local function populateBookmarks()
     bookmarksList.clearChildren()
     local ____opt_0 = mel_tp.configOverride
@@ -152,16 +163,16 @@ local function populateBookmarks()
             do
                 local destination = mel_tp_util.JsonToDestination(dest)
                 if destination.prerequisiteQuest ~= nil and player.hasCompletedQuest(destination.prerequisiteQuest) == false then
-                    goto __continue5
+                    goto __continue7
                 end
                 if destination.warpAction == WarpAlias.OrbitedWorld then
                     if player.worldId() ~= player.ownShipWorldId() then
-                        goto __continue5
+                        goto __continue7
                     end
                     local shipLocation = celestial.shipLocation()
                     local locationType = mel_tp_util.getSpaceLocationType(shipLocation)
                     if locationType == nil or shipLocation == nil then
-                        goto __continue5
+                        goto __continue7
                     end
                     if locationType ~= "CelestialCoordinate" then
                         local systemLocations = celestial.systemObjects()
@@ -170,12 +181,12 @@ local function populateBookmarks()
                             maybeUuid = shipLocation[2]
                         end
                         if maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or destination.deploy ~= true then
-                            goto __continue5
+                            goto __continue7
                         end
                     end
                 end
                 if destination.warpAction == WarpAlias.OwnShip and player.worldId() == player.ownShipWorldId() then
-                    goto __continue5
+                    goto __continue7
                 end
                 local currentBookmark = mel_tp.bookmarkTemplate
                 local iconPath = ""
@@ -211,7 +222,7 @@ local function populateBookmarks()
                 addedBookmark.onSelected = OnTpTargetSelect
                 addedBookmark.bkmData = bkmData
             end
-            ::__continue5::
+            ::__continue7::
         end
     end
     if finalTpConfig.includePlayerBookmarks then

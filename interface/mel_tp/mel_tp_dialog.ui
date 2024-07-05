@@ -60,12 +60,15 @@
         "children" : [
           {"type": "spacer", "size": 8, "expandMode": [0, 0]},
           {"type":"label", "id":"lblBkmName", "text": "", "fontSize" : 9, "size": [20, 24], "expandMode": [2, 1], "align": "center"},    
-          {"type": "layout", "id": "listHazards", "mode": "horizontal", "align": 0, "style": "concave", "expandMode": [2, 1], "children": [],
-            "data": { "type": "image", "file": "", "toolTip": "", "noAutoCrop" : true}
+          {"type": "panel", "mode": "horizontal", "align": 0, "size": [20, 20], "style": "concave", "expandMode": [2, 1], "children": [
+              {"type": "layout", "id": "listHazards", "mode": "horizontal", "align": 0, "expandMode": [2, 1], "children": [],
+                "data": { "type": "image", "file": "", "toolTip": "", "noAutoCrop" : true}
+              }
+            ]
           },
           {"type":"label", "id":"lblBkmHazards", "text": "", "size": [20, 10], "expandMode": [2, 0]},
           {"type": "spacer", "expandMode": [2, 2]}
-        ] 
+        ]
       },
       {"type": "spacer", "size": 10, "expandMode": [0, 0]},
       { 
