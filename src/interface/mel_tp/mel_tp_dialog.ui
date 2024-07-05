@@ -65,7 +65,7 @@
           },
           {"type":"label", "id":"lblBkmHazards", "text": "", "size": [20, 10], "expandMode": [2, 0]},
           {"type": "spacer", "expandMode": [2, 2]}
-        ] 
+        ]
       },
       {"type": "spacer", "size": 10, "expandMode": [0, 0]},
       { 

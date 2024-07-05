@@ -24,7 +24,7 @@ declare type RpcPromise<T> = unknown; //FIXME better description
 
 //Lua-specific wrappers
 declare type LuaFunction = Function
-declare type LuaTable = Record<string, any>|any[]
+declare type LuaTable = Record<string, unknown>|unknown[]
 declare type LuaValue = null|boolean|int|float|string|LuaTable|LuaFunction //TODO |LuaThread|LuaUserData;
 
 /* StarChat */
