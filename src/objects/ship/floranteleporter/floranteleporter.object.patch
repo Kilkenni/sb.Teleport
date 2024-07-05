@@ -1,0 +1,19 @@
+[
+  { 
+    "op" : "replace",
+    "path" : "/interactAction",
+    "value" : "ScriptPane"
+  },
+  { 
+    "op" : "replace",
+    "path" : "/interactData",
+    "value" : { "gui" : {}, "scripts" : ["/metagui.lua"], "ui" : "sbTeleport:TeleportDialog" , "data": {
+      "configPath": "/interface/warping/shipteleporter.config"
+    }}
+  },
+  {
+    "op":"replace",
+    "path": "/floranDescription/",
+    "value": "NICCCCCE"
+  }
+]

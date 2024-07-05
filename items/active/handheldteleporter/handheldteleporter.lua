@@ -47,8 +47,9 @@ function update(dt, fireMode, shiftHeld, moves)
 
       -- activeItem.interact("OpenTeleportDialog", "/interface/warping/warpcoreteleporter.config", activeItem.ownerEntityId())
       
-      --sb.logInfo(sb.printJson(tpConfig))
-			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_dialog.ui", data = {
+      --sb.logInfo(sb.printJson(tpConfig))sbTeleport:TeleportDialog
+      --unregistered path: /interface/mel_tp/mel_tp_dialog.ui
+			activeItem.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "sbTeleport:TeleportDialog", data = {
         configPath = root.itemConfig(item.descriptor()).config.interactData,
         paneIcon = root.itemConfig(item.descriptor()).config.inventoryIcon,
         paneTitle = root.itemConfig(item.descriptor()).config.shortdescription
