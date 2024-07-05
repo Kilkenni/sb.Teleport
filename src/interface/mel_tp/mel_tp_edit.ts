@@ -7,3 +7,7 @@ const bookmarkState:TeleportBookmark = {
   bookmarkName: "Nowhere in particular",
   icon: "default"
 }
+
+// const arr:string[] = ["walnut", "hazelnut"]
+
+// arr[0].search("wal") !== undefined

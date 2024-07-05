@@ -1,3 +1,6 @@
+/*
+The `world` table contains functions that perform actions within a specified such as querying or modifying entities, tiles, etc. in that world.
+*/
 //ZA WARUDO
 declare module world {
   //SOURCE: game/scripting/StarWorldLuaBindings.cpp
@@ -31,18 +34,14 @@ declare module world {
   function dayLength():float;
 
   //OBJECTS
-/*
-  Json WorldEntityCallbacks::getObjectParameter(World* world, EntityId entityId, String const& parameterName, Maybe<Json> const& defaultValue) {
-    Json val = Json();
 
-    if (auto objectEntity = as<Object>(world->entity(entityId))) {
-      val = objectEntity->configValue(parameterName);
-      if (!val && defaultValue)
-        val = *defaultValue;
-    }
-
-    return val;
-  }*/
+  /**
+   * @param entityId 
+   * @param parameterName 
+   * @param defaultValue 
+   * @returns Returns the value of the specified object's config parameter, or defaultValue or `nil` if the parameter is not set or the entity is not an object.
+   */
+  function getObjectParameter(entityId: EntityId, parameterName: string, defaultValue?: JSON):JSON;
 }
 
 

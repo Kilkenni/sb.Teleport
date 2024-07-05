@@ -18,7 +18,12 @@ local mel_tp = {
 mel_tp.bookmarks = player.teleportBookmarks()
 mel_tp.bookmarkTemplate = bookmarksList.data
 local sourceEntity = pane.sourceEntity()
--- sb.logInfo(sb.printJson(sourceEntity))
+if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
+then
+  local iconName = world.getObjectParameter(sourceEntity, "inventoryIcon")
+  --TODO get path to object and set icon
+  mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") or mel_tp.paneTitle
+end
 local metaguiTpData = metagui.inputData
 if metaguiTpData ~= nil then
     mel_tp.configPath = metaguiTpData.configPath or ""

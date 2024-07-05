@@ -33,7 +33,7 @@ const mel_tp:{
   animation: string,
   dialogConfig: TpDialogConfig
 } = {
-  paneIcon: "/interface/warping/icon.png",
+  paneIcon: "/interface/warping/icon.png", //default values
   paneTitle: "Teleporter",
   bookmarks: undefined,
   filter: "",
@@ -48,11 +48,19 @@ const mel_tp:{
 mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 mel_tp.bookmarkTemplate = bookmarksList.data;
 const sourceEntity = pane.sourceEntity();
+if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
+  //if sourceEntity is an object
+  const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string
+  //TODO get path and debug!
+  // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
+  mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;
+}
+
 // sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
 const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
 if(metaguiTpData !== undefined) {
   mel_tp.configPath = metaguiTpData.configPath || "";
-  mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon;
+  mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon; //lastly, try to use override from metagui data
   mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
 }
 if(mel_tp.configPath !== undefined) {

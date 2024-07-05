@@ -12,12 +12,12 @@ Download as a folder and drop to `StarboundLocation/mods`. If you don't need acc
 
 ## Usage
 
-Currently replaces teleport window of all vanilla ship teleports. Old interface is still accessible via fallback button.
+Replaces teleport window of vanilla ship teleports. Old interface is still accessible via fallback button.
 
 Features:
 
 - All the usual QoL MetaGUI stuff
-- Unlike in vanilla dialog, you can deploy mech anywhere you can teleport
+- You can deploy mech anywhere you can teleport
 - Filtering! Filter can be set via corresponding textbox. `Enter` while in the textbox applies the filter (only bookmarks that have `filter` in their text fields are visible). Search is case-insensitive. Standard destinations (like `Warp down`) are not affected. `Esc` while in the textbox or `Reset` button resets the filter
 - Previewing hazards. If a bookmark is selected, info panel tries to list permanent environmental hazards at destionation. Don't forget to equip your EPP!
 
