@@ -10,6 +10,8 @@ Planned features will probably be available in Issues. Soon :tm: Suggestions are
 
 Download as a folder and drop to `StarboundLocation/mods`. If you don't need access to source,`/src` folder can be safely removed.
 
+Currently in alpha phase. Backup your character before installing!
+
 ## Usage
 
 Replaces teleport window of vanilla ship teleports. Old interface is still accessible via fallback button.
@@ -26,15 +28,15 @@ The script tries its best to skip all irrelevant destinations, if present in `te
 - When on the player ship, `Warp to ship` is disabled
 - When in space, warp option without the mech is disabled (you can still try to warp regardless, but I'm not paying your hospital bills)
 - Quest-related destinations are disabled until unlocked
-- However, if a player has no mech (yet), `Deploy` button will be red and deactivated.
+- If a player has no mech (yet), `Deploy` button will be red and deactivated.
 
 ## Known Issues
 
 - No edit and deletion available in the new window (yet)
 - Tooltips on hazard icons in planet info don't show
-- Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, needs verification. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
+- Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, **needs verification**. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
 
-- Possibly cannot warp down if a player is **not** on their own ship. **Needs verification**
+- Possibly cannot warp down if a player is **not** on their own ship (example: on another shup also orbiting a planet). **Needs verification**
 - Cannot warp to party members via this dialog. Seems to be a limitation of vanilla Lua callbacks.
 - Cannot warp in mission dungeon to party members already present in the dungeon. Likewise.
 
@@ -67,6 +69,9 @@ Uses MetaGUI for quick window UI. Thus, requires either [Stardust Core](https://
 Previously used v6's [Handheld Teleporter](https://steamcommunity.com/workshop/filedetails/?id=751199367) as a quick hack during prototyping phase. Current version does *not* include this mod and should not conflict with it.
 
 Thanks to [zetaPRIME](https://github.com/zetaPRIME) for help with Stardust MetaGUI
+
 Thanks to Zygan for some friendly Lua advice
+
 Thanks to patmanf for more advice
+
 Thanks to OpenSb Discord users for support.
