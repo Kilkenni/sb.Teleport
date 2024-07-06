@@ -1,7 +1,7 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
-import {bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
+import {bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnEdit, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 import mel_tp_util from "./mel_tp_util";
 
 export interface Destination {
@@ -78,6 +78,7 @@ const inactiveColor = "ff0000"; //red
 if(player.canDeploy() === false) {
   btnDeploy.color = inactiveColor;
 }
+btnEdit.color = inactiveColor;
 
 metagui.setTitle(mel_tp.paneTitle);
 metagui.setIcon(mel_tp.paneIcon);
@@ -435,8 +436,10 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
   mel_tp.selected = bookmarkWidget.bkmData as Destination;
   const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
   clearPlanetInfo();
+  btnEdit.color = inactiveColor;
 
   if(typeof mel_tp.selected.warpAction === "string") {
+    //destination added from config
     if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
       lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
       lblBkmHazards.setText(world.timeOfDay());
@@ -482,6 +485,8 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
     lblBkmHazards.setText(world.timeOfDay());
   }
   else {
+    //Bookmark selected
+    btnEdit.color = "accent";
     const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
     const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
     if(coord === null) {
@@ -539,6 +544,16 @@ btnSortByPlanet.onClick = function ():void {
   populateBookmarks();
 }
 
+btnEdit.onClick = function() {
+  if(mel_tp.selected == undefined || typeof mel_tp.selected.warpAction === "string") {
+    widget.playSound("/sfx/interface/clickon_error.ogg");
+    lblDump.setText("No target selected");
+    return;
+  }
+
+  widget.playSound("/sfx/interface/ship_confirm1.ogg");
+}
+
 btnTeleport.onClick = function() {
   if(mel_tp.selected == undefined) {
     widget.playSound("/sfx/interface/clickon_error.ogg")  
@@ -549,7 +564,6 @@ btnTeleport.onClick = function() {
   const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
 
   lblDump.setText(`Stringified warp target: ${warpTarget}`);
-  widget.playSound("/sfx/interface/ship_confirm1.ogg");
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
   pane.dismiss();
 }

@@ -45,6 +45,7 @@ local inactiveColor = "ff0000"
 if player.canDeploy() == false then
     btnDeploy.color = inactiveColor
 end
+btnEdit.color = inactiveColor
 
 metagui.setTitle(mel_tp.paneTitle);
 metagui.setIcon(mel_tp.paneIcon);
@@ -97,6 +98,7 @@ local function OnTpTargetSelect(bookmarkWidget)
   mel_tp.selected = bookmarkWidget.bkmData
   local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
   clearPlanetInfo()
+  btnEdit.color = inactiveColor;
 
   if(type(mel_tp.selected.warpAction) == "string") then
     if mel_tp.selected.warpAction ~= "OrbitedWorld" then
@@ -134,7 +136,9 @@ local function OnTpTargetSelect(bookmarkWidget)
     lblBkmName:setText("Object Uuid signature")
     lblBkmHazards:setText(world.timeOfDay())
   else
-    -- sb.logInfo("[log] Showing info for: "..sb.printJson(mel_tp.selected.warpAction[1]))
+    --Bookmark 
+    btnEdit.color = "accent"
+
     local warpTarget = mel_tp.selected.warpAction[1]
     local coord = mel_tp_util.WorldIdToObject(warpTarget)
     if coord == nil then
@@ -350,6 +354,15 @@ function btnSortByPlanet:onClick()
   populateBookmarks()
 end
 
+function btnEdit:onClick()
+  if mel_tp.selected == nil or type(mel_tp.selected.warpAction) == "string" then
+      widget.playSound("/sfx/interface/clickon_error.ogg")
+      lblDump:setText("No target selected")
+      return
+  end
+  widget.playSound("/sfx/interface/ship_confirm1.ogg")
+end
+
 function btnTeleport:onClick()
   if(mel_tp.selected == nil) then
     widget.playSound("/sfx/interface/clickon_error.ogg")  
@@ -358,7 +371,7 @@ function btnTeleport:onClick()
   end
   local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
   lblDump:setText("Stringified warp target: " .. warpTarget)
-  widget.playSound("/sfx/interface/ship_confirm1.ogg")
+  
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
   pane.dismiss()
 end

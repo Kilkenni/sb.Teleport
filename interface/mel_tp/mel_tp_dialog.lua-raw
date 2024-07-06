@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local clearPlanetInfo, displayPlanetInfo, OnTpTargetSelect, mel_tp
+local clearPlanetInfo, displayPlanetInfo, OnTpTargetSelect, mel_tp, inactiveColor
 local ____mel_tp_dialog_2Eui_2Ejs = require("./mel_tp_dialog.ui.js")
 local bookmarksList = ____mel_tp_dialog_2Eui_2Ejs.bookmarksList
 local txtboxFilter = ____mel_tp_dialog_2Eui_2Ejs.txtboxFilter
@@ -9,6 +9,7 @@ local btnSortByPlanet = ____mel_tp_dialog_2Eui_2Ejs.btnSortByPlanet
 local lblBkmName = ____mel_tp_dialog_2Eui_2Ejs.lblBkmName
 local lblBkmHazards = ____mel_tp_dialog_2Eui_2Ejs.lblBkmHazards
 local listHazards = ____mel_tp_dialog_2Eui_2Ejs.listHazards
+local btnEdit = ____mel_tp_dialog_2Eui_2Ejs.btnEdit
 local btnFallback = ____mel_tp_dialog_2Eui_2Ejs.btnFallback
 local btnTeleport = ____mel_tp_dialog_2Eui_2Ejs.btnTeleport
 local btnDeploy = ____mel_tp_dialog_2Eui_2Ejs.btnDeploy
@@ -52,6 +53,7 @@ function OnTpTargetSelect(bookmarkWidget)
     mel_tp.selected = bookmarkWidget.bkmData
     local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
     clearPlanetInfo()
+    btnEdit.color = inactiveColor
     if type(mel_tp.selected.warpAction) == "string" then
         if mel_tp.selected.warpAction ~= OrbitedWorld then
             lblBkmName.setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
@@ -87,6 +89,7 @@ function OnTpTargetSelect(bookmarkWidget)
         lblBkmName.setText("Object Uuid signature")
         lblBkmHazards.setText(world.timeOfDay())
     else
+        btnEdit.color = "accent"
         local warpTarget = mel_tp.selected.warpAction[1]
         local coord = mel_tp_util.WorldIdToObject(warpTarget)
         if coord == nil then
@@ -145,10 +148,11 @@ end
 if mel_tp.configPath ~= nil then
     mel_tp.configOverride = root.assetJson(mel_tp.configPath)
 end
-local inactiveColor = "ff0000"
+inactiveColor = "ff0000"
 if player.canDeploy() == false then
     btnDeploy.color = inactiveColor
 end
+btnEdit.color = inactiveColor
 metagui.setTitle(mel_tp.paneTitle)
 metagui.setIcon(mel_tp.paneIcon)
 local function populateBookmarks()
@@ -293,6 +297,14 @@ btnSortByPlanet.onClick = function()
     mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
     populateBookmarks()
 end
+btnEdit.onClick = function()
+    if mel_tp.selected == nil or type(mel_tp.selected.warpAction) == "string" then
+        widget.playSound("/sfx/interface/clickon_error.ogg")
+        lblDump.setText("No target selected")
+        return
+    end
+    widget.playSound("/sfx/interface/ship_confirm1.ogg")
+end
 btnTeleport.onClick = function()
     if mel_tp.selected == nil then
         widget.playSound("/sfx/interface/clickon_error.ogg")
@@ -301,7 +313,6 @@ btnTeleport.onClick = function()
     end
     local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
     lblDump.setText("Stringified warp target: " .. tostring(warpTarget))
-    widget.playSound("/sfx/interface/ship_confirm1.ogg")
     player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
     pane.dismiss()
 end
