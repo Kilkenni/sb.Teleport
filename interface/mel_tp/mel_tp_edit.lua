@@ -8,7 +8,9 @@ if(metagui.inputData == nil) then
   pane.dismiss()
   return
 else
-  mel_tp = metagui.inputData.mel_tp
+  if(metagui.inputData ~= nil) then
+    mel_tp = metagui.inputData.mel_tp
+  end
 end
  
 
@@ -38,7 +40,7 @@ function btnEditDelete:onClick()
     widget.playSound("/sfx/interface/clickon_error.ogg")
 end
 
-function btnEditSave:onClic()
+function btnEditSave:onClick()
     widget.playSound("/sfx/interface/clickon_error.ogg")
     pane.dismiss()
 end

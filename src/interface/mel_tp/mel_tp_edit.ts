@@ -4,7 +4,18 @@
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.Label, bkmPlanet: metagui.Label, lblDump:metagui.Label;
 
 import * as mel_tp_util from "./mel_tp_util";
-import { mel_tp } from "./mel_tp_dialog";
+// import { mel_tp } from "./mel_tp_dialog";
+
+let mel_tp
+
+if(metagui.inputData === null) {
+  pane.dismiss();
+}
+else {
+  if(metagui.inputData !== undefined) {
+    mel_tp = metagui.inputData.mel_tp
+  }
+}
 
 //some bookmark should be selected fo edit to work
 if(mel_tp.selected === undefined) {
