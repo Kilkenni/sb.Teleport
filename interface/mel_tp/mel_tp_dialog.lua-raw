@@ -2,7 +2,6 @@
 local ____exports = {}
 local clearPlanetInfo, displayPlanetInfo, OnTpTargetSelect, mel_tp
 local ____mel_tp_dialog_2Eui_2Ejs = require("./mel_tp_dialog.ui.js")
-local metagui = ____mel_tp_dialog_2Eui_2Ejs.metagui
 local bookmarksList = ____mel_tp_dialog_2Eui_2Ejs.bookmarksList
 local txtboxFilter = ____mel_tp_dialog_2Eui_2Ejs.txtboxFilter
 local btnResetFilter = ____mel_tp_dialog_2Eui_2Ejs.btnResetFilter

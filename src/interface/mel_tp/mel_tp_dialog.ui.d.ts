@@ -21,7 +21,7 @@ declare const btnDeploy
 declare const btnFallback
 declare const lblDebug
 declare const lblDump
-declare const metagui
+
 declare interface tpItem {
   type: "listItem",
   children: [
@@ -40,8 +40,6 @@ declare interface hazardItem {
 }
 
 export {
-  metagui,
-
   bookmarksList,
   txtboxFilter,
   btnResetFilter,

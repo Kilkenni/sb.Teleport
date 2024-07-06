@@ -1,7 +1,7 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
-import {metagui, bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
+import {bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 import mel_tp_util from "./mel_tp_util";
 
 export interface Destination {
