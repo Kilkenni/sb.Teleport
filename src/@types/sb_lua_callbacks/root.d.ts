@@ -4,6 +4,52 @@ The `root` table contains functions that reference the game's currently loaded a
 
 declare type Image = unknown; //FIXME - can be image OR sub-frame
 declare type LuaEngine = unknown; //FIXME
+declare enum ItemTypeNames {
+  "generic",
+  "liquid",
+  "material",
+  "object",
+  "currency",
+  "miningtool",
+  "flashlight",
+  "wiretool",
+  "beamminingtool",
+  "harvestingtool",
+  "tillingtool",
+  "paintingbeamtool",
+  "headarmor",
+  "chestarmor",
+  "legsarmor",
+  "backarmor",
+  "consumable",
+  "blueprint",
+  "codex",
+  "inspectiontool",
+  "instrument",
+  "thrownitem",
+  "unlockitem",
+  "activeitem",
+  "augmentitem",
+}
+declare interface ItemDescriptor {
+  name: string,
+  count: unsigned,
+  parameters: JSON,
+}
+declare interface ItemConfig {
+  // The relative path in assets to the base config
+  directory: string,
+
+  // A possibly modified / generated config from the base config that is
+  // re-constructed each time an ItemDescriptor is loaded.  Become's the
+  // Item's base config.
+  config: JSON;
+
+  // The parameters from the ItemDescriptor, also possibly modified during
+  // loading.  Since this become's the Item's parameters, it will be
+  // subsequently stored with the Item as the new ItemDescriptor.
+  parameters: JSON;
+};
 
 declare module root {
   //SOURCE: game/scripting/StarRootLuaBindings.cpp
@@ -80,19 +126,30 @@ declare module root {
    * @param itemName 
    * @returns Returns a list of JSON configurations of all recipes which output the given item.
    */
-  function recipesForItem(itemName: string):JSON[];
+  function recipesForItem(itemName: string):ItemRecipe[];
+
+  /*
+  JsonArray LuaBindings::RootCallbacks::allRecipes(Root* root) {
+  auto& recipes = root->itemDatabase()->allRecipes();
+  JsonArray result;
+  result.reserve(recipes.size());
+  for (auto& recipe : recipes)
+    result.append(recipe.toJson());
+  return result;
+}
+  */
 
   /**
    * @param itemName
    * @returns Returns the item type name for the specified item.
    */
-  function itemType(itemName: string): string;
+  function itemType(itemName: string): typeof ItemTypeNames;
 
   /**
    * @param itemName 
    * @returns Returns a list of the tags applied to the specified item.
    */
-  function itemTags(itemName: string):JSON[];
+  function itemTags(itemName: string):JSON[]; //FIXME
 
   /**
    * @param itemName 
@@ -101,6 +158,20 @@ declare module root {
    */
   function itemHasTag(itemName: string, tagName: string):boolean;
 
+  /**
+   * Generates an item from the specified descriptor, level and seed
+   * @param descJson 
+   * @param level 
+   * @param seed 
+   * @returns a JSON object containing the `directory`, `config` and `parameters` for that item or NULL (if the item is not found).
+   */
+  function itemConfig(descJson: ItemDescriptor, level?: float, seed?: unsigned):ItemConfig|null;
 
-
+  /**
+   * Generates an item from the specified descriptor, level and seed and returns a new item descriptor for the resulting item.
+   * @param descJson 
+   * @param level 
+   * @param seed 
+   */
+  function createItem(descJson: ItemDescriptor, level?: float, seed?: unsigned):ItemDescriptor;
 }
