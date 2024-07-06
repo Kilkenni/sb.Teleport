@@ -1,7 +1,7 @@
 {
   "name": "sb.teleport",
   "version": "0.3",
-  "description": "A proof-of-concept mod that uses some minor sorcery to reimagine Teleportation UI.",
+  "description": "Spark Industries used some minor sorcery to reimagine Teleportation UI.",
   "main": "readme.md",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,7 +18,7 @@
     "Lua"
   ],
   "author": "MelOzone",
-  "license": "ISC",
+  "license": "GNU GPL 3",
   "bugs": {
     "url": "https://github.com/Kilkenni/sb.Teleport/issues"
   },

@@ -1,3 +1,4 @@
+/** @compileMembersOnly */
 declare enum ObjectRarity {
   "Common",
   "Legendary",

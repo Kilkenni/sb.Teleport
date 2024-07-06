@@ -54,7 +54,7 @@ function OnTpTargetSelect(bookmarkWidget)
     local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
     clearPlanetInfo()
     if type(mel_tp.selected.warpAction) == "string" then
-        if mel_tp.selected.warpAction ~= WarpAlias.OrbitedWorld then
+        if mel_tp.selected.warpAction ~= OrbitedWorld then
             lblBkmName.setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
             lblBkmHazards.setText(world.timeOfDay())
         else
@@ -177,7 +177,7 @@ local function populateBookmarks()
                 if destination.prerequisiteQuest ~= nil and player.hasCompletedQuest(destination.prerequisiteQuest) == false then
                     goto __continue9
                 end
-                if destination.warpAction == WarpAlias.OrbitedWorld then
+                if destination.warpAction == OrbitedWorld then
                     if player.worldId() ~= player.ownShipWorldId() then
                         goto __continue9
                     end
@@ -197,7 +197,7 @@ local function populateBookmarks()
                         end
                     end
                 end
-                if destination.warpAction == WarpAlias.OwnShip and player.worldId() == player.ownShipWorldId() then
+                if destination.warpAction == OwnShip and player.worldId() == player.ownShipWorldId() then
                     goto __continue9
                 end
                 local currentBookmark = mel_tp.bookmarkTemplate

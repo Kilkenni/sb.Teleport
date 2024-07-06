@@ -29,12 +29,14 @@ declare type LuaValue = null|boolean|int|float|string|LuaTable|LuaFunction //TOD
 
 /* StarChat */
 
+/** @compileMembersOnly */
 declare enum ChatSendMode {
   "Broadcast",
   "Local",
   "Party"
 }
 
+/** @compileMembersOnly */
 declare enum MessageContextModeNames {
   "Local",
   "Party",
@@ -47,6 +49,7 @@ declare enum MessageContextModeNames {
 
 /* StarSkyTypes */
 
+/** @compileMembersOnly */
 declare enum SkyTypeName {
   "barren",
   "atmospheric",
@@ -56,6 +59,7 @@ declare enum SkyTypeName {
   "space"
 }
 
+/** @compileMembersOnly */
 declare enum FlyingTypeNames {
   "none",
   "disembarking",
@@ -63,6 +67,7 @@ declare enum FlyingTypeNames {
   "arriving"
 }
 
+/** @compileMembersOnly */
 declare enum WarpPhaseNames {
   "slowingdown",
   "maintain",
@@ -101,6 +106,7 @@ type SpawnTargetX = string //string(number)
 
 declare type SpawnTarget = SpawnTargetUniqueEntity|SpawnTargetPosition|SpawnTargetX|undefined
 
+/** @compileMembersOnly */
 declare enum WarpAlias {
   "Return", //returns to previous location
   "OrbitedWorld", //does Warp Down when over a planet
