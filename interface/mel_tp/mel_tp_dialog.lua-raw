@@ -304,6 +304,7 @@ btnEdit.onClick = function()
         return
     end
     widget.playSound("/sfx/interface/ship_confirm1.ogg")
+    player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_edit.ui", data = {}})
 end
 btnTeleport.onClick = function()
     if mel_tp.selected == nil then
@@ -343,4 +344,5 @@ if mel_tp.bookmarks ~= nil then
     mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
 end
 populateBookmarks()
+____exports.mel_tp = mel_tp
 return ____exports

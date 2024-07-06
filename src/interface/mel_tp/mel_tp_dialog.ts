@@ -552,6 +552,7 @@ btnEdit.onClick = function() {
   }
 
   widget.playSound("/sfx/interface/ship_confirm1.ogg");
+  player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {}} as unknown as JSON);
 }
 
 btnTeleport.onClick = function() {
@@ -599,6 +600,9 @@ if(mel_tp.bookmarks !== undefined) {
 }
 populateBookmarks()
 
+export {
+  mel_tp
+};
 
  //EDIT BOOKMARK OPTION
 

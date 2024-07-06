@@ -8,7 +8,7 @@ local mel_tp = {
   bookmarks = nil,
   filter = "",
   bookmarksFiltered = nil,
-  bookmarkTemplate = bookmarksList.data,
+  bookmarkTemplate = nil,
   configPath = "",
   configOverride = nil,
   selected = nil,
@@ -361,6 +361,7 @@ function btnEdit:onClick()
       return
   end
   widget.playSound("/sfx/interface/ship_confirm1.ogg")
+  player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_edit.ui", data = {mel_tp = mel_tp}})
 end
 
 function btnTeleport:onClick()
