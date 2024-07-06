@@ -20,8 +20,15 @@ mel_tp.bookmarkTemplate = bookmarksList.data
 local sourceEntity = pane.sourceEntity()
 if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
 then
-  local iconName = world.getObjectParameter(sourceEntity, "inventoryIcon")
-  --TODO get path to object and set icon
+  local entityConfig = root.itemConfig({
+    name = world.getObjectParameter(sourceEntity, "objectName"),
+    count = 1,
+    parameters = {}
+  })
+  if entityConfig ~= nil then
+    local iconName = world.getObjectParameter(sourceEntity, "inventoryIcon")
+    mel_tp.paneIcon = entityConfig.directory..iconName
+  end
   mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") or mel_tp.paneTitle
 end
 local metaguiTpData = metagui.inputData

@@ -50,8 +50,6 @@ mel_tp.bookmarkTemplate = bookmarksList.data;
 const sourceEntity = pane.sourceEntity();
 if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
   //if sourceEntity is an object
-  
-  //get icon
   const entityConfig = root.itemConfig({
     name: world.getObjectParameter(sourceEntity, "objectName") as unknown as string,
     count: 1 as unsigned,
@@ -59,8 +57,7 @@ if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
   });
   if(entityConfig !== null) {
     const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string;
-    entityConfig.directory;
-    //TODO form icon path and assign to mel_tp.paneIcon
+    mel_tp.paneIcon = entityConfig.directory + iconName; //object icon as pane icon
   }
   // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
   mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;

@@ -43,13 +43,13 @@ declare interface ItemConfig {
   // A possibly modified / generated config from the base config that is
   // re-constructed each time an ItemDescriptor is loaded.  Become's the
   // Item's base config.
-  config: JSON;
+  config: JSON,
 
   // The parameters from the ItemDescriptor, also possibly modified during
   // loading.  Since this become's the Item's parameters, it will be
   // subsequently stored with the Item as the new ItemDescriptor.
-  parameters: JSON;
-};
+  parameters: JSON,
+}
 
 declare module root {
   //SOURCE: game/scripting/StarRootLuaBindings.cpp
