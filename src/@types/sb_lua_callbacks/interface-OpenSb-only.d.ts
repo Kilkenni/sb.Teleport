@@ -5,6 +5,7 @@
 declare type LuaCallbacks = unknown; //FIXME better description
 declare type CanvasWidgetPtr = unknown; //FIXME better description
 
+/** @noSelf **/
 declare module interface {
 //SOURCE: frontend/StarInterfaceLuaBindings.cpp
 

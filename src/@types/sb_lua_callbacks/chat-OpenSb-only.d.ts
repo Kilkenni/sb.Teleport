@@ -2,6 +2,7 @@
 The *chat* table is present only in OpenStarbound!
 */
 
+/** @noSelf **/
 declare interface messageConfig {
   mode?: typeof MessageContextModeNames,
   channelName?: string, // only for Local and Party modes

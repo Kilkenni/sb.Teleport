@@ -2,6 +2,7 @@
  * The player table contains functions with privileged access to the player which run in a few contexts on the client such as scripted interface panes, quests, and player companions.
  */
 
+/** @noSelf **/
 declare module player {
   //SOURCE: /game/scripting/StarPlayerLuaBindings.cpp
 

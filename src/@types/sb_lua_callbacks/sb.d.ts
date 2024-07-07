@@ -1,4 +1,6 @@
 //Alias: Utility
+
+/** @noSelf **/
 declare module sb {
   //source: core/scripting/StarUtilityLuaBindings.hpp
 

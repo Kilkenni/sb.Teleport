@@ -4,6 +4,8 @@
 declare type ConnectionId = uint16_t;
 declare type RpcThreadPromise<T> = any; //FIXME
 
+
+/** @noSelf **/
 declare module universe {
   //SOURCE: /game/scripting/StarUniverseServerLuaBindings.cpp
 

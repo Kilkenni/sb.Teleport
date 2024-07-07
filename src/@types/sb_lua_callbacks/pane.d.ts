@@ -1,3 +1,4 @@
+/** @noSelf **/
 declare module pane {
   //SOURCE: /windowing/StarPane.cpp
   /**

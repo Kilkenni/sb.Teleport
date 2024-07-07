@@ -1,3 +1,5 @@
+
+/** @noSelf **/
 declare module widget {
   /**
   * Plays a sound. 

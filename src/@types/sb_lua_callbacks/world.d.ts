@@ -2,6 +2,8 @@
 The `world` table contains functions that perform actions within a specified such as querying or modifying entities, tiles, etc. in that world.
 */
 //ZA WARUDO
+
+/** @noSelf **/
 declare module world {
   //SOURCE: game/scripting/StarWorldLuaBindings.cpp
 

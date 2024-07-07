@@ -4,6 +4,7 @@ The *celestial* table contains functions that relate to the client sky, flying t
 * script pane
 */
 
+/** @noSelf **/
 declare module celestial {
   //SOURCE: game/scripting/StarCelestialLuaBindings.cpp
 

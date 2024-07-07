@@ -2,6 +2,7 @@
 The activeItem table contains bindings which provide functionality for the ActiveItem and for the item's 'owner' (a ToolUser entity currently holding the item).
 */
 
+/** @noSelf **/
 declare module activeItem {
   //SOURCE: TODO
 

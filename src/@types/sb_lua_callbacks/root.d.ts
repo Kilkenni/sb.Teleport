@@ -51,6 +51,7 @@ declare interface ItemConfig {
   parameters: JSON,
 }
 
+/** @noSelf **/
 declare module root {
   //SOURCE: game/scripting/StarRootLuaBindings.cpp
 
