@@ -32,7 +32,7 @@
         ]
       ]
     },
-    { "type": "label", "id": "lblConsole", "text" : "" , "size": [10, 50], "expandMode": [1, 1]},
+    { "type": "label", "id": "lblConsole", "text" : "" , "color": "accent", "size": [10, 50], "expandMode": [1, 1]},
     [ 
       { "size" : 30, "mode":"horizontal" },
       { 
@@ -42,7 +42,8 @@
       },
       { 
         "type" : "button", 
-        "caption" : "Delete", 
+        "caption" : "Delete",
+        "color": "ff0000",
         "id": "btnEditDelete"
       },
       { 

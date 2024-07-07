@@ -242,13 +242,28 @@ end
 -- @param table
 -- @param element
 -- @returns true of false
-local function TableContains(____table, element)
-    for ____, value in ipairs(____table) do
-        if value == element then
-            return true
-        end
+local function TableContains(luaTable, element)
+  for ____, value in ipairs(luaTable) do
+    if value == element then
+      return true
     end
-    return false
+  end
+  return false
+end
+
+--- Dialog windows (panes) in SB are akin to template strings in JS. What JS calls placeholders, SB calls "tags". in the text of a window, those are surrounded by unescaped \<angle brackets\>.
+-- 
+-- @param dialogConfigPath path to vanilla (sic!) dialog pane config (for example, confirmation dialog)
+-- @param replaceMap keys are tags (without brackets), values are what to use as replacement
+-- @returns
+local function fillPlaceholdersInPane(dialogConfigPath, replaceMap)
+  local dialogWindowData = root.assetJson(dialogConfigPath)
+  for key in pairs(dialogWindowData) do
+    if type(dialogWindowData[key]) == "string" then
+      dialogWindowData[key] = sb.replaceTags(dialogWindowData[key], replaceMap)
+    end
+  end
+  return dialogWindowData
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -260,6 +275,7 @@ mel_tp_util = {
   JsonToDestination = JsonToDestination,
   TargetToWarpCommand = TargetToWarpCommand,
   FilterBookmarks = FilterBookmarks,
-  TableContains = TableContains
+  TableContains = TableContains,
+  illPlaceholdersInPane = fillPlaceholdersInPane
 }
 return mel_tp_util

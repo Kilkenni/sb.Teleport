@@ -27,13 +27,15 @@ function btnEditCancel:onClick()
 end
 
 function btnEditDelete:onClick()
-  widget.playSound("/sfx/interface/clickon_error.ogg")
+  -- widget.playSound("/sfx/interface/clickon_error.ogg")
+  sb.logWarn("Trying to delete bookmark...")
+  sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)))
 end
 
 function btnEditSave:onClick()
   if mel_tp_edit.bookmarkState.bookmarkName == "" then
     widget.playSound("/sfx/interface/clickon_error.ogg")
-    setError(">Bookmark needs a name!")
+    setError("> ^red;Bookmark needs a name!^white;")
   end
   -- widget.playSound("/sfx/interface/clickon_error.ogg")
   -- pane.dismiss()

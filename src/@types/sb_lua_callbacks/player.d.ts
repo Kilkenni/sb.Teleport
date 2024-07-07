@@ -572,7 +572,7 @@ Triggers the specified event on the player with the specified fields. Used to re
    * @param bookmarkConfig
    * @returns
    */
-  function removeTeleportBoookmark(bookmarkConfig:TeleportBookmark):boolean;
+  function removeTeleportBookmark(bookmarkConfig:TeleportBookmark):boolean;
 
   //VISITED SYSTEMS
 

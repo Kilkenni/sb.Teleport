@@ -53,7 +53,7 @@ function main():void {
 bkmName.onTextChanged = function() {
   mel_tp_edit.bookmarkState.bookmarkName = bkmName.text;
   if(mel_tp_edit.bookmarkState.bookmarkName === "") {
-    setError(">Bookmark needs a name!");
+    setError("> Bookmark needs a name!");
   }
 }
 
@@ -66,7 +66,21 @@ btnEditCancel.onClick = function() {
 }
 
 btnEditDelete.onClick = function() {
-  widget.playSound("/sfx/interface/clickon_error.ogg");
+  const modgun = someItem
+	const dialogWindow = Ra_DialogLib.fillPlaceholdersInDialogWindow("/interface/confirmation/reassemblerconfirm.config:gun_reset", modgun)
+
+	promises:add(player.confirm(dialogWindow), function (choice)
+		if choice then
+			--sb.logWarn("[HELP] CONFIRMATION: YES")
+			world.sendEntityMessage(pane.containerEntityId(), "resetGun")
+			widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
+		else
+			--sb.logWarn("[HELP] CONFIRMATION: NO")
+		end
+	end)
+	widget.playSound("/sfx/interface/ship_confirm1.ogg")
+  sb.logWarn("Trying to delete bookmark...")
+  sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)));
 }
 
 btnEditSave.onClick = function() {
@@ -76,8 +90,17 @@ btnEditSave.onClick = function() {
   }
 
   //TODO
-  widget.playSound("/sfx/interface/clickon_error.ogg");
-  pane.dismiss()
+
+  /*
+    if (!m_isNew)
+      m_playerUniverseMap->removeTeleportBookmark(m_bookmark);
+    m_playerUniverseMap->addTeleportBookmark(m_bookmark);
+  */
+  //player.removeTeleportBookmark();
+  
+
+  // widget.playSound("/sfx/interface/clickon_error.ogg");
+  // pane.dismiss()
 }
 
 
@@ -105,26 +128,10 @@ private:
   bool m_isNew;
 };
 
-void setupBookmarkEntry(WidgetPtr const& entry, TeleportBookmark const& bookmark);
-}
-
 
 
 
 namespace Star {
-
-EditBookmarkDialog::EditBookmarkDialog(PlayerUniverseMapPtr playerUniverseMap) {
-  m_playerUniverseMap = playerUniverseMap;
-
-  GuiReader reader;
-  auto assets = Root::singleton().assets();
-  reader.registerCallback("ok", [this](Widget*) { ok(); });
-  reader.registerCallback("remove", [this](Widget*) { remove(); });
-  reader.registerCallback("close", [this](Widget*) { close(); });
-  reader.registerCallback("name", [](Widget*) {});
-  reader.construct(assets->json("/interface/windowconfig/editbookmark.config:paneLayout"), this);
-  dismiss();
-}
 
 void EditBookmarkDialog::setBookmark(TeleportBookmark bookmark) {
   m_bookmark = bookmark;
@@ -170,16 +177,6 @@ void EditBookmarkDialog::ok() {
 void EditBookmarkDialog::remove() {
   m_playerUniverseMap->removeTeleportBookmark(m_bookmark);
   dismiss();
-}
-
-void EditBookmarkDialog::close() {
-  dismiss();
-}
-
-void setupBookmarkEntry(WidgetPtr const& entry, TeleportBookmark const& bookmark) {
-  entry->fetchChild<LabelWidget>("name")->setText(bookmark.bookmarkName);
-  entry->fetchChild<LabelWidget>("planetName")->setText(bookmark.targetName);
-  entry->fetchChild<ImageWidget>("icon")->setImage(strf("/interface/bookmarks/icons/{}.png", bookmark.icon));
 }
 
 }

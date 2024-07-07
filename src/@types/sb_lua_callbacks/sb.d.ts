@@ -57,8 +57,8 @@ declare module sb {
 
   /**
    * Replaces tags in the specified string with the specified tag replacement values. If a tag is not found in Map, it is not replaced.
-   * @param str Initial string containing tags. Any substring formatted like <TAG> is considered a tag
-   * @param tags Map of keys (TAG names) and values (what to replace <TAG> with)
+   * @param str Initial string containing tags. Any substring formatted like \<TAG\> is considered a tag
+   * @param tags Map of keys (TAG names) and values (what to replace \<TAG\> with)
    */
   function replaceTags(str:string, tags:Map<string, string>):string;
   

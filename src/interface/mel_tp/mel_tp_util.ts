@@ -186,13 +186,41 @@ function FilterBookmarks(bookmarks: TeleportBookmark[], filter:string):TeleportB
  * @param element 
  * @returns true of false
  */
-const TableContains = function (table:any[], element:any) {
-  for(const value of table) {
+function TableContains(luaTable:any[], element:any) {
+  for(const value of luaTable) {
     if(value === element ){
       return true;
     }
   }
   return false;
+}
+
+/**
+ * Dialog windows (panes) in SB are akin to template strings in JS. What JS calls placeholders, SB calls "tags". in the text of a window, those are surrounded by unescaped \<angle brackets\>.
+ * @param dialogConfigPath path to vanilla (sic!) dialog pane config (for example, confirmation dialog)
+ * @param replaceMap keys are tags (without brackets), values are what to use as replacement
+ * @returns 
+ */
+function fillPlaceholdersInPane(dialogConfigPath: string, replaceMap: Map<string, string>) {
+
+  //extract required data from gun structure to replace tags. Returns an object of pairs tag = value
+  //should probably refactor and move it closer to gun scripts for cohesion
+  /*
+  function rangedWeaponTags(gun) {
+    const replacementMap: Map<string, string> = {} as Map<string, string>;
+    replacementMap["gun_name"] = gun.parameters.shortdescription || "Generic ranged weapon"
+    return replacementMap
+  }
+  */
+
+  const dialogWindowData = root.assetJson(dialogConfigPath)
+  //const tags = rangedWeaponTags(dialogTopicObject)
+  for(const key in dialogWindowData) {
+    if (typeof dialogWindowData[key] === "string") {
+      dialogWindowData[key] = sb.replaceTags(dialogWindowData[key], replaceMap)
+    }
+  }
+  return dialogWindowData
 }
 
 const mel_tp_util =  {
@@ -204,7 +232,38 @@ const mel_tp_util =  {
   JsonToDestination,
   TargetToWarpCommand,
   FilterBookmarks,
-  TableContains
+  TableContains,
+  fillPlaceholdersInPane
 }
 
 export default mel_tp_util;
+
+/*
+--A number of general functions to work on dialog windows
+
+--Dialog Windows in SB are akin to template strings in JS. What JS calls placeholders, SB calls "tags". in the text of a window, those look like this: <gun_name>.
+local function fillPlaceholdersInDialogWindow(dialogConfigPath, dialogTopicObject)
+
+  --extract required data from gun structure to replace tags. Returns an object of pairs tag = value
+  --should probably refactor and move it closer to gun scripts for cohesion
+  local function rangedWeaponTags(gun)
+    return {
+      gun_name = gun.parameters.shortdescription or "Generic ranged weapon"
+    }
+  end
+
+  local dialogWindowData = root.assetJson(dialogConfigPath)
+  local tags = rangedWeaponTags(dialogTopicObject)
+  for key,value in pairs(dialogWindowData) do
+    if type(value) == "string" then
+      dialogWindowData[key] = sb.replaceTags(value, tags)
+    end
+  end
+  return dialogWindowData
+end
+
+--EXPORT PUBLIC Ra_DialogLib
+Ra_DialogLib = {
+  fillPlaceholdersInDialogWindow = fillPlaceholdersInDialogWindow
+}
+*/

@@ -1,7 +1,6 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
-// import {btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnEdit, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
 declare const bookmarksList:metagui.ScrollArea;
 declare const txtboxFilter: metagui.TextBox;
 declare const btnResetFilter: metagui.Button;
@@ -644,9 +643,6 @@ btnFallback.onClick = function() {
   pane.dismiss();
 }
 
-// export {
-//   mel_tp
-// };
 
  //EDIT BOOKMARK OPTION
 

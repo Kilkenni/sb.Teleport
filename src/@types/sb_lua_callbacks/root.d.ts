@@ -70,7 +70,6 @@ declare module root {
   function assetImage(path: string):Image;
 
   /**
-   * Only available in OpenStarbound
    * @param path Relative, should with / which denotes the assets PAK/folder
    * @returns Returns the contents of the specified JSON asset file.
    */
