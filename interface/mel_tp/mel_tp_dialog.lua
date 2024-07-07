@@ -8,7 +8,7 @@ local mel_tp = {
   bookmarks = nil,
   filter = "",
   bookmarksFiltered = nil,
-  bookmarkTemplate = nil,
+  bookmarkTemplate = bookmarksList.data,
   configPath = "",
   configOverride = nil,
   selected = nil,
@@ -16,7 +16,6 @@ local mel_tp = {
   dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config")
 }
 mel_tp.bookmarks = player.teleportBookmarks()
-mel_tp.bookmarkTemplate = bookmarksList.data
 local sourceEntity = pane.sourceEntity()
 if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
 then
@@ -319,6 +318,7 @@ local function populateBookmarks()
         local addedBookmark = bookmarksList:addChild(currentBookmark)
         addedBookmark.onSelected = OnTpTargetSelect
         addedBookmark.bkmData = bkmData
+        ::__continue5::
       end
     end
   end
@@ -332,7 +332,7 @@ function txtboxFilter:onEnter()
     return
   end
   mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
-  populateBookmarks(nil)
+  populateBookmarks()
 end
 
 function txtboxFilter:onEscape()

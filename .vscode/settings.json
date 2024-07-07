@@ -1,6 +1,17 @@
 {
   "Lua.diagnostics.globals": [
-    "updateGui",
-    "player"
+    "activeItem",
+    "celestial",
+    "chat",
+    "interface",
+    "pane",
+    "player",
+    "root",
+    "sb",
+    "script",
+    "widget",
+    "world",
+    
+    "metagui"
   ]
 }

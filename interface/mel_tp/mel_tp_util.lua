@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global
+
 --- Sorts array by certain property
 -- 
 -- @param array Array of similar objects containing properties with string keys

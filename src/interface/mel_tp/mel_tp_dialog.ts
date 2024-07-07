@@ -46,7 +46,6 @@ const mel_tp:{
   dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig
 };
 mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
-mel_tp.bookmarkTemplate = bookmarksList.data;
 const sourceEntity = pane.sourceEntity();
 if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
   //if sourceEntity is an object
