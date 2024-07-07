@@ -1,4 +1,4 @@
---@diagnostic disable: undefined-global
+---@diagnostic disable: undefined-global
 
 require("/interface/mel_tp/mel_tp_util.lua")
 
@@ -63,8 +63,11 @@ local function OnTpTargetSelect(bookmarkWidget)
   clearPlanetInfo()
   btnEdit.color = inactiveColor;
 
+  ---@diagnostic disable-next-line: undefined-field
   if(type(mel_tp.selected.warpAction) == "string") then
+    ---@diagnostic disable-next-line: undefined-field
     if mel_tp.selected.warpAction ~= "OrbitedWorld" then
+      ---@diagnostic disable-next-line: undefined-field
       lblBkmName:setText("Special system alias signature " .. sb.printJson(mel_tp.selected.warpAction))
       lblBkmHazards:setText(world.timeOfDay())
     else
@@ -81,6 +84,7 @@ local function OnTpTargetSelect(bookmarkWidget)
         if locationType == "FloatingDungeon" then
           maybeUuid = shipLocation[2]
         end
+        ---@diagnostic disable-next-line: undefined-field
         if maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or mel_tp.selected.deploy ~= true then
           sb.logError("Teleport list contains [Orbited World] but ship location is " .. sb.printJson(shipLocation))
           return
@@ -92,9 +96,11 @@ local function OnTpTargetSelect(bookmarkWidget)
       end
       displayPlanetInfo(coord)
     end
+    ---@diagnostic disable-next-line: undefined-field
   elseif(mel_tp.selected.warpAction[1] == "player" )then
     lblBkmName:setText("Player signature")
     lblBkmHazards:setText(world.timeOfDay())
+    ---@diagnostic disable-next-line: undefined-field
   elseif mel_tp.selected.warpAction[1] == "object" then
     lblBkmName:setText("Object Uuid signature")
     lblBkmHazards:setText(world.timeOfDay())
@@ -102,6 +108,7 @@ local function OnTpTargetSelect(bookmarkWidget)
     --Bookmark 
     btnEdit.color = "accent"
 
+    ---@diagnostic disable-next-line: undefined-field
     local warpTarget = mel_tp.selected.warpAction[1]
     local coord = mel_tp_util.WorldIdToObject(warpTarget)
     if coord == nil then
@@ -128,24 +135,30 @@ local function OnTpTargetSelect(bookmarkWidget)
   lblDump:setText(sb.printJson(bookmarkWidget.bkmData))
 end
 
+local function refreshBookmarks()
+  mel_tp.bookmarks = player.teleportBookmarks()
+end
 local function populateBookmarks()
   bookmarksList:clearChildren()
-  local ____opt_0 = mel_tp.configOverride
-  local ____temp_10 = ____opt_0 and ____opt_0.canBookmark or false
-  local ____opt_2 = mel_tp.configOverride
-  local ____temp_11 = ____opt_2 and ____opt_2.canTeleport or true
-  local ____opt_4 = mel_tp.configOverride
-  local ____temp_12 = ____opt_4 and ____opt_4.includePartyMembers or false
-  local ____opt_6 = mel_tp.configOverride
-  local ____temp_13 = ____opt_6 and ____opt_6.includePlayerBookmarks or false
-  local ____opt_8 = mel_tp.configOverride
   local finalTpConfig = {
-    canBookmark = ____temp_10,
-    canTeleport = ____temp_11,
-    includePartyMembers = ____temp_12,
-    includePlayerBookmarks = ____temp_13,
-    destinations = ____opt_8 and ____opt_8.destinations or nil
+    canBookmark = false,
+    canTeleport = true,
+    includePartyMembers = false,
+    includePlayerBookmarks = false,
+    destinations = nil
   }
+  if mel_tp.configOverride ~= nil then
+    ---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark
+    ---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport
+    ---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers
+    ---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks
+    ---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.destinations = mel_tp.configOverride.destinations
+  end
 
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do  
@@ -177,12 +190,7 @@ local function populateBookmarks()
           -- sb.logWarn(sb.print(maybeUuid))
           -- sb.logWarn(locationType)
           if(maybeUuid == nil or mel_tp_util.TableContains(systemLocations, maybeUuid) == false or destination.deploy ~= true) then
-            --location is not FLoatingDungeon OR current system locations have no such Uuid or no command to deploy mech
-            sb.logWarn(sb.printJson(shipLocation))
-            sb.logWarn(locationType)
-            sb.logWarn(sb.print(maybeUuid))
-            sb.logWarn(sb.printJson(systemLocations))
-            sb.logWarn("Deploy mech? "..sb.print(deploy))
+            --location is not FloatingDungeon OR current system locations have no such Uuid or no command to deploy mech
             
             goto __continue4 --Warping down is available only when orbiting a planet or floating dungeon
           end
@@ -319,6 +327,7 @@ function btnSortByPlanet:onClick()
 end
 
 function btnEdit:onClick()
+  ---@diagnostic disable-next-line: undefined-field
   if mel_tp.selected == nil or type(mel_tp.selected.warpAction) == "string" then
       widget.playSound("/sfx/interface/clickon_error.ogg")
       lblDump:setText("No target selected")
@@ -333,9 +342,11 @@ function btnTeleport:onClick()
     lblDump:setText("No target selected")
     return
   end
+  ---@diagnostic disable-next-line: undefined-field
   local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
   lblDump:setText("Stringified warp target: " .. warpTarget)
   
+  ---@diagnostic disable-next-line: undefined-field
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy or false)
   pane.dismiss()
 end
@@ -352,6 +363,7 @@ function btnDeploy:onClick()
     return
   end
   
+---@diagnostic disable-next-line: undefined-field
   local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
     player.warp(warpTarget, "deploy", true)
   pane.dismiss()
@@ -363,7 +375,6 @@ function btnFallback:onClick()
 end
 
 local function main()
-  mel_tp.bookmarks = player.teleportBookmarks()
   local sourceEntity = pane.sourceEntity()
   if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
   then
@@ -401,6 +412,7 @@ local function main()
   if mel_tp.bookmarks ~= nil then
     mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
   end
+  refreshBookmarks()
   populateBookmarks()
 
   -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",

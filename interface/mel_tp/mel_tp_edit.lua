@@ -1,4 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+---@diagnostic disable: undefined-global
+
 local mel_tp_edit = {
   bookmarkState = {
     target = "Nowhere", 

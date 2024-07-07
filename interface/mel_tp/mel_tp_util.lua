@@ -251,6 +251,7 @@ local function TableContains(____table, element)
     return false
 end
 
+---@diagnostic disable-next-line: lowercase-global
 mel_tp_util = {
   sortArrayByProperty = sortArrayByProperty,
   getSpaceLocationType = getSpaceLocationType,

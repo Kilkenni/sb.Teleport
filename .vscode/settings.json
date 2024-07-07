@@ -11,8 +11,7 @@
     "script",
     "widget",
     "world",
-    
-    "metagui"
+    "metagui",
   ],
   "prettier.insertPragma": true,
   "prettier.singleAttributePerLine": true

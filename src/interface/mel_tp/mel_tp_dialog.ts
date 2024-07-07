@@ -66,7 +66,6 @@ const inactiveColor = "ff0000"; //red
 main();
 
 function main(this:void):void {
-  mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
   const sourceEntity = pane.sourceEntity();
   if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
     //if sourceEntity is an object
@@ -118,7 +117,8 @@ function main(this:void):void {
   if(mel_tp.bookmarks !== undefined) {
     mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
   }
-  populateBookmarks()
+  refreshBookmarks();
+  populateBookmarks();
 
   //OpenStarbound guard
   if(root.assetSourcePaths !== null) {
@@ -133,16 +133,29 @@ function main(this:void):void {
   lblVersion.setText(mel_tp.version);
 }
 
+function refreshBookmarks():void {
+  mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
+}
+
 function populateBookmarks() {
   bookmarksList.clearChildren()
 
+  //default values
   const finalTpConfig:TeleportConfig = {
-    canBookmark : mel_tp.configOverride?.canBookmark || false, //default: false
-    canTeleport : mel_tp.configOverride?.canTeleport || true, //default: true.
-    includePartyMembers : mel_tp.configOverride?.includePartyMembers || false, //default: false
-    includePlayerBookmarks : mel_tp.configOverride?.includePlayerBookmarks || false, //Default: false
-    destinations : mel_tp.configOverride?.destinations || undefined, //array of additional destinations
+    canBookmark : false,
+    canTeleport : true,
+    includePartyMembers : false,
+    includePlayerBookmarks : false,
+    destinations : undefined, //array of additional destinations
   };
+
+  if(mel_tp.configOverride !== undefined) {
+    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark;
+    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport;
+    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers;
+    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks;
+    finalTpConfig.destinations = mel_tp.configOverride.destinations;
+  }
 
   //process player bookmarks
   /*
