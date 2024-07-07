@@ -185,6 +185,7 @@ declare module metagui {
     findValue(this: void, val: any):CheckBox|null; //If widget is a radio button, returns its sibling with given value if it exists.
     selectValue(this: void, val: any):CheckBox|null; //Same as above, but also sets the specified sibling checked.
 
+    //events
     onClick()
   }
   
