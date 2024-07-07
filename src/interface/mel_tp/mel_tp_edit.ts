@@ -2,6 +2,7 @@
 
 //declare for interface
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
+declare const promises: any;
 
 // import * as mel_tp_util from "./mel_tp_util";
 
@@ -66,18 +67,21 @@ btnEditCancel.onClick = function() {
 }
 
 btnEditDelete.onClick = function() {
-  const modgun = someItem
-	const dialogWindow = Ra_DialogLib.fillPlaceholdersInDialogWindow("/interface/confirmation/reassemblerconfirm.config:gun_reset", modgun)
+  // const modgun = someItem
+	// const dialogWindow = Ra_DialogLib.fillPlaceholdersInDialogWindow("/interface/confirmation/reassemblerconfirm.config:gun_reset", modgun)
+  const dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
 
-	promises:add(player.confirm(dialogWindow), function (choice)
-		if choice then
-			--sb.logWarn("[HELP] CONFIRMATION: YES")
-			world.sendEntityMessage(pane.containerEntityId(), "resetGun")
+  
+	promises.add(player.confirm(dialogWindow), function(choice:boolean) {
+		if(choice === true) {
+			sb.logWarn("[HELP] CONFIRMATION: YES")
+			// world.sendEntityMessage(pane.containerEntityId(), "resetGun")
 			widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
-		else
-			--sb.logWarn("[HELP] CONFIRMATION: NO")
-		end
-	end)
+    }
+		else {
+			sb.logWarn("[HELP] CONFIRMATION: NO")
+    }
+	})
 	widget.playSound("/sfx/interface/ship_confirm1.ogg")
   sb.logWarn("Trying to delete bookmark...")
   sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)));

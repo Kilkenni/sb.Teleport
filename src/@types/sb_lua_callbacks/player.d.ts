@@ -502,10 +502,10 @@ Sets whether the player is marked as having completed the intro instance.
 
   /**
    * Displays a confirmation dialog to the player with the specified dialog configuration
-   * @param dialogConfig
+   * @param dialogConfig Json with dialog config or path to it within assets/
    * @returns `RpcPromise` which can be used to retrieve the player's response to that dialog.
    */
-  function confirm(dialogConfig:JSON):RpcPromise<unknown>;
+  function confirm(dialogConfig:JSON|string):RpcPromise<unknown>;
 
 /*
 #### `void` player.playCinematic(`Json` cinematic, [`bool` unique])

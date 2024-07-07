@@ -27,9 +27,20 @@ function btnEditCancel:onClick()
 end
 
 function btnEditDelete:onClick()
-  -- widget.playSound("/sfx/interface/clickon_error.ogg")
-  sb.logWarn("Trying to delete bookmark...")
-  sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)))
+  local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
+  promises.add(
+    player.confirm(dialogWindow),
+    function(choice)
+      if choice == true then
+        sb.logWarn("[HELP] CONFIRMATION: YES")
+        widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
+      else
+        sb.logWarn("[HELP] CONFIRMATION: NO")
+      end
+    end
+  )
+  -- sb.logWarn("Trying to delete bookmark...")
+  -- sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)))
 end
 
 function btnEditSave:onClick()
