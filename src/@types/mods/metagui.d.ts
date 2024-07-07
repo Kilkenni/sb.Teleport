@@ -1,10 +1,14 @@
+/**
+ * Definition file for Zia Satazaki's MetaGUI, part of Stardust Core/Lite
+ */
+
 interface Tab {
   id : string, // Optional. Tab's unique identifier; if not specified, will be populated with a UUID.
   title : string, // The tab's displayed title.
   icon : string, // The tab's icon; 16x16 or smaller.
   visible : boolean, // Whether the tab widget itself is visible. Same rules as on widgets.
   color : string, // The accent color of the tab in HEX format.
-  contents : metagui.widget[ ], // The contents of the tab's connected page.
+  contents : metagui.widget[], // The contents of the tab's connected page.
 }
 
 declare module metagui {
@@ -223,13 +227,32 @@ declare module metagui {
     // Implicit for menuItems.
     selectionGroup? : string, // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
 
-    select()
-    deselect()
+    select(this: void):void;
+    deselect(this: void):void;
 
     //events
     onSelected()
-    onClick(button)
+    onClick()
   }
+
+  /**
+   * Item of a context menu, alias for list item; essentially a layout, selectable by mouse click. Deselects siblings when selected. 
+   */
+     interface MenuItem extends widget {
+      type: "menuItem",
+      buttonLike? : boolean, // Default: true. Flag for theme use; by default, indicates that the item should make a sound when clicked, e.g. a context menu item.
+      //Implicit for menuItems.
+      noAutoSelect? : boolean, // Default: true. When true, list item will not be automatically set as selected when clicked.
+      // Implicit for menuItems.
+      selectionGroup? : string, // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
+  
+      select(this: void):void;
+      deselect(this: void):void;
+  
+      //events
+      onSelected()
+      onClick()
+    }
 
   //GENERAL METHODS
 
@@ -253,7 +276,7 @@ declare module metagui {
 
   /**
    * Sets the window icon.
-   * @param path Full path in assets starting with / is recommended. Otherwise tries to search in the same folder.
+   * @param iconPath Full path in assets starting with / is recommended. Otherwise tries to search in the same folder.
    */
   function setIcon(iconPath: string):unknown;
 
