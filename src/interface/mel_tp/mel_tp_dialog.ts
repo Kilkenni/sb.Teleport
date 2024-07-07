@@ -290,9 +290,9 @@ function populateBookmarks() {
       currentBookmark.children[0].file = bkmData.icon;
       currentBookmark.children[1].text = bkmData.name;
       currentBookmark.children[2].text = bkmData.planetName;
-      const addedBookmark = bookmarksList.addChild(currentBookmark);
-      addedBookmark.onSelected = OnTpTargetSelect;
-      addedBookmark.bkmData = bkmData;
+      const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
+      addedBookmark["onSelected"] = OnTpTargetSelect;
+      addedBookmark["bkmData"] = bkmData;
     }
   }
 
@@ -337,9 +337,9 @@ function populateBookmarks() {
         currentBookmark.children[1].text = bkmData.name;
         currentBookmark.children[2].text = bkmData.planetName;
       
-        const addedBookmark = bookmarksList.addChild(currentBookmark);
-        addedBookmark.onSelected = OnTpTargetSelect;
-        addedBookmark.bkmData = bkmData;
+        const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
+        addedBookmark["onSelected"] = OnTpTargetSelect;
+        addedBookmark["bkmData"] = bkmData;
       }
     } 
   };

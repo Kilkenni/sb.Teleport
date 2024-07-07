@@ -16,37 +16,38 @@ declare module metagui {
     position?: Vec2I; // Explicit position; ignored in automatic layouts. Top to bottom, left to right.
     size?: Vec2I; // Explicit size.
     expandMode? : Vec2I; // Only available for some widget types; how eager the widget is to expand on each
-    // axis. 0 is fixed size; otherwise widget will expand if none in the layout have higher priority.
+    // axis. 0 is fixed size; 1 = "can", 2 = "want" etc. Widget will expand if none in the layout have higher priority.
     visible? : boolean; // When false, widget is hidden and excluded from layout calculations.
     toolTip? : string; // Self explanatory. Can be multiple lines.
     data? : { [key: string] : unknown }; // Arbitrary JSON data. Mostly useful for script-built panes.
 
     center(this: void):Vec2I; //Returns the widget's center position.
-    queueRedraw():void;
-    queueGeometryUpdate():void;
-    relativeMousePosition():unknown; //FIXME
-    setVisible(boolean):unknown; //FIXME
-    addChild(widget: unknown) //Only recommended to use on layout, panel, or scrollArea.
-    clearChildren(): unknown;
-    delete():unknown;
-    findParent(widgetType: string) //Find most immediate parent of a specific type.
-    subscribeEvent(name:string, func: Function) //Subscribe to a named event on behalf of a widget.
-    pushEvent(name: string, ...$vararg) //Push event to widget with given parameters. FIXME for TSTL
+    queueRedraw(this: void):void;
+    queueGeometryUpdate(this: void):void;
+    relativeMousePosition():Vec2I;
+    setVisible(this: void, visible:boolean):void;
+    getTooltip(this: void):string|null;
+    addChild(this: void, widget: widget):widget; //Only recommended to use on layout, panel, or scrollArea.
+    clearChildren(this: void): void;
+    delete(this: void):void;
+    findParent(this: void, widgetType: string):widget; //Find most immediate parent of a specific type.
+    subscribeEvent(this: void, name:string, func: Function):void; //Subscribe to a named event on behalf of a widget.
+    pushEvent(this: void, name: string, ...$vararg):unknown; //Push event to widget with given parameters.
     //Checks self first, then each child. If own event gives a "truthy" value, immediately returns it;
     //if a child event gives one, it only short-circuits if it's nonboolean.
-    broadcast(name:string, ...$vararg) //Push event to widget's parent (and likely siblings).
-    wideBroadcast(level: unsigned, name: string, ...$vararg) //Same as broadcast, but from specified number of levels up.
-  }
+    broadcast(this: void, name:string, ...$vararg):unknown; //Push event to widget's parent (and likely siblings).
+    wideBroadcast(this: void, level: unsigned, name: string, ...$vararg):unknown; //Same as broadcast, but from specified number of levels up.
+  } 
 
   interface Layout extends widget {
     type: "layout",
-    mode?: "horizontal"|"h"|"vertical"|"v"|"stack"|"manual", // How the layout arranges its children. Defaults to manual if explicitly declared.
+    mode?: "horizontal"|"h"|"vertical"|"v"|"stack"|"manual", // Default: "manual". How the layout arranges its children.
     // "horizontal", "vertical" ("h", "v"): Automatically arranges children in a row or column.
     // "stack" : Children are stacked on top of each other and expanded to fit layout space.
     // "manual": Children are explicitly placed; layout expands to fit.
-    spacing? : unsigned, // Spacing between child elements in automatic layout modes, in pixels. Defaults to 2px.
-    align? : number, // Proportion of alignment for fixed-size children on opposite axis in automatic modes.
-    // 0 is aligned with left or top edge; 1 with bottom or right. Defaults to 0.5 (centered).
+    spacing? : unsigned, // Default: 2. Spacing between child elements in automatic layout modes, in pixels.
+    align? : number, // Default: 0.5 (centered). Proportion of alignment for fixed-size children on opposite axis in automatic modes.
+    // 0 is aligned with left or top edge; 1 with bottom or right.
   }
 
   /**
@@ -67,8 +68,8 @@ declare module metagui {
     scrollBars? : boolean, // Whether to show scroll bars after scrolling. Defaults to true.
     thumbScrolling? : boolean, // Whether "thumb" (absolute) scrolling is enabled. Defaults to true.
 
-    scrollBy(vec: unsigned, suppressAnimation?: boolean) //Attempts to scroll contents by [vec] pixels. Shows scroll bars if suppressAnimation is false or omitted.
-    scrollTo(pos: number, suppressAnimation?: boolean, raw?: boolean) //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
+    scrollBy(this: void, vec: int, suppressAnimation?: boolean):void; //Attempts to scroll contents by [vec] pixels. Shows scroll bars if suppressAnimation is false or omitted.
+    scrollTo(this: void, pos: number, suppressAnimation?: boolean, raw?: boolean):void; //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
   }
 
   interface TabField extends widget {
@@ -79,18 +80,18 @@ declare module metagui {
     tabs : Tab[], // An array of tabs, formatted as follows:
     bottomBar : widget[], // Contents of an optional bar below the contents. Mostly useful for vertical tab layout.
 
-    newTab(parameters: Tab):Tab; //Creates a new tab. Parameters are as in the "tabs" attribute. Returns a tab object.
-    select():unknown; //Switches to tab.
-    setTitle(title: string, icon?: string):unknown; //Changes the tab's title and (optionally) icon.
-    setColor(color:string):unknown; //Changes the tab's accent color.
-    setVisible(bool:boolean): unknown;
+    newTab(this: void, parameters: Tab):Tab; //Creates a new tab. Parameters are as in the "tabs" attribute. Returns a tab object.
+    select(this: void):void; //Switches to tab.
+    setTitle(this: void, title: string, icon?: string):void; //Changes the tab's title and (optionally) icon.
+    setColor(this: void, color:string):void; //Changes the tab's accent color.
+    setVisible(this: void, bool:boolean): void;
 
     //events
     onTabChanged(tab, previous) //Called on changing tabs.
   }
 
   /**
-   * Empty space used to add single margins/paddings manually between widgets or center children in layouts
+   * Empty space used to add single margins/paddings manually between widgets or center children in layouts. Default expandMode = [2, 2].
    */
   interface Spacer extends widget {
     type: "spacer",
@@ -101,15 +102,15 @@ declare module metagui {
    */
   interface Label extends widget {
     type: "label",
-    text : "Hello ^accent;world^reset;!", // The text to display. Supports formatting codes.
+    text : string, // Default: "". The text to display. Supports formatting codes.
     fontSize? : unsigned, // Defaults to 8.
     color? : string, // The unformatted text color, either "accent" or a hexcode.
     align? : "left"|"center"|"right", // Horizontal alignment. Defaults to "left".
-    inline? : boolean, // If true, makes label fixed-size.
+    inline? : boolean, // If true, makes fixed-size.
     expand? : boolean, // If true, gives (horizontal) expansion priority.
     wrap? : boolean, // Default: true. If false, disables word wrap.
 
-    setText(text:string)
+    setText(this: void, text:string):void;
   }
   
   /**
@@ -117,12 +118,12 @@ declare module metagui {
    */
   interface Image extends widget {
     type: "image",
-    file : string, // The image to display. Can be absolute or relative (to the pane!).
+    file : string, // The image to display. Can be absolute or relative (to the pane!). Fallback: "/assetmissing.png".
     scale? : unsigned, // Default: 1. Scale proportion for the image.
     noAutoCrop? : boolean, // Default: false. When true, preserve empty space in image margins; otherwise, behavior matches vanilla images.
 
-    setFile(path: string)
-    setScale(value: unsigned)
+    setFile(this: void, path: string, noAutoCrop?: boolean):void;
+    setScale(this: void, value: number):void;
   }
 
   /**
@@ -132,7 +133,7 @@ declare module metagui {
     type: "canvas",
 
     //Shorthand for widget.bindCanvas(canvas.backingWidget)
-    bind();
+    bind(this: void, );
   }
 
   interface Button extends widget {
@@ -140,64 +141,69 @@ declare module metagui {
     caption? : string, // Text to draw on the button.
     captionOffset? : Vec2I, // Pixel offset for caption.
     color? : string, // Accent color. Rendering dependent on theme.
+    inline? : boolean, // If true, makes fixed-size.
+    expand? : boolean, // If true, gives (horizontal) expansion priority.
 
     //Sets the button's caption.
-    setText(string) 
+    setText(this: void, label:string):void;
 
     //Called when button released after pressing (left click).
     onClick() 
   }
 
   /**
-   * A button that renders as a given icon.
+   * A button that renders as a given icon. Extended from Button.
    */
   interface IconButton extends widget {
     type: "iconButton",
-    image: string, // The idle image to use. If suffixed with a colon (image.png:), file is treated as a sprite sheet with the frames "idle", "hover" and "press". Relative or absolute paths accepted.
+    image: string, // The idle image to use. If suffixed with a colon (image.png:), file is treated as a sprite sheet with the frames "idle", "hover" and "press". Relative or absolute paths accepted. Default: "/assetmissing.png".
     hoverImage: string,
     pressImage: string,
 
-    setImage(this: void, idle: string, hover: string, press: string) //Sets the button's icon drawables.
+    setImage(this: void, idle: string, hover: string, press: string):void; //Sets the button's icon drawables.
+    setText(this: void, label:string):void; //TODD test if it works
 
     //Called when button released after pressing (left click).
     onClick() 
   }
 
-  /*
+  /**
+   * A check box. Uses the same onClick event as the button types. Derived from Button.
+   */
   interface CheckBox extends widget {
-    A check box. Uses the same onClick event as the button types.
-    "checked" : true, // Pre-checked if specified.
-    "radioGroup" : "mode", // If specified, widget becomes a radio button grouped with others of its group.
-    "value" : 23, // Any data type. Used by radio buttons.
+    checked? : boolean, // Default: false. Pre-checked if specified without value.
+    radioGroup? : string, // If specified, widget becomes a radio button grouped with others of its group.
+    value? : any, // Any data type. Used by radio buttons.
 
-    checkBox:setChecked(b)
-    local bool = checkBox.checked
-    checkBox:getGroupChecked() //If widget is a radio button, returns the checked widget of its group.
-    checkBox:getGroupValue() //Same as above, except returns the widget's value attribute.
-    checkBox:findValue(val) //If widget is a radio button, returns its sibling with given value if it exists.
-    checkBox:selectValue(val) //Same as above, but sets the specified sibling checked.
+    setChecked(this: void, checked: boolean):void;
+    getGroupChecked(this: void):CheckBox|null; //If widget is a radio button, returns the checked widget of its group.
+    getGroupValue(this: void): any|null; //Same as above, except returns the widget's value attribute.
+    findValue(this: void, val: any):CheckBox|null; //If widget is a radio button, returns its sibling with given value if it exists.
+    selectValue(this: void, val: any):CheckBox|null; //Same as above, but also sets the specified sibling checked.
+
+    onClick()
   }
-  */
+  
 
   /**
    * A text entry field.
    */
   interface TextBox extends widget {
     type: "textBox",
-    text: string, //SHOULD BE PRIVATE
-    caption? : string, // Text to display when unfocused and no text is entered.
+    text: string, //Default: "".
+    caption? : string, // Default: "". Text to display when unfocused and no text is entered.
     color? : string, // Text color.
     inline? : boolean, // Alias for an expandMode of [0, 0].
     expand? : boolean, // Alias for an expandMode of [2, 0].
 
-    focus() //Grabs keyboard focus.
-    blur() //Releases focus.
-    setText(text: string) //Sets contents.
-    setColor(color: string) //Sets text color in HEX format.
+    focus(this: void): void; //Grabs keyboard focus.
+    blur(this: void): void;  //Releases focus.
+    setText(this: void, text: string): void; //Sets contents.
+    setColor(this: void, color: string):void; //Sets text color.
 
-    setCursorPosition(pos: int) //Sets the position of the text cursor, in characters.
-    moveCursor(pos: int) //Moves the cursor by a given number of characters.
-    setScrollPosition(pos: int) //Sets how far the text field is scrolled, if contents overflow.
+    setCursorPosition(this: void, pos: int):void; //Sets the position of the text cursor, in characters.
+    moveCursor(this: void, pos: int):void; //Moves the cursor by a given number of characters (left or right).
+    setScrollPosition(this: void, pos: number):void; //Sets how far the text field is scrolled, if contents overflow.
 
     //events
     onTextChanged() //Called on any change to the entered text.
@@ -224,7 +230,6 @@ declare module metagui {
     onSelected()
     onClick(button)
   }
-  //TODO add the rest
 
   //GENERAL METHODS
 
