@@ -18,10 +18,10 @@ declare module metagui {
     expandMode? : Vec2I; // Only available for some widget types; how eager the widget is to expand on each
     // axis. 0 is fixed size; otherwise widget will expand if none in the layout have higher priority.
     visible? : boolean; // When false, widget is hidden and excluded from layout calculations.
-    toolTip? : "I'm a tool tip!"; // Self explanatory. Can be multiple lines.
+    toolTip? : string; // Self explanatory. Can be multiple lines.
     data? : { [key: string] : unknown }; // Arbitrary JSON data. Mostly useful for script-built panes.
 
-    center():Vec2I; //Returns the widget's center position.
+    center(this: void):Vec2I; //Returns the widget's center position.
     queueRedraw():void;
     queueGeometryUpdate():void;
     relativeMousePosition():unknown; //FIXME
@@ -71,8 +71,6 @@ declare module metagui {
     scrollTo(pos: number, suppressAnimation?: boolean, raw?: boolean) //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
   }
 
-  
-
   interface TabField extends widget {
     type: "tabField",
     layout : "horizontal"|"vertical", // Which direction the tabs run. "horizontal" is a bar across the top, "vertical" is a sidebar down the left side.
@@ -111,7 +109,7 @@ declare module metagui {
     expand? : boolean, // If true, gives (horizontal) expansion priority.
     wrap? : boolean, // Default: true. If false, disables word wrap.
 
-    setText(string)
+    setText(text:string)
   }
   
   /**
@@ -159,7 +157,7 @@ declare module metagui {
     hoverImage: string,
     pressImage: string,
 
-    setImage(idle: string, hover: string, press: string) //Sets the button's icon drawables.
+    setImage(this: void, idle: string, hover: string, press: string) //Sets the button's icon drawables.
 
     //Called when button released after pressing (left click).
     onClick() 
@@ -186,6 +184,7 @@ declare module metagui {
    */
   interface TextBox extends widget {
     type: "textBox",
+    text: string, //SHOULD BE PRIVATE
     caption? : string, // Text to display when unfocused and no text is entered.
     color? : string, // Text color.
     inline? : boolean, // Alias for an expandMode of [0, 0].

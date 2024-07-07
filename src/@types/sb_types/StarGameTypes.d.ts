@@ -141,6 +141,16 @@ declare type WarpAction = WarpAlias|UuidTarget|PlayerTarget|BookmarkTarget;
 
 type WarpActionString = WarpAlias|WarpToPlayer|WarpToWorld
 
+declare interface Destination {
+  name : string, //equivalent of Bookmark.bookmarkName. Default: ""
+  planetName : string, //equivalent of Bookmark.targetName. Default: "???"
+  warpAction : WarpAction, //equivalent of Bookmark.target.
+  icon : string, //equivalent of Bookmark.icon
+  deploy? : boolean, //Deploy mech. Default: false
+  mission? : boolean, //Default: false
+  prerequisiteQuest? : any, //if the player has not completed the quest, destination is not available
+}
+
 // declare type CelestialCoordinateJson_no
 
 declare interface CelestialCoordinate {

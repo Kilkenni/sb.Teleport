@@ -15,44 +15,7 @@ local mel_tp = {
   animation = "default",
   dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config")
 }
-mel_tp.bookmarks = player.teleportBookmarks()
-local sourceEntity = pane.sourceEntity()
-if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
-then
-  local entityConfig = root.itemConfig({
-    name = world.getObjectParameter(sourceEntity, "objectName"),
-    count = 1,
-    parameters = {}
-  })
-  if entityConfig ~= nil then
-    local iconName = world.getObjectParameter(sourceEntity, "inventoryIcon")
-    mel_tp.paneIcon = entityConfig.directory..iconName
-  end
-  mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") or mel_tp.paneTitle
-end
-local metaguiTpData = metagui.inputData
-if metaguiTpData ~= nil then
-    mel_tp.configPath = metaguiTpData.configPath or ""
-    mel_tp.paneIcon = metaguiTpData.paneIcon or mel_tp.paneIcon
-    mel_tp.paneTitle = metaguiTpData.paneTitle or mel_tp.paneTitle
-end
-if mel_tp.configPath ~= nil then
-    mel_tp.configOverride = root.assetJson(mel_tp.configPath)
-end
-
 local inactiveColor = "ff0000"
-if player.canDeploy() == false then
-    btnDeploy.color = inactiveColor
-end
-btnEdit.color = inactiveColor
-
-metagui.setTitle(mel_tp.paneTitle);
-metagui.setIcon(mel_tp.paneIcon);
-
- -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
-    -- "icon":"garden",
-    -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
-    -- "bookmarkName":"Merchant test"}
 
 local function clearPlanetInfo()
   lblBkmName:setText("")
@@ -360,7 +323,6 @@ function btnEdit:onClick()
       lblDump:setText("No target selected")
       return
   end
-  widget.playSound("/sfx/interface/ship_confirm1.ogg")
   player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_edit.ui", data = {mel_tp = mel_tp}})
 end
 
@@ -399,7 +361,51 @@ function btnFallback:onClick()
   pane.dismiss();
 end
 
-if mel_tp.bookmarks ~= nil then
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
+local function main()
+  mel_tp.bookmarks = player.teleportBookmarks()
+  local sourceEntity = pane.sourceEntity()
+  if world.getObjectParameter(sourceEntity, "objectName") ~= nil 
+  then
+    local entityConfig = root.itemConfig({
+      name = world.getObjectParameter(sourceEntity, "objectName"),
+      count = 1,
+      parameters = {}
+    })
+    if entityConfig ~= nil then
+      local iconName = world.getObjectParameter(sourceEntity, "inventoryIcon")
+      mel_tp.paneIcon = entityConfig.directory..iconName
+    end
+    mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") or mel_tp.paneTitle
+  end
+
+  local metaguiTpData = metagui.inputData
+  if metaguiTpData ~= nil then
+      mel_tp.configPath = metaguiTpData.configPath or ""
+      mel_tp.paneIcon = metaguiTpData.paneIcon or mel_tp.paneIcon
+      mel_tp.paneTitle = metaguiTpData.paneTitle or mel_tp.paneTitle
+  end
+  if mel_tp.configPath ~= nil then
+      mel_tp.configOverride = root.assetJson(mel_tp.configPath)
+  end
+
+  --pane init
+  if player.canDeploy() == false then
+    btnDeploy.color = inactiveColor
+  end
+  btnEdit.color = inactiveColor
+
+  metagui.setTitle(mel_tp.paneTitle);
+  metagui.setIcon(mel_tp.paneIcon);
+
+  if mel_tp.bookmarks ~= nil then
+    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
+  end
+  populateBookmarks()
+
+  -- {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
+    -- "icon":"garden",
+    -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
+    -- "bookmarkName":"Merchant test"}
 end
-populateBookmarks()
+
+main()

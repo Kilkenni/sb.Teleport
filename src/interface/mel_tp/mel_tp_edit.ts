@@ -1,46 +1,67 @@
 //manages edit dialog for a bookmark
 
 //declare for interface
-declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.Label, bkmPlanet: metagui.Label, lblDump:metagui.Label;
+declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
 
-import * as mel_tp_util from "./mel_tp_util";
-// import { mel_tp } from "./mel_tp_dialog";
-
-let mel_tp
-
-if(metagui.inputData === null) {
-  pane.dismiss();
-}
-else {
-  if(metagui.inputData !== undefined) {
-    mel_tp = metagui.inputData.mel_tp
-  }
-}
-
-//some bookmark should be selected fo edit to work
-if(mel_tp.selected === undefined) {
-  pane.dismiss();
-}
+// import * as mel_tp_util from "./mel_tp_util";
 
 const mel_tp_edit:{
   bookmarkState:TeleportBookmark,
 } = {
   bookmarkState: {
     target: "Nowhere" as unknown as BookmarkTarget,
-    targetName: "nowherish",
+    targetName: "nowherish", //planetName
     bookmarkName: "Nowhere in particular",
     icon: "/interface/bookmarks/icons/default.png"
   }
 }
+main();
 
-//INIT TODO here
-bkmIcon.setFile(mel_tp_edit.bookmarkState.icon);
-bkmName.setText(mel_tp_edit.bookmarkState.bookmarkName);
-bkmPlanet.setText(mel_tp_edit.bookmarkState.targetName);
-lblDump.setText(sb.printJson(mel_tp_edit.bookmarkState.target as unknown as JSON));
+function main():void {
+  let mel_tp: {
+    bookmarks: TeleportBookmark[]|undefined,
+    selected: Destination|undefined,
+    };
+    
+    if(metagui.inputData === undefined) {
+      pane.dismiss();
+      return;
+    }
+    
+    mel_tp = metagui.inputData.mel_tp as {
+      bookmarks: TeleportBookmark[]|undefined,
+      selected: Destination|undefined,
+    }
+    
+    //some bookmark should be selected fo edit to work
+    if(mel_tp.selected === undefined || mel_tp.bookmarks === undefined) {
+      pane.dismiss();
+      return;
+    }
+    
+    mel_tp_edit.bookmarkState.icon =  mel_tp.selected.icon;
+    mel_tp_edit.bookmarkState.targetName = mel_tp.selected.planetName;
+    mel_tp_edit.bookmarkState.bookmarkName = mel_tp.selected.name;
+    mel_tp_edit.bookmarkState.target = mel_tp.selected.warpAction as BookmarkTarget;
+    //INIT
+    bkmIcon.setFile(mel_tp_edit.bookmarkState.icon);
+    bkmName.setText(mel_tp_edit.bookmarkState.bookmarkName);
+    bkmPlanet.setText(mel_tp_edit.bookmarkState.targetName);
+    lblInfo.setText(sb.printJson(mel_tp_edit.bookmarkState.target as unknown as JSON));
+}
+
+bkmName.onTextChanged = function() {
+  mel_tp_edit.bookmarkState.bookmarkName = bkmName.text;
+  if(mel_tp_edit.bookmarkState.bookmarkName === "") {
+    setError(">Bookmark needs a name!");
+  }
+}
+
+function setError(error: string):void {
+  lblConsole.setText(error);
+}
 
 btnEditCancel.onClick = function() {
-  widget.playSound("/sfx/interface/clickon_error.ogg");
   pane.dismiss()
 }
 
@@ -49,8 +70,13 @@ btnEditDelete.onClick = function() {
 }
 
 btnEditSave.onClick = function() {
-  widget.playSound("/sfx/interface/clickon_error.ogg");
+  if(mel_tp_edit.bookmarkState.bookmarkName === "") {
+    widget.playSound("/sfx/interface/clickon_error.ogg");
+    setError(">Bookmark needs a name!");
+  }
+
   //TODO
+  widget.playSound("/sfx/interface/clickon_error.ogg");
   pane.dismiss()
 }
 

@@ -1,18 +1,31 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
-import {bookmarksList, txtboxFilter, btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnEdit, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
-import mel_tp_util from "./mel_tp_util";
-
-export interface Destination {
-  name : string, //equivalent of Bookmark.bookmarkName. Default: ""
-  planetName : string, //equivalent of Bookmark.targetName. Default: "???"
-  warpAction : WarpAction, //equivalent of Bookmark.target.
-  icon : string, //equivalent of Bookmark.icon
-  deploy? : boolean, //Deploy mech. Default: false
-  mission? : boolean, //Default: false
-  prerequisiteQuest? : any, //if the player has not completed the quest, destination is not available
+// import {btnResetFilter, btnSortByPlanet, lblBkmName, lblBkmHazards, listHazards, btnEdit, btnFallback, btnTeleport, btnDeploy, lblDump, tpItem, hazardItem} from "./mel_tp_dialog.ui.js";
+declare const bookmarksList:metagui.ScrollArea;
+declare const txtboxFilter: metagui.TextBox;
+declare const btnResetFilter: metagui.Button;
+declare const btnSortByPlanet: metagui.Button;
+declare const btnEdit: metagui.Button;
+declare const btnFallback: metagui.Button;
+declare const btnTeleport: metagui.Button;
+declare const btnDeploy: metagui.Button;
+declare const lblBkmName: metagui.Label;
+declare const lblBkmHazards: metagui.Label;
+declare const lblDump: metagui.Label;
+declare const listHazards: metagui.Layout;
+declare interface tpItem {
+  type: "listItem",
+  children: [
+    {type: "image", file: string},
+    {type: "label", text: string},
+    {type: "label", text: string},
+],
+  data: {target:string}
 }
+declare interface hazardItem extends metagui.Image {}
+
+import mel_tp_util from "./mel_tp_util";
 
 declare interface MetaguiTpData {
   configPath?: string, //path to teleport.config. Similar to interactData on vanilla teleporters
@@ -38,56 +51,72 @@ const mel_tp:{
   bookmarks: undefined,
   filter: "",
   bookmarksFiltered: undefined,
-  bookmarkTemplate: bookmarksList.data,
+  bookmarkTemplate: bookmarksList.data as unknown as tpItem,
   configPath: "",
   configOverride: undefined,
   selected: undefined,
   animation: "default",
   dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig
 };
-mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
-const sourceEntity = pane.sourceEntity();
-if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
-  //if sourceEntity is an object
-  const entityConfig = root.itemConfig({
-    name: world.getObjectParameter(sourceEntity, "objectName") as unknown as string,
-    count: 1 as unsigned,
-    parameters: {} as unknown as JSON
-  });
-  if(entityConfig !== null) {
-    const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string;
-    mel_tp.paneIcon = entityConfig.directory + iconName; //object icon as pane icon
-  }
-  // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
-  mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;
-}
-
-// sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
-const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
-if(metaguiTpData !== undefined) {
-  mel_tp.configPath = metaguiTpData.configPath || "";
-  mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon; //lastly, try to use override from metagui data
-  mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
-}
-if(mel_tp.configPath !== undefined) {
-  mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
-}
-
 const inactiveColor = "ff0000"; //red
-if(player.canDeploy() === false) {
-  btnDeploy.color = inactiveColor;
+
+main();
+
+function main(this:void):void {
+  mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
+  const sourceEntity = pane.sourceEntity();
+  if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
+    //if sourceEntity is an object
+    const entityConfig = root.itemConfig({
+      name: world.getObjectParameter(sourceEntity, "objectName") as unknown as string,
+      count: 1 as unsigned,
+      parameters: {} as unknown as JSON
+    });
+    if(entityConfig !== null) {
+      const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string;
+      mel_tp.paneIcon = entityConfig.directory + iconName; //object icon as pane icon
+    }
+    // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
+    mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;
+  }
+
+  // sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
+  const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
+  if(metaguiTpData !== undefined) {
+    mel_tp.configPath = metaguiTpData.configPath || "";
+    mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon; //lastly, try to use override from metagui data
+    mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
+  }
+  if(mel_tp.configPath !== undefined) {
+    mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
+  }
+
+  if(player.canDeploy() === false) {
+    btnDeploy.color = inactiveColor;
+  }
+  
+
+  /*
+    {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
+      "icon":"garden",
+      "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
+      "bookmarkName":"Merchant test"}
+  */  
+
+  /**
+   * Init pane part
+  */
+
+  btnEdit.color = inactiveColor;
+
+  metagui.setTitle(mel_tp.paneTitle);
+  metagui.setIcon(mel_tp.paneIcon);
+
+  if(mel_tp.bookmarks !== undefined) {
+    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
+  }
+  populateBookmarks()
 }
-btnEdit.color = inactiveColor;
-
-metagui.setTitle(mel_tp.paneTitle);
-metagui.setIcon(mel_tp.paneIcon);
-
-/*
-  {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
-    "icon":"garden",
-    "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
-    "bookmarkName":"Merchant test"}
-*/
 
 function populateBookmarks() {
   bookmarksList.clearChildren()
@@ -412,7 +441,7 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
     // sb.logInfo("[log] Planet visitable parameters: "..sb.printJson(planetParams as unknown as JSON));
     if(planetParams.environmentStatusEffects.length > 0) {
       //experimental - if at least one hazard is there, show its icon
-      const hazardTemplate:hazardItem = listHazards.data;
+      const hazardTemplate:hazardItem = listHazards.data as unknown as hazardItem;
       for(const effect of planetParams.environmentStatusEffects) {
         if(mel_tp.dialogConfig.planetaryEnvironmentHazards[effect] !== undefined) {
           hazardTemplate.file = mel_tp.dialogConfig.planetaryEnvironmentHazards[effect].icon;
@@ -427,7 +456,7 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
     }
   }
   else {
-    lblBkmHazards.setText(world.timeOfDay());
+    lblBkmHazards.setText(world.timeOfDay().toString());
   }
 }
 
@@ -441,7 +470,7 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
     //destination added from config
     if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
       lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
-      lblBkmHazards.setText(world.timeOfDay());
+      lblBkmHazards.setText(world.timeOfDay().toString());
     }
     else {
       //Special case for Orbited World: show hazards
@@ -477,11 +506,11 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
   }
   else if((mel_tp.selected.warpAction as PlayerTarget)[0] === "player") {
     lblBkmName.setText("Player signature");
-    lblBkmHazards.setText(world.timeOfDay());
+    lblBkmHazards.setText(world.timeOfDay().toString());
   }
   else if((mel_tp.selected.warpAction as UuidTarget)[0] === "object" ) {
     lblBkmName.setText("Object Uuid signature");
-    lblBkmHazards.setText(world.timeOfDay());
+    lblBkmHazards.setText(world.timeOfDay().toString());
   }
   else {
     //Bookmark selected
@@ -490,7 +519,7 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
     const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
     if(coord === null) {
       lblBkmName.setText(dbErrorText);
-      lblBkmHazards.setText(world.timeOfDay());
+      lblBkmHazards.setText(world.timeOfDay().toString());
     }
     else {
       if((coord as CelestialCoordinate).location !== undefined) {
@@ -520,8 +549,6 @@ txtboxFilter.onEnter = function ():void {
   }
   mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
   populateBookmarks();
-  player.say(sb.printJson(txtboxFilter.text))
-  // chat.send(sb.printJson(txtboxFilter.text));
 }
 
 txtboxFilter.onEscape = function ():void {
@@ -550,8 +577,7 @@ btnEdit.onClick = function() {
     return;
   }
 
-  widget.playSound("/sfx/interface/ship_confirm1.ogg");
-  player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {}} as unknown as JSON);
+  player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {mel_tp: mel_tp}} as unknown as JSON);
 }
 
 btnTeleport.onClick = function() {
@@ -590,18 +616,9 @@ btnFallback.onClick = function() {
   pane.dismiss();
 }
 
-/**
- * Init pane part
- */
-
-if(mel_tp.bookmarks !== undefined) {
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
-}
-populateBookmarks()
-
-export {
-  mel_tp
-};
+// export {
+//   mel_tp
+// };
 
  //EDIT BOOKMARK OPTION
 

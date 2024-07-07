@@ -1,22 +1,4 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
---[[local ____mel_tp_dialog = --require("/interface/mel_tp/mel_tp_dialog.lua") --]]
--- local mel_tp = ____mel_tp_dialog.mel_tp
-
-local mel_tp
-
-if(metagui.inputData == nil) then
-  pane.dismiss()
-  return
-else
-  if(metagui.inputData ~= nil) then
-    mel_tp = metagui.inputData.mel_tp
-  end
-end
- 
-
-if mel_tp.selected == nil then
-    pane.dismiss()
-end
 local mel_tp_edit = {
   bookmarkState = {
     target = "Nowhere", 
@@ -26,21 +8,59 @@ local mel_tp_edit = {
   }
 }
 
-bkmIcon:setFile(mel_tp_edit.bookmarkState.icon)
-bkmName:setText(mel_tp_edit.bookmarkState.bookmarkName)
-bkmPlanet:setText(mel_tp_edit.bookmarkState.targetName)
-lblDump:setText(sb.printJson(mel_tp_edit.bookmarkState.target))
+local function setError(error)
+  lblConsole:setText(error)
+end
+
+function bkmName:onTextChanged()
+  mel_tp_edit.bookmarkState.bookmarkName = bkmName.text
+  setError(sb.printJson(mel_tp_edit.bookmarkState))
+  if mel_tp_edit.bookmarkState.bookmarkName == "" then
+      setError(">Bookmark needs a name!")
+  end
+end
 
 function btnEditCancel:onClick()
-    widget.playSound("/sfx/interface/clickon_error.ogg")
-    pane.dismiss()
+  pane.dismiss()
 end
 
 function btnEditDelete:onClick()
-    widget.playSound("/sfx/interface/clickon_error.ogg")
+  widget.playSound("/sfx/interface/clickon_error.ogg")
 end
 
 function btnEditSave:onClick()
+  if mel_tp_edit.bookmarkState.bookmarkName == "" then
     widget.playSound("/sfx/interface/clickon_error.ogg")
-    pane.dismiss()
+    setError(">Bookmark needs a name!")
+  end
+  -- widget.playSound("/sfx/interface/clickon_error.ogg")
+  -- pane.dismiss()
 end
+
+local function main()
+  local mel_tp
+
+  if metagui.inputData == nil then
+      pane.dismiss()
+      return
+  end
+
+  mel_tp = metagui.inputData.mel_tp
+
+  if mel_tp.selected == nil or mel_tp.bookmarks == nil then
+      pane.dismiss()
+      return
+  end
+
+  
+  mel_tp_edit.bookmarkState.icon = mel_tp.selected.icon
+  mel_tp_edit.bookmarkState.targetName = mel_tp.selected.planetName
+  mel_tp_edit.bookmarkState.bookmarkName = mel_tp.selected.name
+  mel_tp_edit.bookmarkState.target = mel_tp.selected.warpAction
+  bkmIcon:setFile(mel_tp_edit.bookmarkState.icon)
+  bkmName:setText(mel_tp_edit.bookmarkState.bookmarkName)
+  bkmPlanet:setText(mel_tp_edit.bookmarkState.targetName)
+  lblInfo:setText(sb.printJson(mel_tp_edit.bookmarkState.target))
+end
+
+main()

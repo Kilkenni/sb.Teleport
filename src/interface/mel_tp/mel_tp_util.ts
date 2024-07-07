@@ -1,5 +1,3 @@
-import {Destination} from "./mel_tp_dialog"
-
 /**
  * Sorts array by certain property
  * @param array Array of similar objects containing properties with string keys

@@ -12,14 +12,29 @@
   "uniqueMode" : "toggle", 
   "children" : [
     { "mode" : "vertical" },
-    [
-      { "type": "image", "id":"bkmIcon", "file": "/interface/bookmarks/icons/default.png" },
-      { "type": "label", "id":"bkmName", "text": "" },
-      { "type": "label", "id":"bkmPlanet", "text": "" },
-      { "type": "label", "id" : "lblDump", "text" : "" }
-    ],
+    { "type": "panel", "style": "concave", "mode" : "vertical", "padding": 2, "align": 0, "expandMode": [1, 2], "children":
+      [
+        { "type": "image", "id":"bkmIcon", "file": "/interface/bookmarks/icons/default.png" },
+        {"type": "spacer", "size": 8},
+        [
+          { "type": "label", "text": "Name: " , "size": [50, 10]},
+          { "type": "textBox", "id":"bkmName", "caption": "New bookmark name...", "expandMode":[2, 0], "text": ""}
+        ],
+        {"type": "spacer", "size": 8},
+        [
+          { "type": "label", "text": "Location: " , "size": [50, 10]},
+          { "type": "label", "id":"bkmPlanet", "expandMode":[2, 0], "text": "" }
+        ],
+        {"type": "spacer", "size": 8},
+        [
+          { "type": "label", "text": "Info: " , "size": [50, 10]},
+          { "type": "label", "id" : "lblInfo", "expandMode":[2, 0], "text" : "" }
+        ]
+      ]
+    },
+    { "type": "label", "id": "lblConsole", "text" : "" , "size": [10, 50], "expandMode": [1, 1]},
     [ 
-      { "size" : 80, "mode":"horizontal" },
+      { "size" : 30, "mode":"horizontal" },
       { 
         "type" : "button",
         "caption" : "Cancel",
