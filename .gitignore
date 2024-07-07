@@ -44,4 +44,4 @@ node_modules/
 
 # TSTL emit
 dist/
-# **/*.lua-raw
+**/*.lua-raw
