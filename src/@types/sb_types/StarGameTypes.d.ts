@@ -20,7 +20,16 @@ declare type size_t = number & { __brand: "long unsigned int"};
 declare type Uuid = string;
 declare type EntityId = number & { __brand: "int32_t" };
 
-declare type RpcPromise<T> = unknown; //FIXME better description
+declare interface RpcPromise<T> {
+  /**Is it resolved? */
+  finished(this:void):boolean,
+  /**is it successful? */
+  succeeded(this:void):boolean,
+  /** @returns result of resolved promise */
+  result(this:void):T,
+  /**@returns Error string or nil. Internal radio messages (eg. sendRadioMessage) always return an error, even if they executed properly */
+  error(this:void):string|null
+} //FIXME better description
 
 //Lua-specific wrappers
 declare type LuaFunction = Function

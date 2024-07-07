@@ -28,7 +28,7 @@ end
 
 function btnEditDelete:onClick()
   local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
-  promises.add(
+  promises:add(
     player.confirm(dialogWindow),
     function(choice)
       if choice == true then
