@@ -13,7 +13,8 @@ local mel_tp = {
   configOverride = nil,
   selected = nil,
   animation = "default",
-  dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config")
+  dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config"),
+  version = "SparkTpTec v: unknown"
 }
 local inactiveColor = "ff0000"
 
@@ -406,6 +407,19 @@ local function main()
     -- "icon":"garden",
     -- "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
     -- "bookmarkName":"Merchant test"}
+
+    --for OpenSb only
+  if root.assetSourcePaths ~= nil then
+    local assetsWithMetadata = root.assetSourcePaths(true)
+    for modPath in pairs(assetsWithMetadata) do
+        local modName = "sb.Teleport"
+        if assetsWithMetadata[modPath].name == modName then
+            mel_tp.version = "SparkTpTec v: " .. tostring(assetsWithMetadata[modPath].version)
+        end
+    end
+  end
+
+  lblVersion:setText(mel_tp.version)
 end
 
 main()

@@ -32,7 +32,8 @@
           { "type": "label", "text" : "Debug info" },
           { "type": "label", "id" : "lblDebug", "text" : ""},
           { "type": "label", "id" : "lblDump", "text" : ""} 
-        ] }  
+        ] },
+        {"type":"label", "id":"lblVersion", "text": "", "size": [20, 10]}  
       ]
     },
     [ 

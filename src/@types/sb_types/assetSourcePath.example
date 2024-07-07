@@ -1,0 +1,38 @@
+{
+  "../mods/sb.Teleport": {
+    "version": "0.3-alpha",
+    "author": "MelOzone",
+    "description": "Like walking, but better",
+    "name": "sb.Teleport",
+    "friendlyName": "sb.Teleport",
+    "priority": 0,
+    "link": "https://github.com/Kilkenni/sb.Teleport",
+    "includes": ["QuickbarMini"]
+  },
+  "../mods/Stardust-Core-Lite.pak": {
+    "version": "Beta v0.1.5e-a9e6199",
+    "author": "Zia Satazaki",
+    "description": "Library code and system features for the modded experience.",
+    "name": "QuickbarMini",
+    "friendlyName": "Stardust Core Lite",
+    "priority": -1000,
+    "steamContentId": "2512589532",
+    "link": "steam://url/CommunityFilePage/1088459034",
+    "includes": []
+  },
+  "../assets/packed.pak": {
+    "author": "Chucklefish",
+    "name": "base",
+    "friendlyName": "Base Game Assets",
+    "priority": -9999
+  },
+  "../assets/user": {},
+  "../assets/opensb.pak": {
+    "author": "Not Chucklefish",
+    "requires": ["base"],
+    "name": "opensb_base",
+    "friendlyName": "OpenStarbound Assets",
+    "priority": -9999,
+    "scripts": { "postLoad": ["/scripts/opensb/assets/postload.lua"] }
+  }
+}

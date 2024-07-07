@@ -3,7 +3,6 @@ The `root` table contains functions that reference the game's currently loaded a
 */
 
 declare type Image = unknown; //FIXME - can be image OR sub-frame
-declare type LuaEngine = unknown; //FIXME
 declare enum ItemTypeNames {
   "generic",
   "liquid",
@@ -83,12 +82,12 @@ declare module root {
    * @param extension Can start with leading ".", but it is optional
    * @returns array of files in assets/ with the given extension, case-insensitive
    */
-  function assetsByExtension(engine: LuaEngine, extension: string):string[]|null;
+  function assetsByExtension(extension: string):string[]|null;
 
   /**
    * Only available in OpenStarbound
    * @param path 
-   * @returns The source that has the primary asset copy (if found)
+   * @returns Path to the source that has the primary asset copy (if found)
    */
   function assetOrigin(path: string):string|null;
 
@@ -98,7 +97,7 @@ declare module root {
    * @param path 
    * @returns FIXME patches for the asset and their paths (if found)
    */
-  function assetPatches(engine: LuaEngine, path: string):[JSON, string][]|null; //FIXME
+  function assetPatches(path: string):[JSON, string][]|null; //FIXME
 
   /**
    * Only available in OpenStarbound
@@ -106,7 +105,7 @@ declare module root {
    * @param withMetadata 
    * @returns Returns an array of all the source assetPaths used by Assets in load order. If requested withMetadata, returns an object indexed with assetPaths.
    */
-  function assetSourcePaths(engine: LuaEngine, withMetadata?: boolean): string[]|{[assetPath: string]: JSON};
+  function assetSourcePaths(withMetadata?: boolean): string[]|{[assetPath: string]: JSON};
 
 
   /**

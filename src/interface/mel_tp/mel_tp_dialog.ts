@@ -24,6 +24,7 @@ declare interface tpItem {
   data: {target:string}
 }
 declare interface hazardItem extends metagui.Image {}
+declare const lblVersion:metagui.Label;
 
 import mel_tp_util from "./mel_tp_util";
 
@@ -44,7 +45,8 @@ const mel_tp:{
   configOverride?: TeleportConfig,
   selected: Destination|undefined,
   animation: string,
-  dialogConfig: TpDialogConfig
+  dialogConfig: TpDialogConfig,
+  version: string
 } = {
   paneIcon: "/interface/warping/icon.png", //default values
   paneTitle: "Teleporter",
@@ -56,7 +58,8 @@ const mel_tp:{
   configOverride: undefined,
   selected: undefined,
   animation: "default",
-  dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig
+  dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig,
+  version: "SparkTpTec v: unknown"
 };
 const inactiveColor = "ff0000"; //red
 
@@ -116,6 +119,18 @@ function main(this:void):void {
     mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
   }
   populateBookmarks()
+
+  //OpenStarbound guard
+  if(root.assetSourcePaths !== null) {
+    const assetsWithMetadata = root.assetSourcePaths(true) as {[assetName:string]: any}
+    for(const modPath in assetsWithMetadata) {
+      const modName = "sb.Teleport";
+      if(assetsWithMetadata[modPath].name === modName) {
+        mel_tp.version = "SparkTpTec v: " + assetsWithMetadata[modPath].version;
+      }
+    }
+  }
+  lblVersion.setText(mel_tp.version);
 }
 
 function populateBookmarks() {
