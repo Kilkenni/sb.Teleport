@@ -10,13 +10,13 @@ declare module script {
    * Sets the script's update delta.
    * @param dt Delta-tick. 60 dt = 1 second. 0 dt stops auto-update of the script (callbacks, hooks etc still work)
    */
-  function setUpdateDelta(dt:number):void; //dt is unsigned int
+  function setUpdateDelta(dt:number):void; //dt is float
 
   /**
    * Returns the script's update delta.
    * @returns Update delta-tick. 60 dt = 1 second. 0 dt means no auto-update.
    */
-  function updateDt():number; //unsigned, actually
+  function updateDt():number;
 
 
 

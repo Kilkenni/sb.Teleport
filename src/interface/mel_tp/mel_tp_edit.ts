@@ -2,7 +2,6 @@
 
 //declare for interface
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
-declare const promises: any;
 
 // import * as mel_tp_util from "./mel_tp_util";
 
@@ -16,7 +15,39 @@ const mel_tp_edit:{
     icon: "/interface/bookmarks/icons/default.png"
   }
 }
+const _ASYNC: {
+  promises: {[key: string]: {promise: RpcPromise<any>, callback: Function}|undefined},
+  length: number,
+  add: Function,
+  update: Function,
+} = {
+  promises: {},
+  length: 0,
+  add: function(promise: RpcPromise<any>, callback: Function) {
+    _ASYNC.promises[_ASYNC.length.toString()] = ({promise, callback});
+    _ASYNC.length = _ASYNC.length +1;
+  },
+  update: function() {
+    for(const index in _ASYNC.promises) {
+      const prom = _ASYNC.promises[index];
+      if(prom != undefined) {
+        // sb.logWarn(sb.print([prom.promise.finished(), prom.promise.succeeded(), prom.promise.error(), prom.promise.result]))
+        // sb.logWarn(sb.print(prom.promise as unknown as LuaValue))
+        if(prom !== undefined && prom.promise.succeeded() === true) {
+          prom.callback(prom.promise.result());
+          _ASYNC.promises[index] = undefined;
+        }
+      }     
+    }
+  }
+}
 main();
+
+
+
+function update(dt) {
+  _ASYNC.update();
+}
 
 function main():void {
   let mel_tp: {
@@ -67,24 +98,20 @@ btnEditCancel.onClick = function() {
 }
 
 btnEditDelete.onClick = function() {
-  // const modgun = someItem
-	// const dialogWindow = Ra_DialogLib.fillPlaceholdersInDialogWindow("/interface/confirmation/reassemblerconfirm.config:gun_reset", modgun)
   const dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
-
-  
-	promises.add(player.confirm(dialogWindow), function(choice:boolean) {
+	_ASYNC.add(player.confirm(dialogWindow), function(choice:boolean) {
 		if(choice === true) {
-			sb.logWarn("[HELP] CONFIRMATION: YES")
-			// world.sendEntityMessage(pane.containerEntityId(), "resetGun")
-			widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
+			// sb.logWarn("[HELP] CONFIRMATION: YES")
+			pane.playSound("/sfx/projectiles/electric_barrier_shock_kill.ogg");
+      player.removeTeleportBookmark(mel_tp_edit.bookmarkState);
+      pane.dismiss();
+			// widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
     }
 		else {
-			sb.logWarn("[HELP] CONFIRMATION: NO")
+			// sb.logWarn("[HELP] CONFIRMATION: NO")
+      return;
     }
 	})
-	widget.playSound("/sfx/interface/ship_confirm1.ogg")
-  sb.logWarn("Trying to delete bookmark...")
-  sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)));
 }
 
 btnEditSave.onClick = function() {
@@ -93,7 +120,7 @@ btnEditSave.onClick = function() {
     setError(">Bookmark needs a name!");
   }
 
-  //TODO
+  //TODO 
 
   /*
     if (!m_isNew)
@@ -175,11 +202,6 @@ void EditBookmarkDialog::ok() {
   if (!m_isNew)
     m_playerUniverseMap->removeTeleportBookmark(m_bookmark);
   m_playerUniverseMap->addTeleportBookmark(m_bookmark);
-  dismiss();
-}
-
-void EditBookmarkDialog::remove() {
-  m_playerUniverseMap->removeTeleportBookmark(m_bookmark);
   dismiss();
 }
 

@@ -10,6 +10,26 @@ local mel_tp_edit = {
   }
 }
 
+_ASYNC = {
+  promises = {},
+  length = 0,
+  add = function(promise, callback)
+    _ASYNC.promises[tostring(_ASYNC.length)] = {promise = promise, callback = callback}
+    _ASYNC.length = _ASYNC.length + 1
+  end,
+  update = function()
+    for index in pairs(_ASYNC.promises) do
+      local prom = _ASYNC.promises[index]
+      if prom ~= nil then
+        if prom ~= nil and prom.promise:succeeded() == true then
+            prom.callback(prom.promise:result())
+            _ASYNC.promises[index] = nil
+        end
+      end
+    end
+  end
+}
+
 local function setError(error)
   lblConsole:setText(error)
 end
@@ -28,28 +48,32 @@ end
 
 function btnEditDelete:onClick()
   local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
-  promises:add(
+  _ASYNC.add(
     player.confirm(dialogWindow),
     function(choice)
       if choice == true then
-        sb.logWarn("[HELP] CONFIRMATION: YES")
-        widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
+        pane.playSound("/sfx/projectiles/electric_barrier_shock_kill.ogg")
+        player.removeTeleportBookmark(mel_tp_edit.bookmarkState)
+        pane.dismiss()
       else
-        sb.logWarn("[HELP] CONFIRMATION: NO")
+        return
       end
     end
   )
-  -- sb.logWarn("Trying to delete bookmark...")
-  -- sb.logWarn(sb.print(player.removeTeleportBookmark(mel_tp_edit.bookmarkState)))
 end
 
 function btnEditSave:onClick()
   if mel_tp_edit.bookmarkState.bookmarkName == "" then
     widget.playSound("/sfx/interface/clickon_error.ogg")
-    setError("> ^red;Bookmark needs a name!^white;")
+    setError("> ^red;Bookmark needs a name!^reset;")
   end
   -- widget.playSound("/sfx/interface/clickon_error.ogg")
   -- pane.dismiss()
+end
+
+---@diagnostic disable-next-line: lowercase-global
+function update(dt)
+  _ASYNC.update()
 end
 
 local function main()
@@ -67,7 +91,7 @@ local function main()
       return
   end
 
-  
+
   mel_tp_edit.bookmarkState.icon = mel_tp.selected.icon
   mel_tp_edit.bookmarkState.targetName = mel_tp.selected.planetName
   mel_tp_edit.bookmarkState.bookmarkName = mel_tp.selected.name

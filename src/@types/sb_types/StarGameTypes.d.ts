@@ -22,14 +22,14 @@ declare type EntityId = number & { __brand: "int32_t" };
 
 declare interface RpcPromise<T> {
   /**Is it resolved? */
-  finished(this:void):boolean,
+  finished():boolean,
   /**is it successful? */
-  succeeded(this:void):boolean,
+  succeeded():boolean,
   /** @returns result of resolved promise */
-  result(this:void):T,
+  result():T,
   /**@returns Error string or nil. Internal radio messages (eg. sendRadioMessage) always return an error, even if they executed properly */
-  error(this:void):string|null
-} //FIXME better description
+  error():string|null
+} //REQUIRES self, do not add void in args!
 
 //Lua-specific wrappers
 declare type LuaFunction = Function
