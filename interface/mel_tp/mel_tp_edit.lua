@@ -1,8 +1,15 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 ---@diagnostic disable: undefined-global
+require("/interface/mel_tp/mel_tp_util.lua")
 
 local mel_tp_edit = {
   bookmarkState = {
+    target = "Nowhere", 
+    targetName = "nowherish", 
+    bookmarkName = "Nowhere in particular", 
+    icon = "/interface/bookmarks/icons/default.png"
+  },
+  original = {
     target = "Nowhere", 
     targetName = "nowherish", 
     bookmarkName = "Nowhere in particular", 
@@ -35,10 +42,12 @@ local function setError(error)
 end
 
 function bkmName:onTextChanged()
+  setError("> ")
   mel_tp_edit.bookmarkState.bookmarkName = bkmName.text
   setError(sb.printJson(mel_tp_edit.bookmarkState))
   if mel_tp_edit.bookmarkState.bookmarkName == "" then
-      setError(">Bookmark needs a name!")
+    setError("> ^red;Bookmark needs a name!^reset;")
+    return
   end
 end
 
@@ -47,6 +56,8 @@ function btnEditCancel:onClick()
 end
 
 function btnEditDelete:onClick()
+  sb.logWarn(mel_tp_edit.bookmarkState.icon)
+  sb.logWarn(mel_tp_edit.original.icon)
   local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
   _ASYNC.add(
     player.confirm(dialogWindow),
@@ -67,8 +78,15 @@ function btnEditSave:onClick()
     widget.playSound("/sfx/interface/clickon_error.ogg")
     setError("> ^red;Bookmark needs a name!^reset;")
   end
-  -- widget.playSound("/sfx/interface/clickon_error.ogg")
-  -- pane.dismiss()
+  if sb.printJson(mel_tp_edit.bookmarkState) == sb.printJson(mel_tp_edit.original) then
+    setError("> No changes detected")
+    return
+  else
+    player.removeTeleportBookmark(mel_tp_edit.original)
+    pane.playSound("/sfx/interface/ship_confirm1.ogg")
+  end
+  player.addTeleportBookmark(mel_tp_edit.bookmarkState)
+  pane.dismiss()
 end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -96,7 +114,11 @@ local function main()
   mel_tp_edit.bookmarkState.targetName = mel_tp.selected.planetName
   mel_tp_edit.bookmarkState.bookmarkName = mel_tp.selected.name
   mel_tp_edit.bookmarkState.target = mel_tp.selected.warpAction
-  bkmIcon:setFile(mel_tp_edit.bookmarkState.icon)
+  mel_tp_edit.original.icon = mel_tp.selected.icon
+  mel_tp_edit.original.targetName = mel_tp.selected.planetName
+  mel_tp_edit.original.bookmarkName = mel_tp.selected.name
+  mel_tp_edit.original.target = mel_tp.selected.warpAction
+  bkmIcon:setFile(mel_tp_util.getIconFullPath(mel_tp_edit.bookmarkState.icon))
   bkmName:setText(mel_tp_edit.bookmarkState.bookmarkName)
   bkmPlanet:setText(mel_tp_edit.bookmarkState.targetName)
   lblInfo:setText(sb.printJson(mel_tp_edit.bookmarkState.target))

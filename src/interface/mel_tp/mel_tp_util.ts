@@ -195,6 +195,10 @@ function TableContains(luaTable:any[], element:any) {
   return false;
 }
 
+function getIconFullPath(iconName: string):string {
+  return `/interface/bookmarks/icons/${iconName}.png`;
+}
+
 /**
  * Dialog windows (panes) in SB are akin to template strings in JS. What JS calls placeholders, SB calls "tags". in the text of a window, those are surrounded by unescaped \<angle brackets\>.
  * @param dialogConfigPath path to vanilla (sic!) dialog pane config (for example, confirmation dialog)
@@ -233,7 +237,8 @@ const mel_tp_util =  {
   TargetToWarpCommand,
   FilterBookmarks,
   TableContains,
-  fillPlaceholdersInPane
+  fillPlaceholdersInPane,
+  getIconFullPath
 }
 
 export default mel_tp_util;

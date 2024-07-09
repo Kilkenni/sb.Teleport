@@ -203,10 +203,6 @@ local function populateBookmarks()
       end
       
       local currentBookmark = mel_tp.bookmarkTemplate
-      local iconPath = ""
-      if destination.icon ~= nil then
-          iconPath = ("/interface/bookmarks/icons/" .. destination.icon) .. ".png"
-      end
 
       --Special: for mission teleports when in a party
       if destination.mission == true and type(destination.warpAction) ~= "string" then
@@ -234,13 +230,13 @@ local function populateBookmarks()
         warpAction = destination.warpAction,
         name = destination.name or "???",
         planetName = destination.planetName or "",
-        icon = iconPath,
+        icon = destination.icon,
         deploy = destination.deploy or false,
         mission = destination.mission or false,
         prerequisiteQuest = destination.prerequisiteQuest or false
       }
 
-      currentBookmark.children[1].file = bkmData.icon
+      currentBookmark.children[1].file = mel_tp_util.getIconFullPath(bkmData.icon)
       currentBookmark.children[2].text = bkmData.name
       currentBookmark.children[3].text = bkmData.planetName
       local addedBookmark = bookmarksList:addChild(currentBookmark)
@@ -261,16 +257,12 @@ local function populateBookmarks()
     if filteredBookmarks ~= nil then
       for index, bookmark in ipairs(filteredBookmarks) do
         local currentBookmark = mel_tp.bookmarkTemplate
-        local iconPath = ""
-        if bookmark.icon ~= nil then
-          iconPath = ("/interface/bookmarks/icons/" .. bookmark.icon) .. ".png"
-        end
         local bkmData = {
             --system = false --for special locations like ship etc
             warpAction = bookmark.target,
             name = bookmark.bookmarkName or "???",
             planetName = bookmark.targetName or "",
-            icon = iconPath,
+            icon = bookmark.icon,
             deploy = false
         }
     
@@ -283,7 +275,7 @@ local function populateBookmarks()
         -- }
 
     
-        currentBookmark.children[1].file = bkmData.icon
+        currentBookmark.children[1].file = mel_tp_util.getIconFullPath(bkmData.icon)
         currentBookmark.children[2].text = bkmData.name
         currentBookmark.children[3].text = bkmData.planetName
         -- currentBookmark.bkmData = bkmData

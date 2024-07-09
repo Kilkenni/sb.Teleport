@@ -3,9 +3,10 @@
 //declare for interface
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
 
-// import * as mel_tp_util from "./mel_tp_util";
+import mel_tp_util from "./mel_tp_util";
 
 const mel_tp_edit:{
+  original: TeleportBookmark,
   bookmarkState:TeleportBookmark,
 } = {
   bookmarkState: {
@@ -13,7 +14,13 @@ const mel_tp_edit:{
     targetName: "nowherish", //planetName
     bookmarkName: "Nowhere in particular",
     icon: "/interface/bookmarks/icons/default.png"
-  }
+  },
+  original: {
+    target: "Nowhere" as unknown as BookmarkTarget,
+    targetName: "nowherish", //planetName
+    bookmarkName: "Nowhere in particular",
+    icon: "/interface/bookmarks/icons/default.png"
+  },
 }
 const _ASYNC: {
   promises: {[key: string]: {promise: RpcPromise<any>, callback: Function}|undefined},
@@ -43,9 +50,11 @@ const _ASYNC: {
 }
 main();
 
-
-
-function update(dt) {
+/**
+ * Automatic function that gets called with dt interval by C++
+ * @param dt Frequency of refreshing, in delta tick. 1 dt = 1/60 of a second
+ */
+function update(dt: number) {
   _ASYNC.update();
 }
 
@@ -71,21 +80,29 @@ function main():void {
       return;
     }
     
-    mel_tp_edit.bookmarkState.icon =  mel_tp.selected.icon;
+    mel_tp_edit.bookmarkState.icon = mel_tp.selected.icon;
     mel_tp_edit.bookmarkState.targetName = mel_tp.selected.planetName;
     mel_tp_edit.bookmarkState.bookmarkName = mel_tp.selected.name;
     mel_tp_edit.bookmarkState.target = mel_tp.selected.warpAction as BookmarkTarget;
+    mel_tp_edit.original = {
+      icon: mel_tp.selected.icon,
+      targetName: mel_tp.selected.planetName,
+      bookmarkName:mel_tp.selected.name,
+      target: mel_tp.selected.warpAction as BookmarkTarget
+    }
     //INIT
-    bkmIcon.setFile(mel_tp_edit.bookmarkState.icon);
+    bkmIcon.setFile( mel_tp_util.getIconFullPath(mel_tp_edit.bookmarkState.icon));
     bkmName.setText(mel_tp_edit.bookmarkState.bookmarkName);
     bkmPlanet.setText(mel_tp_edit.bookmarkState.targetName);
     lblInfo.setText(sb.printJson(mel_tp_edit.bookmarkState.target as unknown as JSON));
 }
 
 bkmName.onTextChanged = function() {
+  setError("> ");
   mel_tp_edit.bookmarkState.bookmarkName = bkmName.text;
   if(mel_tp_edit.bookmarkState.bookmarkName === "") {
-    setError("> Bookmark needs a name!");
+    setError("> ^red;Bookmark needs a name!^reset;");
+    return;
   }
 }
 
@@ -117,21 +134,23 @@ btnEditDelete.onClick = function() {
 btnEditSave.onClick = function() {
   if(mel_tp_edit.bookmarkState.bookmarkName === "") {
     widget.playSound("/sfx/interface/clickon_error.ogg");
-    setError(">Bookmark needs a name!");
+    setError("> ^red;Bookmark needs a name!^reset;");
+    return;
   }
-
-  //TODO 
-
-  /*
-    if (!m_isNew)
-      m_playerUniverseMap->removeTeleportBookmark(m_bookmark);
-    m_playerUniverseMap->addTeleportBookmark(m_bookmark);
-  */
-  //player.removeTeleportBookmark();
   
-
-  // widget.playSound("/sfx/interface/clickon_error.ogg");
-  // pane.dismiss()
+  if(sb.printJson(mel_tp_edit.bookmarkState as unknown as JSON) === sb.printJson(mel_tp_edit.original as unknown as JSON)) {
+    //bookmark is not changed, doing nothing
+    setError("> No changes detected");
+    return;
+  }
+  else {
+    //Bookmark changed, needs saving
+    player.removeTeleportBookmark(mel_tp_edit.original);
+    pane.playSound("/sfx/interface/ship_confirm1.ogg");
+  }
+  player.addTeleportBookmark(mel_tp_edit.bookmarkState);
+  pane.dismiss();
+  return;
 }
 
 

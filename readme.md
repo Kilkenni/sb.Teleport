@@ -10,7 +10,7 @@ Planned features will probably be available in Issues. Soon :tm: Suggestions are
 
 Download as a folder and drop to `StarboundLocation/mods`. If you don't need access to source,`/src` folder can be safely removed.
 
-Currently in alpha phase. Backup your character before installing!
+Currently in alpha phase. Especially editing bookmarks. Backup your character before installing!
 
 ## Usage
 
@@ -32,9 +32,8 @@ The script tries its best to skip all irrelevant destinations, if present in `te
 
 ## Known Issues
 
-- No edit and deletion available in the new window (yet)
 - Tooltips on hazard icons in planet info don't show
-- Celestial Database client cache in vanilla Sb is unstable. Possibly fixed in OpenSb, **needs verification**. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes.
+- Celestial Database client cache in vanilla Sb is unstable. Symptom: when a bookmark is selected, planetary info shows `Celestial Database Error`. A workaround is to click other bookmarks until the cache refreshes. *Fixed in OpenSb*.
 
 - Possibly cannot warp down if a player is **not** on their own ship (example: on another shup also orbiting a planet). **Needs verification**
 - Cannot warp to party members via this dialog. Seems to be a limitation of vanilla Lua callbacks.

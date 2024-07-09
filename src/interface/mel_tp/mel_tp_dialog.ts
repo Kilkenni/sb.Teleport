@@ -211,10 +211,6 @@ function populateBookmarks() {
 
       //Add destination from config to TP targets
       const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-      let iconPath = "";
-      if(destination.icon !== undefined) {
-        iconPath =`/interface/bookmarks/icons/${destination.icon}.png`;
-      }
 
       if (destination.mission === true && typeof destination.warpAction !== "string") {
         // if the warpAction is for an instance world, set the uuid to the team uuid -- or so the source code claims
@@ -281,13 +277,13 @@ function populateBookmarks() {
         warpAction: destination.warpAction, //warp coords or command
         name: destination.name || "???", //default: ???
         planetName: destination.planetName || "", //default: empty string
-        icon: iconPath, //default: no icon
+        icon: destination.icon,
         deploy: destination.deploy || false, //Deploy mech. Default: false
         mission: destination.mission || false, //Default: false
         prerequisiteQuest: destination.prerequisiteQuest || false, //if the player has not completed the quest, destination is not available
       };
       
-      currentBookmark.children[0].file = bkmData.icon;
+      currentBookmark.children[0].file = mel_tp_util.getIconFullPath(bkmData.icon);
       currentBookmark.children[1].text = bkmData.name;
       currentBookmark.children[2].text = bkmData.planetName;
       const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
@@ -308,17 +304,13 @@ function populateBookmarks() {
     if(filteredBookmarks !== undefined) {
       for(const bookmark of filteredBookmarks) {
         const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-        let iconPath = "";
-        if(bookmark.icon !== undefined) {
-          iconPath = `/interface/bookmarks/icons/${bookmark.icon}.png`;
-        }
     
         const bkmData: Destination = {
           //system = false //for special locations like ship etc
           warpAction: bookmark.target as BookmarkTarget, //warp coords or command
           name: bookmark.bookmarkName || "???", //default: ???
           planetName: bookmark.targetName || "", //default: empty string
-          icon: iconPath, //default: no icon
+          icon: bookmark.icon,
           deploy: false, //Deploy mech. Default: false
           // mission: false, //Default: false
           // prerequisiteQuest: false, //if the player has not completed the quest, destination is not available
@@ -333,7 +325,7 @@ function populateBookmarks() {
           "data": {"target": null}
         }
         */
-        currentBookmark.children[0].file = bkmData.icon;
+        currentBookmark.children[0].file = mel_tp_util.getIconFullPath(bkmData.icon);
         currentBookmark.children[1].text = bkmData.name;
         currentBookmark.children[2].text = bkmData.planetName;
       
