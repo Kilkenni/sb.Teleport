@@ -2,9 +2,21 @@
 
 Spark Industries used some minor sorcery to reimagine Teleportation UI.
 
+![UI preview](./preview.png)
+
 Works almost entirely on vanilla Lua callbacks (and occasionally hazelnut chocolate), but can get additional minor bonuses from OpenSb or StarExtensions callbacks.
 
 Planned features will probably be available in Issues. Soon :tm: Suggestions are welcome but no promises.
+
+## Flavor
+
+Everything is achieveable through technology. Better living, robust health and - for the first time in our history - the possibility of a better teleportation. Hello and welcome to Spark Indistries. What you'll need for spacefaring is right here.
+
+Project sb.Teleport, courtesy of SI, was created as a response to the tender published by the Terrene Protectorate. Its goal was to create a convenient, functional and simple UI system paired with their newly implemented Ship-based Artificial Intelligence Latice. Eventually another finalist had been chosen, one the Terrene Protectorate dubbed more... "agreeable".
+
+We at SI, however, never lost hope. While the Protectorate's eventual demise was tragic and untimely, not in the least due to billing and development plans put on indefinite hold, it also offered an opportunity to get access to Ship Lattices circumventing usual Protectorate bureaucracy. We finally got a chance to see our ideas in practice. Please, keep in mind that new technology involves risks, so remember to backup your important data before upgrading, and report any issues with the system to our engineers. A happy customer is a healthy customer with their limbs still attached. Be safe and travel with a flash!
+
+Thank you for choosing Spark Industries.
 
 ## Installation
 
@@ -22,14 +34,14 @@ Features:
 - You can deploy mech anywhere you can teleport
 - Filtering! Filter can be set via corresponding textbox. `Enter` while in the textbox applies the filter (only bookmarks that have `filter` in their text fields are visible). Search is case-insensitive. Standard destinations (like `Warp down`) are not affected. `Esc` while in the textbox or `Reset` button resets the filter
 - Previewing hazards. If a bookmark is selected, info panel tries to list permanent environmental hazards at destionation. Don't forget to equip your EPP!
-- Now with editing and deletion. Editing supports longer names (but be careful). Deletion asks for confirmation as it always should have.
+- Now with editing and deletion. Editing supports longer names than stock UI (but be careful). Deletion asks for confirmation. Polite.
 
 The script tries its best to skip all irrelevant destinations, if present in `teleport.config`. Examples:
 
 - When on the player ship, `Warp to ship` is disabled
-- When in space, warp option without the mech is disabled (you can still try to warp regardless, but I'm not paying your hospital bills)
+- When in space, warp option without the mech is disabled (you can still try to warp regardless, but you agree to indemnify and hold Spark Industries harmless of paying any possible medical bills)
 - Quest-related destinations are disabled until unlocked
-- If a player has no mech (yet), `Deploy` button will be red and deactivated.
+- If a player has no mech (yet), `Deploy` button will be deactivated.
 
 ## Known Issues
 

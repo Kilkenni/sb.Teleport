@@ -52,7 +52,8 @@
       { 
         "type" : "button", 
         "caption" : "Sort by planet", 
-        "id": "btnSortByPlanet"
+        "id": "btnSortByPlanet",
+        "visible": false
       },
       {"type": "spacer", "size": 8, "expandMode": [0, 0]},
       { 
