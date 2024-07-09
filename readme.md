@@ -22,6 +22,7 @@ Features:
 - You can deploy mech anywhere you can teleport
 - Filtering! Filter can be set via corresponding textbox. `Enter` while in the textbox applies the filter (only bookmarks that have `filter` in their text fields are visible). Search is case-insensitive. Standard destinations (like `Warp down`) are not affected. `Esc` while in the textbox or `Reset` button resets the filter
 - Previewing hazards. If a bookmark is selected, info panel tries to list permanent environmental hazards at destionation. Don't forget to equip your EPP!
+- Now with editing and deletion. Editing supports longer names (but be careful). Deletion asks for confirmation as it always should have.
 
 The script tries its best to skip all irrelevant destinations, if present in `teleport.config`. Examples:
 
