@@ -8,14 +8,15 @@ local mel_tp_edit = {
     target = "Nowhere", 
     targetName = "nowherish", 
     bookmarkName = "Nowhere in particular", 
-    icon = "/interface/bookmarks/icons/default.png"
+    icon = "/interface/bookmarks/icons/default.png",
   },
   original = {
     target = "Nowhere", 
     targetName = "nowherish", 
     bookmarkName = "Nowhere in particular", 
     icon = "/interface/bookmarks/icons/default.png"
-  }
+  },
+  locale = nil
 }
 
 local function setError(error)
@@ -37,9 +38,8 @@ function btnEditCancel:onClick()
 end
 
 function btnEditDelete:onClick()
-  sb.logWarn(mel_tp_edit.bookmarkState.icon)
-  sb.logWarn(mel_tp_edit.original.icon)
-  local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
+---@diagnostic disable-next-line: undefined-field
+  local dialogWindow = mel_tp_util.fillPlaceholdersInPane("/interface/mel_tp/mel_tp_confirm.config:bookmark_delete", mel_tp_edit.locale.mel_tp_confirm)
   promises:add(
     player.confirm(dialogWindow),
     function(choice)
@@ -84,6 +84,7 @@ local function main()
   end
 
   mel_tp = metagui.inputData.mel_tp
+  mel_tp_edit.locale = metagui.inputData.localeData
 
   if mel_tp.selected == nil or mel_tp.bookmarks == nil then
       pane.dismiss()

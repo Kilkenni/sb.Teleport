@@ -12,7 +12,7 @@ interface Tab {
 }
 
 declare module metagui {
-  const inputData: {[key: string]: unknown}|undefined;
+  const inputData: {[key: string]: string|unknown}|undefined;
 
   interface widget {
     type: string; //As you'd expect, the type of widget. Case sensitive; generally in camelCase.

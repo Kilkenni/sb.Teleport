@@ -596,7 +596,7 @@ btnEdit.onClick = function() {
     return;
   }
 
-  player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {mel_tp: mel_tp}} as unknown as JSON);
+  player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {mel_tp: mel_tp, localeData: mel_tp.dialogConfig.mel_tp_edit}} as unknown as JSON);
 }
 
 btnTeleport.onClick = function() {

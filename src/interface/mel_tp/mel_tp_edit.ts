@@ -10,6 +10,7 @@ import promises from "../../scripts/messageutil.lua";
 const mel_tp_edit:{
   original: TeleportBookmark,
   bookmarkState:TeleportBookmark,
+  locale
 } = {
   bookmarkState: {
     target: "Nowhere" as unknown as BookmarkTarget,
@@ -23,6 +24,7 @@ const mel_tp_edit:{
     bookmarkName: "Nowhere in particular",
     icon: "/interface/bookmarks/icons/default.png"
   },
+  locale: undefined
 }
 
 main();
@@ -50,6 +52,8 @@ function main():void {
       bookmarks: TeleportBookmark[]|undefined,
       selected: Destination|undefined,
     }
+
+    mel_tp_edit.locale = metagui.inputData.localeData;
     
     //some bookmark should be selected fo edit to work
     if(mel_tp.selected === undefined || mel_tp.bookmarks === undefined) {
@@ -92,7 +96,7 @@ btnEditCancel.onClick = function() {
 }
 
 btnEditDelete.onClick = function() {
-  const dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
+  const dialogWindow = mel_tp_util.fillPlaceholdersInPane("/interface/mel_tp/mel_tp_confirm.config:bookmark_delete", mel_tp_edit.locale.mel_tp_confirm)
 	promises.add(player.confirm(dialogWindow), function(choice:boolean) {
 		if(choice === true) {
 			// sb.logWarn("[HELP] CONFIRMATION: YES")
