@@ -1,6 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 ---@diagnostic disable: undefined-global
 require("/interface/mel_tp/mel_tp_util.lua")
+require("/scripts/messageutil.lua")
 
 local mel_tp_edit = {
   bookmarkState = {
@@ -15,26 +16,6 @@ local mel_tp_edit = {
     bookmarkName = "Nowhere in particular", 
     icon = "/interface/bookmarks/icons/default.png"
   }
-}
-
-_ASYNC = {
-  promises = {},
-  length = 0,
-  add = function(promise, callback)
-    _ASYNC.promises[tostring(_ASYNC.length)] = {promise = promise, callback = callback}
-    _ASYNC.length = _ASYNC.length + 1
-  end,
-  update = function()
-    for index in pairs(_ASYNC.promises) do
-      local prom = _ASYNC.promises[index]
-      if prom ~= nil then
-        if prom ~= nil and prom.promise:succeeded() == true then
-            prom.callback(prom.promise:result())
-            _ASYNC.promises[index] = nil
-        end
-      end
-    end
-  end
 }
 
 local function setError(error)
@@ -59,7 +40,7 @@ function btnEditDelete:onClick()
   sb.logWarn(mel_tp_edit.bookmarkState.icon)
   sb.logWarn(mel_tp_edit.original.icon)
   local dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
-  _ASYNC.add(
+  promises:add(
     player.confirm(dialogWindow),
     function(choice)
       if choice == true then
@@ -91,7 +72,7 @@ end
 
 ---@diagnostic disable-next-line: lowercase-global
 function update(dt)
-  _ASYNC.update()
+  promises:update()
 end
 
 local function main()

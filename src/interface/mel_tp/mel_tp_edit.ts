@@ -4,6 +4,8 @@
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
 
 import mel_tp_util from "./mel_tp_util";
+import "../../scripts/messageutil.lua"
+import promises from "../../scripts/messageutil.lua";
 
 const mel_tp_edit:{
   original: TeleportBookmark,
@@ -22,32 +24,7 @@ const mel_tp_edit:{
     icon: "/interface/bookmarks/icons/default.png"
   },
 }
-const _ASYNC: {
-  promises: {[key: string]: {promise: RpcPromise<any>, callback: Function}|undefined},
-  length: number,
-  add: Function,
-  update: Function,
-} = {
-  promises: {},
-  length: 0,
-  add: function(promise: RpcPromise<any>, callback: Function) {
-    _ASYNC.promises[_ASYNC.length.toString()] = ({promise, callback});
-    _ASYNC.length = _ASYNC.length +1;
-  },
-  update: function() {
-    for(const index in _ASYNC.promises) {
-      const prom = _ASYNC.promises[index];
-      if(prom != undefined) {
-        // sb.logWarn(sb.print([prom.promise.finished(), prom.promise.succeeded(), prom.promise.error(), prom.promise.result]))
-        // sb.logWarn(sb.print(prom.promise as unknown as LuaValue))
-        if(prom !== undefined && prom.promise.succeeded() === true) {
-          prom.callback(prom.promise.result());
-          _ASYNC.promises[index] = undefined;
-        }
-      }     
-    }
-  }
-}
+
 main();
 
 /**
@@ -55,7 +32,7 @@ main();
  * @param dt Frequency of refreshing, in delta tick. 1 dt = 1/60 of a second
  */
 function update(dt: number) {
-  _ASYNC.update();
+  promises.update();
 }
 
 function main():void {
@@ -116,7 +93,7 @@ btnEditCancel.onClick = function() {
 
 btnEditDelete.onClick = function() {
   const dialogWindow = "/interface/mel_tp/mel_tp_confirm.config:bookmark_delete"
-	_ASYNC.add(player.confirm(dialogWindow), function(choice:boolean) {
+	promises.add(player.confirm(dialogWindow), function(choice:boolean) {
 		if(choice === true) {
 			// sb.logWarn("[HELP] CONFIRMATION: YES")
 			pane.playSound("/sfx/projectiles/electric_barrier_shock_kill.ogg");
