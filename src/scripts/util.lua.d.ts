@@ -753,13 +753,13 @@ declare function contains(table: any[], value1: any):number|false;
 declare function construct(table: any[], ...args):void;
 
 //FIXME
-declare function path(table: any[], ...args):nil|unknown;
+declare function path(table: any[], ...args):unknown|null;
 
 //FIXME
 declare function jsonPath(table: any[], pathString: string):unknown;
 
 //FIXME
-declare function setPath(t, ...):void;
+declare function setPath(t, ...args):void;
 
 //FIXME
 declare function jsonSetPath(t, pathString, value):void
@@ -785,7 +785,7 @@ declare function isEmpty(tbl: any[]|{[key: string]: any}):boolean;
 declare function xor(a,b):boolean;
 
 //FIXME
-declare function bind(func: Function, ...):unknown;
+declare function bind(func: Function, ...args):unknown;
 
 /*
 // The very most basic state machine
@@ -821,21 +821,21 @@ end
 
 // Very basic and probably not that reliable profiler
 declare class Profiler {
-totals: {[key: string]: number};
-timers: {[key: string]: number}; //each timer value is a timestamp of when a timer started
-ticks: number; //Default: 0
+  totals: {[key: string]: number};
+  timers: {[key: string]: number}; //each timer value is a timestamp of when a timer started
+  ticks: number; //Default: 0
 
-new():InstanceType<Profiler>;
-//adds timestamp with a <key> name
-start(key: string):void;
-//records run time for <key> in totals and stops that timer
-stop(key: string):void;
-//simply increases ticks by 1
-tick():void;
-/**
- * Dumps recorded data in Sb console in the format of [key]: seconds
- */
-dump():void;
+  new():Profiler;
+  //adds timestamp with a <key> name
+  start(key: string):void;
+  //records run time for <key> in totals and stops that timer
+  stop(key: string):void;
+  //simply increases ticks by 1
+  tick():void;
+  /**
+   * Dumps recorded data in Sb console in the format of [key]: seconds
+   */
+  dump():void;
 }
 
 /*
