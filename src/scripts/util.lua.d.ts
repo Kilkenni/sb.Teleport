@@ -820,12 +820,14 @@ end
 */
 
 // Very basic and probably not that reliable profiler
+/** @customConstructor Profiler.new */
 declare class Profiler {
   totals: {[key: string]: number};
   timers: {[key: string]: number}; //each timer value is a timestamp of when a timer started
   ticks: number; //Default: 0
 
-  new():Profiler;
+  constructor();
+  new();
   //adds timestamp with a <key> name
   start(key: string):void;
   //records run time for <key> in totals and stops that timer

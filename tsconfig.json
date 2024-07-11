@@ -20,7 +20,7 @@
     "tstlVerbose": true,
     "noImplicitGlobalVariables": true,
     "noImplicitSelf": true,
-    "noResolvePaths": ["./mel_tp_dialog.ui.js"],
+    "noResolvePaths": ["../../scripts/messageutil.lua"],
     "extension": ".lua-raw",
     "luaLibImport": "none"
     //"exclude": ["src/StarboundLua.ts", "src/sb_lua_callbacks/**/*", "src/sb_types/**/*"] 

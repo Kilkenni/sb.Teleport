@@ -280,7 +280,7 @@ mel_tp_util = {
   TargetToWarpCommand = TargetToWarpCommand,
   FilterBookmarks = FilterBookmarks,
   TableContains = TableContains,
-  illPlaceholdersInPane = fillPlaceholdersInPane,
+  fillPlaceholdersInPane = fillPlaceholdersInPane,
   getIconFullPath = getIconFullPath
 }
 return mel_tp_util
