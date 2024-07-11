@@ -14,7 +14,7 @@ interface Tab {
 declare module metagui {
   const inputData: {[key: string]: string|unknown}|undefined;
 
-  interface widget {
+  abstract class  widget {
     type: string; //As you'd expect, the type of widget. Case sensitive; generally in camelCase.
     id?: string; //Key of the widget's global reference; if omitted, none is created.
     position?: Vec2I; // Explicit position; ignored in automatic layouts. Top to bottom, left to right.
@@ -76,13 +76,13 @@ declare module metagui {
     scrollTo(this: void, pos: number, suppressAnimation?: boolean, raw?: boolean):void; //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
   }
 
-  interface TabField extends widget {
-    type: "tabField",
-    layout : "horizontal"|"vertical", // Which direction the tabs run. "horizontal" is a bar across the top, "vertical" is a sidebar down the left side.
-    tabWidth? : unsigned, // If using vertical layout, how wide the tabs are. (Horizontal tabs fit to contents.)
-    noFocusFirstTab? : boolean, // If true, prevents the first tab created from being automatically selected. Useful for cases where tab contents are loaded on first viewing, such as the settings panel. Default: false
-    tabs : Tab[], // An array of tabs, formatted as follows:
-    bottomBar : widget[], // Contents of an optional bar below the contents. Mostly useful for vertical tab layout.
+  abstract class TabField extends widget {
+    type: "tabField";
+    layout : "horizontal"|"vertical"; // Which direction the tabs run. "horizontal" is a bar across the top, "vertical" is a sidebar down the left side.
+    tabWidth? : unsigned; // If using vertical layout, how wide the tabs are. (Horizontal tabs fit to contents.)
+    noFocusFirstTab? : boolean; // If true, prevents the first tab created from being automatically selected. Useful for cases where tab contents are loaded on first viewing, such as the settings panel. Default: false
+    tabs : Tab[]; // An array of tabs, formatted as follows:
+    bottomBar : widget[]; // Contents of an optional bar below the contents. Mostly useful for vertical tab layout.
 
     newTab(this: void, parameters: Tab):Tab; //Creates a new tab. Parameters are as in the "tabs" attribute. Returns a tab object.
     select(this: void):void; //Switches to tab.
@@ -91,7 +91,7 @@ declare module metagui {
     setVisible(this: void, bool:boolean): void;
 
     //events
-    onTabChanged(tab, previous) //Called on changing tabs.
+    abstract onTabChanged(tab, previous) //Called on changing tabs.
   }
 
   /**
@@ -140,44 +140,44 @@ declare module metagui {
     bind(this: void, );
   }
 
-  interface Button extends widget {
-    type: "button",
-    caption? : string, // Text to draw on the button.
-    captionOffset? : Vec2I, // Pixel offset for caption.
-    color? : string, // Accent color. Rendering dependent on theme.
-    inline? : boolean, // If true, makes fixed-size.
-    expand? : boolean, // If true, gives (horizontal) expansion priority.
+  abstract class Button extends widget {
+    type: "button";
+    caption? : string; // Text to draw on the button.
+    captionOffset? : Vec2I; // Pixel offset for caption.
+    color? : string; // Accent color. Rendering dependent on theme.
+    inline? : boolean; // If true, makes fixed-size.
+    expand? : boolean; // If true, gives (horizontal) expansion priority.
 
     //Sets the button's caption.
     setText(this: void, label:string):void;
 
     //Called when button released after pressing (left click).
-    onClick() 
+    abstract onClick();
   }
 
   /**
    * A button that renders as a given icon. Extended from Button.
    */
-  interface IconButton extends widget {
-    type: "iconButton",
-    image: string, // The idle image to use. If suffixed with a colon (image.png:), file is treated as a sprite sheet with the frames "idle", "hover" and "press". Relative or absolute paths accepted. Default: "/assetmissing.png".
-    hoverImage: string,
-    pressImage: string,
+  abstract class IconButton extends widget {
+    type: "iconButton";
+    image: string; // The idle image to use. If suffixed with a colon (image.png:), file is treated as a sprite sheet with the frames "idle", "hover" and "press". Relative or absolute paths accepted. Default: "/assetmissing.png".
+    hoverImage: string;
+    pressImage: string;
 
     setImage(this: void, idle: string, hover: string, press: string):void; //Sets the button's icon drawables.
     setText(this: void, label:string):void; //TODD test if it works
 
     //Called when button released after pressing (left click).
-    onClick() 
+    abstract onClick() 
   }
 
   /**
    * A check box. Uses the same onClick event as the button types. Derived from Button.
    */
-  interface CheckBox extends widget {
-    checked? : boolean, // Default: false. Pre-checked if specified without value.
-    radioGroup? : string, // If specified, widget becomes a radio button grouped with others of its group.
-    value? : any, // Any data type. Used by radio buttons.
+  abstract class CheckBox extends widget {
+    checked? : boolean; // Default: false. Pre-checked if specified without value.
+    radioGroup? : string; // If specified, widget becomes a radio button grouped with others of its group.
+    value? : any; // Any data type. Used by radio buttons.
 
     setChecked(this: void, checked: boolean):void;
     getGroupChecked(this: void):CheckBox|null; //If widget is a radio button, returns the checked widget of its group.
@@ -186,20 +186,20 @@ declare module metagui {
     selectValue(this: void, val: any):CheckBox|null; //Same as above, but also sets the specified sibling checked.
 
     //events
-    onClick()
+    abstract onClick()
   }
   
 
   /**
    * A text entry field.
    */
-  interface TextBox extends widget {
-    type: "textBox",
-    text: string, //Default: "".
-    caption? : string, // Default: "". Text to display when unfocused and no text is entered.
-    color? : string, // Text color.
-    inline? : boolean, // Alias for an expandMode of [0, 0].
-    expand? : boolean, // Alias for an expandMode of [2, 0].
+  abstract class TextBox extends widget {
+    type: "textBox";
+    text: string; //Default: "".
+    caption? : string; // Default: "". Text to display when unfocused and no text is entered.
+    color? : string; // Text color.
+    inline? : boolean; // Alias for an expandMode of [0, 0].
+    expand? : boolean; // Alias for an expandMode of [2, 0].
 
     focus(this: void): void; //Grabs keyboard focus.
     blur(this: void): void;  //Releases focus.
@@ -211,48 +211,48 @@ declare module metagui {
     setScrollPosition(this: void, pos: number):void; //Sets how far the text field is scrolled, if contents overflow.
 
     //events
-    onTextChanged() //Called on any change to the entered text.
-    onEnter() //Called when unfocused by hitting enter.
-    onEscape() //Called when unfocused by hitting escape.
+    abstract onTextChanged() //Called on any change to the entered text.
+    abstract onEnter() //Called when unfocused by hitting enter.
+    abstract onEscape() //Called when unfocused by hitting escape.
   }
 
   /**
    * A list item; essentially a layout, selectable by mouse click. Deselects siblings when selected. 
    * Also available under type menuItem with behavior modified accordingly.
    */
-  interface ListItem extends widget {
-    type: "listItem",
-    buttonLike? : boolean, // Default: true. Flag for theme use; by default, indicates that the item should make a sound when clicked, e.g. a context menu item.
+  abstract class ListItem extends widget {
+    type: "listItem";
+    buttonLike? : boolean; // Default: true. Flag for theme use; by default, indicates that the item should make a sound when clicked, e.g. a context menu item.
     //Implicit for menuItems.
-    noAutoSelect? : boolean, // Default: true. When true, list item will not be automatically set as selected when clicked.
+    noAutoSelect? : boolean; // Default: true. When true, list item will not be automatically set as selected when clicked.
     // Implicit for menuItems.
-    selectionGroup? : string, // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
+    selectionGroup? : string; // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
 
     select(this: void):void;
     deselect(this: void):void;
 
     //events
-    onSelected()
-    onClick()
+    abstract onSelected()
+    abstract onClick()
   }
 
   /**
    * Item of a context menu, alias for list item; essentially a layout, selectable by mouse click. Deselects siblings when selected. 
    */
-     interface MenuItem extends widget {
-      type: "menuItem",
-      buttonLike? : boolean, // Default: true. Flag for theme use; by default, indicates that the item should make a sound when clicked, e.g. a context menu item.
+     abstract class MenuItem extends widget {
+      type: "menuItem";
+      buttonLike? : boolean; // Default: true. Flag for theme use; by default, indicates that the item should make a sound when clicked, e.g. a context menu item.
       //Implicit for menuItems.
-      noAutoSelect? : boolean, // Default: true. When true, list item will not be automatically set as selected when clicked.
+      noAutoSelect? : boolean; // Default: true. When true, list item will not be automatically set as selected when clicked.
       // Implicit for menuItems.
-      selectionGroup? : string, // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
+      selectionGroup? : string; // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
   
       select(this: void):void;
       deselect(this: void):void;
   
       //events
-      onSelected()
-      onClick()
+      abstract onSelected()
+      abstract onClick()
     }
 
   //GENERAL METHODS

@@ -44,6 +44,15 @@ declare module world {
    * @returns Returns the value of the specified object's config parameter, or defaultValue or `nil` if the parameter is not set or the entity is not an object.
    */
   function getObjectParameter(entityId: EntityId, parameterName: string, defaultValue?: JSON):JSON;
+
+  //ENTITIES
+
+  /**
+   * FIXME what if an entity is not found?
+   * @param UniqueId 
+   * @returns coordinates for the entity
+   */
+  function findUniqueEntity(UniqueId: string):RpcPromise<Vec2F>;
 }
 
 

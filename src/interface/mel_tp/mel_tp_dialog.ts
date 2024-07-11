@@ -599,11 +599,11 @@ btnEdit.onClick = function() {
   player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {mel_tp: mel_tp, localeData: mel_tp.dialogConfig.mel_tp_edit}} as unknown as JSON);
 }
 
-btnTeleport.onClick = function() {
+btnTeleport.onClick = function():void {
   if(mel_tp.selected == undefined) {
     widget.playSound("/sfx/interface/clickon_error.ogg")  
     lblDump.setText("No target selected")
-    return
+    return;
   }
   // let tempWarpTarget:WarpAction = mel_tp.selected.warpAction;
   const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
@@ -613,7 +613,7 @@ btnTeleport.onClick = function() {
   pane.dismiss();
 }
 
-btnDeploy.onClick = function() {
+btnDeploy.onClick = function():void {
   if(mel_tp.selected == undefined) {
     widget.playSound("/sfx/interface/clickon_error.ogg");
     lblDump.setText("No target selected");
@@ -630,7 +630,7 @@ btnDeploy.onClick = function() {
   pane.dismiss();
 }
 
-btnFallback.onClick = function() {
+btnFallback.onClick = function():void {
   activeItem.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 }
