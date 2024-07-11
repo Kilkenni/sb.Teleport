@@ -213,4 +213,43 @@ declare interface VisitableParametersJson {
   worldEdgeForceRegions: "None"|"Top"|"Bottom"|"TopAndBottom", //default: "None". WorldEdgeForceRegionTypeNames
 }
 
-declare type DamageTeam = any; //FIXME
+/** @compileMembersOnly */
+declare enum TeamType {
+  "Null",
+  // non-PvP-enabled players and player allied NPCs
+  "Friendly",
+  // hostile and neutral NPCs and monsters
+  "Enemy",
+  // PvP-enabled players
+  "PVP",
+  // cannot damage anything, can be damaged by Friendly/PVP/Assistant
+  "Passive",
+  // cannot damage or be damaged
+  "Ghostly",
+  // cannot damage enemies, can be damaged by anything except enemy
+  "Environment",
+  // damages anything except ghostly, damaged by anything except ghostly/passive
+  // used for self damage
+  "Indiscriminate",
+  // cannot damage friendlies and cannot be damaged by anything
+  "Assistant"
+}
+
+declare interface DamageTeam {
+  type: TeamType;
+  team: unsigned;
+}
+
+/* Entity */
+declare enum EntityTypeNames{
+  "plant",
+  "object",
+  "vehicle",
+  "itemDrop",
+  "plantDrop",
+  "projectile",
+  "stagehand",
+  "monster",
+  "npc",
+  "player"
+}

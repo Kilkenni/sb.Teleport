@@ -53,6 +53,12 @@ declare module world {
    * @returns coordinates for the entity
    */
   function findUniqueEntity(UniqueId: string):RpcPromise<Vec2F>;
+
+  /**
+   * @param entityId 
+   * @returns UniqueId of this entity or NIL (if the entity has none)
+   */
+  function entityUniqueId(entityId: EntityId):string;
 }
 
 

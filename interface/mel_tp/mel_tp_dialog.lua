@@ -142,23 +142,59 @@ local function populateBookmarks()
   bookmarksList:clearChildren()
   local finalTpConfig = {
     canBookmark = false,
+    bookmarkName = "",
     canTeleport = true,
     includePartyMembers = false,
     includePlayerBookmarks = false,
     destinations = nil
   }
-  if mel_tp.configOverride ~= nil then
+  if mel_tp.configOverride ~= nil then        
     ---@diagnostic disable-next-line: undefined-field
-    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark
+    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark or finalTpConfig.canBookmark
+---@diagnostic disable-next-line: undefined-field
+    finalTpConfig.bookmarkName = mel_tp.configOverride.bookmarkName or finalTpConfig.bookmarkName
     ---@diagnostic disable-next-line: undefined-field
-    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport
+    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport or finalTpConfig.canTeleport
     ---@diagnostic disable-next-line: undefined-field
-    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers
+    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers or finalTpConfig.includePartyMembers
     ---@diagnostic disable-next-line: undefined-field
-    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks
+    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks or finalTpConfig.includePlayerBookmarks
     ---@diagnostic disable-next-line: undefined-field
-    finalTpConfig.destinations = mel_tp.configOverride.destinations
+    finalTpConfig.destinations = mel_tp.configOverride.destinations or finalTpConfig.destinations
   end
+
+  --TODO FIXME
+  if finalTpConfig.canBookmark == true then
+    local entityConfig = root.itemConfig({
+        name = world.getObjectParameter(
+            pane.sourceEntity(),
+            "objectName"
+        ),
+        count = 1,
+        parameters = {}
+    })
+    local uniqueId = ""
+    if entityConfig ~= nil then
+        uniqueId = world.entityUniqueId(pane.sourceEntity())
+    end
+    if uniqueId ~= "" then
+        sb.logWarn(uniqueId)
+        local destination = {icon = "default", name = "", planetName = "", warpAction = "Nowhere"}
+        local bkmData = {
+            warpAction = destination.warpAction,
+            name = destination.name or "???",
+            planetName = destination.planetName or "",
+            icon = destination.icon,
+            deploy = destination.deploy or false,
+            mission = destination.mission or false,
+            prerequisiteQuest = destination.prerequisiteQuest or false
+        }
+        local currentBookmark = mel_tp.bookmarkTemplate
+        currentBookmark.children[1].file = mel_tp_util.getIconFullPath(bkmData.icon)
+        currentBookmark.children[2].text = bkmData.name
+        currentBookmark.children[3].text = bkmData.planetName
+    end
+end
 
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do  

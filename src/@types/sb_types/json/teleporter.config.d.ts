@@ -23,7 +23,8 @@ declare interface JsonDestination {
 }
 
 declare interface TeleportConfig  {
-  canBookmark : boolean, //default: false
+  canBookmark? : boolean, //default: false
+  bookmarkName?: string, //If can bookmark, this is the default name
   canTeleport? : boolean, //default: true.
   includePartyMembers? : boolean, //default: false
   includePlayerBookmarks? : boolean, //Default: false

@@ -36,8 +36,6 @@ declare module player {
    */
   function isAdmin():boolean;
 
-
-
   //QUESTS
 
   /**
@@ -178,7 +176,7 @@ Removes the specified object from the player's scanned objects.
    * @param config 
    * @param sourceEntityId 
    */
-  function interact(interactionType: string, config: JSON, sourceEntityId?: EntityId):void;
+  function interact(interactionType: string, config: JSON|string, sourceEntityId?: EntityId):void;
 
   /**
    * @returns Returns a JSON object containing information about the player's current ship upgrades including "shipLevel", "maxFuel", "crewSize" and a list of "capabilities".

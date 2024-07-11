@@ -142,6 +142,7 @@ function populateBookmarks() {
   //default values
   const finalTpConfig:TeleportConfig = {
     canBookmark : false,
+    bookmarkName : "",
     canTeleport : true,
     includePartyMembers : false,
     includePlayerBookmarks : false,
@@ -149,11 +150,12 @@ function populateBookmarks() {
   };
 
   if(mel_tp.configOverride !== undefined) {
-    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark;
-    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport;
-    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers;
-    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks;
-    finalTpConfig.destinations = mel_tp.configOverride.destinations;
+    finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark || finalTpConfig.canBookmark;
+    finalTpConfig.bookmarkName = mel_tp.configOverride.bookmarkName || finalTpConfig.bookmarkName;
+    finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport || finalTpConfig.canTeleport;
+    finalTpConfig.includePartyMembers = mel_tp.configOverride.includePartyMembers || finalTpConfig.includePartyMembers;
+    finalTpConfig.includePlayerBookmarks = mel_tp.configOverride.includePlayerBookmarks || finalTpConfig.includePlayerBookmarks;
+    finalTpConfig.destinations = mel_tp.configOverride.destinations || finalTpConfig.destinations;
   }
 
   //process player bookmarks
@@ -170,7 +172,59 @@ function populateBookmarks() {
   "bookmarkName":"Outpost - The Ark"}
   */
    //process additional locations from override config
-  
+  //ADD BOOKMARK OPTION
+  if(finalTpConfig.canBookmark === true) {
+    const entityConfig = root.itemConfig({
+      name: world.getObjectParameter(pane.sourceEntity(), "objectName") as unknown as string,
+      count: 1 as unsigned,
+      parameters: {} as unknown as JSON
+    });
+    let uniqueId:string = "";
+    if(entityConfig !== null) {
+      uniqueId = world.entityUniqueId(pane.sourceEntity())
+    }
+    if(uniqueId !== "") {
+      sb.logWarn(uniqueId);
+      //sourceEntity is an object AND has config AND UniqueId
+      const destination: Destination = {
+        icon: "default",
+        name: finalTpConfig.bookmarkName as string,
+        planetName: "???",
+        warpAction: WarpAlias.Nowhere
+      }
+
+      //TODO FIXME
+
+      
+      let objLocation , objUuid;
+
+      if(false /*objLocation is ClientShipWorldId*/) {
+        destination.icon = "ship";
+        destination.planetName = "Player Ship";
+      }
+      else if (false /* CelestialWorldId */) {
+        //destination.icon = "default" //typeName of main planetary biome
+        //destination.planetName = "" //worldName of planet
+      }
+      else if(false /* InstanceWorldId */) {
+        //destination.icon = "default" //typeName of instance
+        //destination.planetName = "" //worldName of instance
+      }
+
+      //FIXME
+      destination.warpAction = [
+        "playerWorld" as WorldIdString,
+        "SpawnTargetUniqueEntity uniqueId"
+      ] as BookmarkTarget;
+
+      if(false /* playerBookmarks NOT contains destination.warpAction */ || finalTpConfig.canTeleport === false) {
+        //open add new bookmark with <destination> as a bookmark
+      }
+    }
+
+  }
+
+
   if(finalTpConfig.destinations !== undefined) {
     for(const dest of finalTpConfig.destinations) {
       //Skip unavailable destinations in config
@@ -210,7 +264,6 @@ function populateBookmarks() {
       }
 
       //Add destination from config to TP targets
-      const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
 
       if (destination.mission === true && typeof destination.warpAction !== "string") {
         // if the warpAction is for an instance world, set the uuid to the team uuid -- or so the source code claims
@@ -283,6 +336,7 @@ function populateBookmarks() {
         prerequisiteQuest: destination.prerequisiteQuest || false, //if the player has not completed the quest, destination is not available
       };
       
+      const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
       currentBookmark.children[0].file = mel_tp_util.getIconFullPath(bkmData.icon);
       currentBookmark.children[1].text = bkmData.name;
       currentBookmark.children[2].text = bkmData.planetName;
@@ -303,8 +357,6 @@ function populateBookmarks() {
     }
     if(filteredBookmarks !== undefined) {
       for(const bookmark of filteredBookmarks) {
-        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-    
         const bkmData: Destination = {
           //system = false //for special locations like ship etc
           warpAction: bookmark.target as BookmarkTarget, //warp coords or command
@@ -325,6 +377,7 @@ function populateBookmarks() {
           "data": {"target": null}
         }
         */
+        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
         currentBookmark.children[0].file = mel_tp_util.getIconFullPath(bkmData.icon);
         currentBookmark.children[1].text = bkmData.name;
         currentBookmark.children[2].text = bkmData.planetName;
@@ -631,68 +684,6 @@ btnDeploy.onClick = function():void {
 }
 
 btnFallback.onClick = function():void {
-  activeItem.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
+  player.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 }
-
-
- //EDIT BOOKMARK OPTION
-
-/*
-  auto config = assets->fetchJson(interactAction.bookmarks);
-  if (config.getBool("canBookmark", false)) {
-    if (auto entity = world->entity(interactAction.entityId)) {
-      if (auto uniqueEntityId = entity->uniqueId()) {
-        auto worldTemplate = m_client->worldClient()->currentTemplate();
-
-        String icon, planetName;
-        if (m_client->playerWorld().is<ClientShipWorldId>()) {
-          icon = "ship";
-          planetName = "Player Ship";
-        } else if (m_client->playerWorld().is<CelestialWorldId>()) {
-          icon = worldTemplate->worldParameters()->typeName;
-          planetName = worldTemplate->worldName();
-        } else if (m_client->playerWorld().is<InstanceWorldId>()) {
-          icon = worldTemplate->worldParameters()->typeName;
-          planetName = worldTemplate->worldName();
-        } else {
-          icon = "default";
-          planetName = "???";
-        }
-
-        currentLocation = TeleportBookmark{
-          {m_client->playerWorld(), SpawnTargetUniqueEntity(*uniqueEntityId)},
-          planetName,
-          config.getString("bookmarkName", ""),
-          icon};
-
-        if (!m_client->mainPlayer()->universeMap()->teleportBookmarks().contains(currentLocation) || !config.getBool("canTeleport", true)) {
-          auto editBookmarkDialog = make_shared<EditBookmarkDialog>(m_client->mainPlayer()->universeMap());
-          editBookmarkDialog->setBookmark(currentLocation);
-          m_paneManager.displayPane(PaneLayer::ModalWindow, editBookmarkDialog);
-          return;
-        }
-      }
-    }
-  }
-  */
-
-/*
-
-void TeleportDialog::editBookmark() {
-    auto destList = fetchChild<ListWidget>("bookmarkList.bookmarkItemList");
-    if (destList->selectedItem() != NPos) {
-      size_t selectedItem = destList->selectedItem();
-      auto bookmarks = m_client->mainPlayer()->universeMap()->teleportBookmarks();
-      bookmarks.sort([](auto const& a, auto const& b) { return a.bookmarkName.toLower() < b.bookmarkName.toLower(); });
-      selectedItem = selectedItem - (m_destinations.size() - bookmarks.size());
-      if (bookmarks.size() > selectedItem) {
-        auto editBookmarkDialog = make_shared<EditBookmarkDialog>(m_client->mainPlayer()->universeMap());
-        editBookmarkDialog->setBookmark(bookmarks[selectedItem]);
-        m_paneManager->displayPane(PaneLayer::ModalWindow, editBookmarkDialog);
-      }
-      dismiss();
-    }
-  }
-*/
-
