@@ -1,6 +1,7 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
+import { metagui } from "../../@types-mods/stardust_metagui.lua";
 declare const bookmarksList:metagui.ScrollArea;
 declare const txtboxFilter: metagui.TextBox;
 declare const btnResetFilter: metagui.Button;
@@ -62,76 +63,6 @@ const mel_tp:{
 };
 const inactiveColor = "ff0000"; //red
 
-main();
-
-function main(this:void):void {
-  const sourceEntity = pane.sourceEntity();
-  if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
-    //if sourceEntity is an object
-    const entityConfig = root.itemConfig({
-      name: world.getObjectParameter(sourceEntity, "objectName") as unknown as string,
-      count: 1 as unsigned,
-      parameters: {} as unknown as JSON
-    });
-    if(entityConfig !== null) {
-      const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string;
-      mel_tp.paneIcon = entityConfig.directory + iconName; //object icon as pane icon
-    }
-    // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
-    mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;
-  }
-
-  // sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
-  const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
-  if(metaguiTpData !== undefined) {
-    mel_tp.configPath = metaguiTpData.configPath || "";
-    mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon; //lastly, try to use override from metagui data
-    mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
-  }
-  if(mel_tp.configPath !== undefined) {
-    mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
-  }
-
-  if(player.canDeploy() === false) {
-    btnDeploy.color = inactiveColor;
-  }
-  
-
-  /*
-    {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
-      "icon":"garden",
-      "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
-      "bookmarkName":"Merchant test"}
-  */  
-
-  /**
-   * Init pane part
-  */
-
-  btnEdit.color = inactiveColor;
-
-  metagui.setTitle(mel_tp.paneTitle);
-  metagui.setIcon(mel_tp.paneIcon);
-
-  if(mel_tp.bookmarks !== undefined) {
-    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
-  }
-  refreshBookmarks();
-  populateBookmarks();
-
-  //OpenStarbound guard
-  if(root.assetSourcePaths !== null) {
-    const assetsWithMetadata = root.assetSourcePaths(true) as {[assetName:string]: any}
-    for(const modPath in assetsWithMetadata) {
-      const modName = "sb.Teleport";
-      if(assetsWithMetadata[modPath].name === modName) {
-        mel_tp.version = "SparkTpTec v: " + assetsWithMetadata[modPath].version;
-      }
-    }
-  }
-  lblVersion.setText(mel_tp.version);
-}
-
 function refreshBookmarks():void {
   mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 }
@@ -158,20 +89,6 @@ function populateBookmarks() {
     finalTpConfig.destinations = mel_tp.configOverride.destinations || finalTpConfig.destinations;
   }
 
-  //process player bookmarks
-  /*
-  EXAMPLE BOOKMARKS
-  {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
-    "icon":"garden",
-    "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
-    "bookmarkName":"Merchant test"}
-
-  {"targetName":"",
-  "icon":"outpost",
-  "target":["InstanceWorld:outpost:-:-","arkteleporter"],
-  "bookmarkName":"Outpost - The Ark"}
-  */
-   //process additional locations from override config
   //ADD BOOKMARK OPTION
   if(finalTpConfig.canBookmark === true) {
     const entityConfig = root.itemConfig({
@@ -184,47 +101,57 @@ function populateBookmarks() {
       uniqueId = world.entityUniqueId(pane.sourceEntity())
     }
     if(uniqueId !== "") {
-      sb.logWarn(uniqueId);
-      //sourceEntity is an object AND has config AND UniqueId
+      //sourceEntity is an object AND has config AND UniqueId - the latter is the teleporter ID.
+      const worldId: WorldIdString = player.worldId();
       const destination: Destination = {
         icon: "default",
         name: finalTpConfig.bookmarkName as string,
         planetName: "???",
-        warpAction: WarpAlias.Nowhere
+        warpAction: [
+          worldId as WorldIdString,
+          uniqueId as SpawnTarget
+        ] as BookmarkTarget
       }
 
-      //TODO FIXME
+      //TODO FIXME - + don't forget to disable current location in bookmarks for teleportation, if saved
 
-      
-      let objLocation , objUuid;
-
-      if(false /*objLocation is ClientShipWorldId*/) {
+      if(mel_tp_util.IsBookmarkShip(destination.warpAction as BookmarkTarget)) {
+        /* BookmarkTarget is ClientShipWorldId */
         destination.icon = "ship";
         destination.planetName = "Player Ship";
       }
-      else if (false /* CelestialWorldId */) {
-        //destination.icon = "default" //typeName of main planetary biome
-        //destination.planetName = "" //worldName of planet
+      else if (mel_tp_util.IsBookmarkPlanet(destination.warpAction as BookmarkTarget)) {
+        /* BookmarkTarget is CelestialWorldId */
+        const planetWorldIdString = worldId as CelestialWorldIdString;
+        destination.icon = world.type()||"default", //typeName of main planetary biome
+        destination.planetName = celestial.planetName(mel_tp_util.WorldIdToObject(planetWorldIdString) as CelestialCoordinate) as string; //worldName of planet
       }
-      else if(false /* InstanceWorldId */) {
-        //destination.icon = "default" //typeName of instance
-        //destination.planetName = "" //worldName of instance
+      else if(mel_tp_util.IsBookmarkInstance(destination.warpAction as BookmarkTarget)) {
+        /* BookmarkTarget is InstanceWorldId */
+        const instanceWorldIdString = worldId as InstanceWorldIdString;
+        const instanceWorldId: InstanceWorldId = mel_tp_util.WorldIdToObject(instanceWorldIdString) as InstanceWorldId;
+        destination.icon = world.type()||"default", //typeName of instance
+        destination.planetName = instanceWorldId.instance //worldName of instance
       }
 
-      //FIXME
-      destination.warpAction = [
-        "playerWorld" as WorldIdString,
-        "SpawnTargetUniqueEntity uniqueId"
-      ] as BookmarkTarget;
-
-      if(false /* playerBookmarks NOT contains destination.warpAction */ || finalTpConfig.canTeleport === false) {
+      const currentLocBookmarked = util.find(mel_tp.bookmarks as TeleportBookmark[], function(bkm: TeleportBookmark) {
+        return mel_tp_util.TargetToWarpCommand(bkm.target) === mel_tp_util.TargetToWarpCommand(destination.warpAction);
+      }) 
+      if(currentLocBookmarked === null || finalTpConfig.canTeleport === false) {
+        /* If current location is not saved to bookmarks OR it can only serve as destination for Tp - offer to save it */
         //open add new bookmark with <destination> as a bookmark
+      const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
+      currentBookmark.children[0].file = mel_tp_util.getIconFullPath(destination.icon);
+      currentBookmark.children[1].text = destination.name;
+      currentBookmark.children[2].text = destination.planetName;
+      const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
+      addedBookmark["onSelected"] = undefined; //OnTpTargetSelect; //FIXME - temp disable select for current location
+      addedBookmark["bkmData"] = destination;
       }
     }
-
   }
 
-
+  //process additional locations from override config
   if(finalTpConfig.destinations !== undefined) {
     for(const dest of finalTpConfig.destinations) {
       //Skip unavailable destinations in config
@@ -346,6 +273,19 @@ function populateBookmarks() {
     }
   }
 
+  //process player bookmarks
+  /*
+  EXAMPLE BOOKMARKS
+  {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
+    "icon":"garden",
+    "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
+    "bookmarkName":"Merchant test"}
+
+  {"targetName":"",
+  "icon":"outpost",
+  "target":["InstanceWorld:outpost:-:-","arkteleporter"],
+  "bookmarkName":"Outpost - The Ark"}
+  */
 
   if(finalTpConfig.includePlayerBookmarks) {
     let filteredBookmarks:TeleportBookmark[]|undefined;
@@ -541,7 +481,7 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
   if(typeof mel_tp.selected.warpAction === "string") {
     //destination added from config
     if(mel_tp.selected.warpAction !== WarpAlias.OrbitedWorld) {
-      lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction)}`);
+      lblBkmName.setText(`Special system alias signature ${sb.printJson(mel_tp.selected.warpAction as unknown as JSON)}`);
       lblBkmHazards.setText(world.timeOfDay().toString());
     }
     else {
@@ -687,3 +627,73 @@ btnFallback.onClick = function():void {
   player.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 }
+
+function main(this:void):void {
+  const sourceEntity = pane.sourceEntity();
+  if(world.getObjectParameter(sourceEntity, "objectName") !== null) {
+    //if sourceEntity is an object
+    const entityConfig = root.itemConfig({
+      name: world.getObjectParameter(sourceEntity, "objectName") as unknown as string,
+      count: 1 as unsigned,
+      parameters: {} as unknown as JSON
+    });
+    if(entityConfig !== null) {
+      const iconName = world.getObjectParameter(sourceEntity, "inventoryIcon") as unknown as string;
+      mel_tp.paneIcon = entityConfig.directory + iconName; //object icon as pane icon
+    }
+    // mel_tp.paneIcon = iconName || mel_tp.paneIcon; //try to override using its parameters
+    mel_tp.paneTitle = world.getObjectParameter(sourceEntity, "shortdescription") as unknown as string || mel_tp.paneTitle;
+  }
+
+  // sb.logInfo(sb.printJson(sourceEntity as unknown as JSON));
+  const metaguiTpData:MetaguiTpData|undefined = metagui.inputData;
+  if(metaguiTpData !== undefined) {
+    mel_tp.configPath = metaguiTpData.configPath || "";
+    mel_tp.paneIcon = metaguiTpData.paneIcon || mel_tp.paneIcon; //lastly, try to use override from metagui data
+    mel_tp.paneTitle = metaguiTpData.paneTitle || mel_tp.paneTitle;
+  }
+  if(mel_tp.configPath !== undefined) {
+    mel_tp.configOverride = root.assetJson(mel_tp.configPath) as unknown as TeleportConfig;
+  }
+
+  if(player.canDeploy() === false) {
+    btnDeploy.color = inactiveColor;
+  }
+  
+
+  /*
+    {"targetName":"Larkheed Veil ^green;II^white; ^white;- ^yellow;b^white;",
+      "icon":"garden",
+      "target":["CelestialWorld:479421145:-426689872:-96867506:7:3","5dc0465b72cf67e42a88fdcb0aeeba5a"],
+      "bookmarkName":"Merchant test"}
+  */  
+
+  /**
+   * Init pane part
+  */
+
+  btnEdit.color = inactiveColor;
+
+  metagui.setTitle(mel_tp.paneTitle);
+  metagui.setIcon(mel_tp.paneIcon);
+
+  if(mel_tp.bookmarks !== undefined) {
+    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
+  }
+  refreshBookmarks();
+  populateBookmarks();
+
+  //OpenStarbound guard
+  if(root.assetSourcePaths !== null) {
+    const assetsWithMetadata = root.assetSourcePaths(true) as {[assetName:string]: any}
+    for(const modPath in assetsWithMetadata) {
+      const modName = "sb.Teleport";
+      if(assetsWithMetadata[modPath].name === modName) {
+        mel_tp.version = "SparkTpTec v: " + assetsWithMetadata[modPath].version;
+      }
+    }
+  }
+  lblVersion.setText(mel_tp.version);
+}
+
+main();

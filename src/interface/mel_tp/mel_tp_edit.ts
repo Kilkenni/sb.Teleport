@@ -1,12 +1,14 @@
 //manages edit dialog for a bookmark
 
 //declare for interface
+import { metagui } from "../../@types-mods/stardust_metagui.lua";
 declare const btnEditCancel:metagui.Button, btnEditDelete:metagui.Button, btnEditSave:metagui.Button, bkmIcon:metagui.Image, bkmName: metagui.TextBox, bkmPlanet: metagui.Label, lblInfo:metagui.Label, lblConsole: metagui.Label;
 
 import mel_tp_util from "./mel_tp_util";
 /** @noResolution */
 declare module promises {};
 import promises from "../../scripts/messageutil.lua";
+
 
 const mel_tp_edit:{
   original: TeleportBookmark,

@@ -2,6 +2,11 @@
  * Definition file for Zia Satazaki's MetaGUI, part of Stardust Core/Lite
  */
 
+//Some utils are PRELOADED by default
+import "../scripts/util.lua";
+import "../scripts/vec2.lua";
+import "../scripts/rect.lua";
+
 interface Tab {
   id : string, // Optional. Tab's unique identifier; if not specified, will be populated with a UUID.
   title : string, // The tab's displayed title.
@@ -12,9 +17,12 @@ interface Tab {
 }
 
 declare module metagui {
+  /**
+   * contents of optional metagui data parameter passed on pane init, if any
+   */
   const inputData: {[key: string]: string|unknown}|undefined;
 
-  abstract class  widget {
+  abstract class widget {
     type: string; //As you'd expect, the type of widget. Case sensitive; generally in camelCase.
     id?: string; //Key of the widget's global reference; if omitted, none is created.
     position?: Vec2I; // Explicit position; ignored in automatic layouts. Top to bottom, left to right.

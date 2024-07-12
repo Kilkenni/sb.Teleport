@@ -115,8 +115,34 @@ function ObjectToWorldId(target:CelestialCoordinate|InstanceWorldId):WorldIdStri
 //   return trimBrackets.split(",") as BookmarkTarget;
 // }
 
+/**
+ * Checks if BookmarkTarget[0] is an InstanceWorldIdString
+ * @param target 
+ * @returns 
+ */
 function IsBookmarkInstance(target:BookmarkTarget):boolean {
-  return target[0].includes("InstanceWorld");
+  if(target[0].includes("InstanceWorld")) {
+    return true
+  }
+  else return false;
+}
+
+/**
+ * Check if BookmarkTarget[0] is a CelestialWorldIdString
+ * @param target 
+ */
+function IsBookmarkPlanet(target: BookmarkTarget):boolean {
+  if(target[0].includes("CelestialWorld")) {
+    return true
+  }
+  else return false;
+}
+
+function IsBookmarkShip(target: BookmarkTarget): boolean {
+  if(target[0].includes("ClientShipWorld")) {
+    return true
+  }
+  else return false;
 }
 
 function JsonToDestination(destJson: JsonDestination):Destination {
@@ -206,17 +232,6 @@ function getIconFullPath(iconName: string):string {
  * @returns 
  */
 function fillPlaceholdersInPane(dialogConfigPath: string, replaceMap: Map<string, string>) {
-
-  //extract required data from gun structure to replace tags. Returns an object of pairs tag = value
-  //should probably refactor and move it closer to gun scripts for cohesion
-  /*
-  function rangedWeaponTags(gun) {
-    const replacementMap: Map<string, string> = {} as Map<string, string>;
-    replacementMap["gun_name"] = gun.parameters.shortdescription || "Generic ranged weapon"
-    return replacementMap
-  }
-  */
-
   const dialogWindowData = root.assetJson(dialogConfigPath)
   //const tags = rangedWeaponTags(dialogTopicObject)
   for(const key in dialogWindowData) {
@@ -233,6 +248,9 @@ const mel_tp_util =  {
   WorldIdToObject,
   ObjectToWorldId,
   // parseWorldIdFull,
+  IsBookmarkInstance,
+  IsBookmarkPlanet,
+  IsBookmarkShip,
   JsonToDestination,
   TargetToWarpCommand,
   FilterBookmarks,
@@ -242,33 +260,3 @@ const mel_tp_util =  {
 }
 
 export default mel_tp_util;
-
-/*
---A number of general functions to work on dialog windows
-
---Dialog Windows in SB are akin to template strings in JS. What JS calls placeholders, SB calls "tags". in the text of a window, those look like this: <gun_name>.
-local function fillPlaceholdersInDialogWindow(dialogConfigPath, dialogTopicObject)
-
-  --extract required data from gun structure to replace tags. Returns an object of pairs tag = value
-  --should probably refactor and move it closer to gun scripts for cohesion
-  local function rangedWeaponTags(gun)
-    return {
-      gun_name = gun.parameters.shortdescription or "Generic ranged weapon"
-    }
-  end
-
-  local dialogWindowData = root.assetJson(dialogConfigPath)
-  local tags = rangedWeaponTags(dialogTopicObject)
-  for key,value in pairs(dialogWindowData) do
-    if type(value) == "string" then
-      dialogWindowData[key] = sb.replaceTags(value, tags)
-    end
-  end
-  return dialogWindowData
-end
-
---EXPORT PUBLIC Ra_DialogLib
-Ra_DialogLib = {
-  fillPlaceholdersInDialogWindow = fillPlaceholdersInDialogWindow
-}
-*/
