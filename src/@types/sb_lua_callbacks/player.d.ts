@@ -136,7 +136,7 @@ declare module player {
   /**
    * Returns stringified WorldID of the player's current world.
    */
-  function worldId():string;
+  function worldId():WorldIdString;
 
   /**
    * Returns stringified WorldID of the player's ship world.

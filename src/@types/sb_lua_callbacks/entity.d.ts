@@ -12,6 +12,7 @@
 * active items
  */
 
+/** @noSelf **/
 declare namespace entity {
   //SOURCE: game/scripting/StarEntityLuaBindings.cpp
 

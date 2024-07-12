@@ -1,3 +1,5 @@
+
+
 //Primitive C++ types
 declare type int = number & { __brand: "int" }
 declare type unsigned = number & { __brand: "unsigned" }
@@ -104,10 +106,12 @@ interface InstanceWorldId {
 type ClientShipWorldId = Uuid
 
 type CelestialWorldIdString = `CelestialWorld:${CelestialCoordinate["location"][0]}:${CelestialCoordinate["location"][1]}:${CelestialCoordinate["location"][2]}:${CelestialCoordinate["planet"]}:${CelestialCoordinate["satellite"]}` //3 coords, planet, satellite
+
 type InstanceWorldIdString = `InstanceWorld:${InstanceWorldId["instance"]}:${InstanceWorldId["uuid"]}:${InstanceWorldId["level"]}` | `InstanceWorld:${InstanceWorldId["instance"]}`
 
+type ShipWorldIdString = `ClientShipWorld:${Uuid}`
 
-declare type WorldIdString = CelestialWorldIdString|InstanceWorldIdString
+declare type WorldIdString = CelestialWorldIdString|InstanceWorldIdString|ShipWorldIdString
 
 type SpawnTargetUniqueEntity = string
 type SpawnTargetPosition = `[${string}, ${string}]` //string from Vec2F
@@ -138,13 +142,12 @@ declare interface TeleportBookmark {
 declare type PlayerTarget = ["player", Uuid]
 declare type UuidTarget = [ "object", Uuid ]
 
-
 declare type WarpToPlayer = `Player:${Uuid}`
 declare type WarpToWorld = `${BookmarkTarget[0]}=${BookmarkTarget[1]|"-"}`
 //Instance worlds typically have named WorldID and SpawnTarget
 declare type WarpToInstance = WarpToWorld
 
-type WarpToShipWorldId = `ClientShipWorld:${Uuid}`
+type WarpToShipWorldId = ShipWorldIdString
 
 declare type WarpAction = WarpAlias|UuidTarget|PlayerTarget|BookmarkTarget;
 

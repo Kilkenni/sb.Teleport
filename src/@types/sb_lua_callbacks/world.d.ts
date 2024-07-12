@@ -7,6 +7,25 @@ The `world` table contains functions that perform actions within a specified suc
 declare module world {
   //SOURCE: game/scripting/StarWorldLuaBindings.cpp
 
+  //PLANET INFO
+
+  /**
+   * @returns Returns a string describing the world's type. For terrestrial worlds this will be the primary biome, for instance worlds this will be the instance name, and for ship or generic worlds this will be 'unknown'.
+   */
+  function type():string|"unknown";
+
+  /**
+   * @returns Returns a `true` if the current world is a terrestrial world, i.e. a planet, and `false` otherwise.
+   */
+  function terrestrial():boolean;
+
+  /**
+   * @returns Returns a vector describing the size of the current world.
+   */
+  function size():Vec2I;
+
+  //SHIP WORLD
+
   //Returns the current flight status of a ship world.
   function flyingType():typeof FlyingTypeNames;
 
