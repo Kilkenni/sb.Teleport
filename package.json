@@ -5,7 +5,7 @@
   "main": "readme.md",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "echo Copy non-TS files verbatim to output dir && copyfiles --error --up 1 --exclude './src/@types/**/*.*' -e ./src/@types-mods/**/*.*' -e './src/**/*.ts' -e './**/*.d.ts' --verbose './src/**/*' './'",
+    "prebuild": "echo Copy non-TS files verbatim to output dir && copyfiles --error --up 1 --exclude './src/@types/**/*.*' -e './src/@types-mods/**/*.*' -e './src/**/*.ts' -e './**/*.d.ts' --verbose './src/**/*' './'",
     "build": "tstl",
     "dev": "tstl --watch"
   },
