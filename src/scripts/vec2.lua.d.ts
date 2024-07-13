@@ -1,5 +1,5 @@
 /**
- * Helper function for working with tables as 2 component vectors (Vec2)
+ * Helper functions for working with tables as 2 component vectors (Vec2)
  * All functions operate on the given vector in-place
  */
 
