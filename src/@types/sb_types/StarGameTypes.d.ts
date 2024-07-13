@@ -9,8 +9,12 @@ declare type double = number & { __brand: "double" }
 //Vectors
 declare type Vec2I = [int, int]
 declare type Vec2F = [float, float]
+declare type Vec2U = [unsigned, unsigned]
+declare type Vec2 = Vec2I|Vec2F|Vec2U
 declare type Vec3I = [int, int, int]
 declare type Vec3F = [float, float, float]
+declare type Vec3U = [unsigned, unsigned, unsigned]
+declare type Vec3 = Vec3I|Vec3F|Vec3U
 
 //Box/Rect is an Axis aligned box that can be used as a bounding volume.
 declare type RectI = [Vec2I, Vec2I] // min coord, max coord

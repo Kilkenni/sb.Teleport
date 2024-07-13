@@ -6,6 +6,7 @@ type rectangle = [number, number, number, number]
 
 /** @noSelf **/
 declare module rect {
+  //SOURCE: /assets/scripts/rect.lua
   /**
    * @returns zeroed rectangle ([x1, y1, x2, y2] with all coords = 0))
    */
