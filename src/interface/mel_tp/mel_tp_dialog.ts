@@ -142,7 +142,12 @@ function populateBookmarks() {
         //open add new bookmark with <destination> as a bookmark
       const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
       currentBookmark.children[0].file = mel_tp_util.getIconFullPath(destination.icon);
-      currentBookmark.children[1].text = destination.name;
+      if(destination.name !== "") {
+        currentBookmark.children[1].text = destination.name;
+      }
+      else {
+        currentBookmark.children[1].text = "Current location (not saved)";
+      }  
       currentBookmark.children[2].text = destination.planetName;
       const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
       addedBookmark["onSelected"] = undefined; //OnTpTargetSelect; //FIXME - temp disable select for current location

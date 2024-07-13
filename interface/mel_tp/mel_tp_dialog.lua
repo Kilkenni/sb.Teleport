@@ -151,7 +151,7 @@ local function populateBookmarks()
   if mel_tp.configOverride ~= nil then        
     ---@diagnostic disable-next-line: undefined-field
     finalTpConfig.canBookmark = mel_tp.configOverride.canBookmark or finalTpConfig.canBookmark
----@diagnostic disable-next-line: undefined-field
+    ---@diagnostic disable-next-line: undefined-field
     finalTpConfig.bookmarkName = mel_tp.configOverride.bookmarkName or finalTpConfig.bookmarkName
     ---@diagnostic disable-next-line: undefined-field
     finalTpConfig.canTeleport = mel_tp.configOverride.canTeleport or finalTpConfig.canTeleport
@@ -163,38 +163,68 @@ local function populateBookmarks()
     finalTpConfig.destinations = mel_tp.configOverride.destinations or finalTpConfig.destinations
   end
 
-  --TODO FIXME
+  --Current location
   if finalTpConfig.canBookmark == true then
     local entityConfig = root.itemConfig({
-        name = world.getObjectParameter(
-            pane.sourceEntity(),
-            "objectName"
-        ),
-        count = 1,
-        parameters = {}
+      name = world.getObjectParameter(
+        pane.sourceEntity(),
+        "objectName"
+      ),
+      count = 1,
+      parameters = {}
     })
     local uniqueId = ""
     if entityConfig ~= nil then
-        uniqueId = world.entityUniqueId(pane.sourceEntity())
+      uniqueId = world.entityUniqueId(pane.sourceEntity())
     end
     if uniqueId ~= "" then
-        sb.logWarn(uniqueId)
-        local destination = {icon = "default", name = "", planetName = "", warpAction = "Nowhere"}
-        local bkmData = {
-            warpAction = destination.warpAction,
-            name = destination.name or "???",
-            planetName = destination.planetName or "",
-            icon = destination.icon,
-            deploy = destination.deploy or false,
-            mission = destination.mission or false,
-            prerequisiteQuest = destination.prerequisiteQuest or false
-        }
+      local worldId = player.worldId()
+      local destination = {
+        icon = "default",
+        name = finalTpConfig.bookmarkName,
+        planetName = "???",
+        warpAction = {worldId, uniqueId}
+      }
+      if mel_tp_util.IsBookmarkShip(destination.warpAction) then
+        destination.icon = "ship"
+        destination.planetName = "Player Ship"
+      elseif mel_tp_util.IsBookmarkPlanet(destination.warpAction) then
+        local planetWorldIdString = worldId
+        do
+          destination.icon = world.type() or "default"
+          destination.planetName = celestial.planetName(mel_tp_util.WorldIdToObject(planetWorldIdString))
+        end
+      elseif mel_tp_util.IsBookmarkInstance(destination.warpAction) then
+        local instanceWorldIdString = worldId
+        local instanceWorldId = mel_tp_util.WorldIdToObject(instanceWorldIdString)
+        do
+          destination.icon = world.type() or "default"
+          destination.planetName = instanceWorldId.instance
+        end
+      end
+
+      local currentLocBookmarked = util.find(
+        mel_tp.bookmarks,
+        function(bkm)
+          return mel_tp_util.TargetToWarpCommand(bkm.target) == mel_tp_util.TargetToWarpCommand(destination.warpAction)
+        end
+      )
+
+      if currentLocBookmarked == nil or finalTpConfig.canTeleport == false then
         local currentBookmark = mel_tp.bookmarkTemplate
-        currentBookmark.children[1].file = mel_tp_util.getIconFullPath(bkmData.icon)
-        currentBookmark.children[2].text = bkmData.name
-        currentBookmark.children[3].text = bkmData.planetName
+        currentBookmark.children[1].file = mel_tp_util.getIconFullPath(destination.icon)
+        if(destination.name ~= "") then
+          currentBookmark.children[2].text = destination.name
+        else
+          currentBookmark.children[2].text = "Current location (not saved)"
+        end
+        currentBookmark.children[3].text = destination.planetName
+        local addedBookmark = bookmarksList:addChild(currentBookmark)
+        addedBookmark.onSelected = nil
+        addedBookmark.bkmData = destination
+      end
     end
-end
+  end
 
   if finalTpConfig.destinations ~= nil then
     for index, dest in ipairs(finalTpConfig.destinations) do  

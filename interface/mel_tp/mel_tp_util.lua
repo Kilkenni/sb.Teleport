@@ -169,9 +169,25 @@ local function parseWorldIdFull(target)
   return stringToArray(trimBrackets, ",")
 end
 
---TODO test
+--- Checks if BookmarkTarget[1] is an InstanceWorldIdString
 local function IsBookmarkInstance(target)
   if string.find(target[1], "InstanceWorld") ~= nil then
+    return true
+  else
+    return false
+  end
+end
+
+--- Check if BookmarkTarget[1] is a CelestialWorldIdString
+local function IsBookmarkPlanet(target)
+  if string.find(target[1], "CelestialWorld") ~= nil then
+    return true
+  else
+    return false
+  end
+end
+local function IsBookmarkShip(target)
+  if string.find(target[1], "ClientShipWorld") ~= nil then
     return true
   else
     return false
@@ -276,6 +292,9 @@ mel_tp_util = {
   getSpaceLocationType = getSpaceLocationType,
   WorldIdToObject = WorldIdToObject,
   ObjectToWorldId = ObjectToWorldId,
+  IsBookmarkInstance = IsBookmarkInstance,
+  IsBookmarkPlanet = IsBookmarkPlanet,
+  IsBookmarkShip = IsBookmarkShip,
   JsonToDestination = JsonToDestination,
   TargetToWarpCommand = TargetToWarpCommand,
   FilterBookmarks = FilterBookmarks,
