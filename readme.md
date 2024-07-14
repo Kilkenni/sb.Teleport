@@ -26,7 +26,7 @@ Currently in alpha phase. Especially editing bookmarks. Backup your character be
 
 ## Usage
 
-Replaces teleport window of vanilla ship teleports. Old interface is still accessible via fallback button.
+Replaces teleport window of vanilla ship teleports and teleports purchased from 2-Stop Teleshop. Old interface is still accessible via fallback button.
 
 Features:
 
