@@ -1,7 +1,8 @@
 /**
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
-import { metagui } from "../../@types-mods/stardust_metagui.lua";
+/** @noResolution */
+import {metagui} from "../../@types-mods/stardust_metagui.lua";
 declare const bookmarksList:metagui.ScrollArea;
 declare const txtboxFilter: metagui.TextBox;
 declare const btnResetFilter: metagui.Button;
@@ -11,10 +12,11 @@ declare const btnFallback: metagui.Button;
 declare const btnTeleport: metagui.Button;
 declare const btnDeploy: metagui.Button;
 declare const lblBkmName: metagui.Label;
+declare const lblBkmNote: metagui.Label;
 declare const lblBkmHazards: metagui.Label;
 declare const lblDump: metagui.Label;
 declare const listHazards: metagui.Layout;
-declare interface tpItem {
+declare interface tpItem extends metagui.ListItem{
   type: "listItem",
   children: [
     {type: "image", file: string},
@@ -67,6 +69,30 @@ function refreshBookmarks():void {
   mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 }
 
+/**
+ * @returns current location shaped as a BookmarkTarget. If the location cannot be bookmarked (example: handheld teleporter), returns null.
+ */
+function getCurrentLocation():BookmarkTarget|null {
+  const entityConfig = root.itemConfig({
+    name: world.getObjectParameter(pane.sourceEntity(), "objectName") as unknown as string,
+    count: 1 as unsigned,
+    parameters: {} as unknown as JSON
+  });
+  let uniqueId:string = "";
+  if(entityConfig !== null) {
+    uniqueId = world.entityUniqueId(pane.sourceEntity())
+  }
+  if(uniqueId !== "") {
+    //sourceEntity is an object AND has config AND UniqueId - the latter is the teleporter ID.
+    const worldId: WorldIdString = player.worldId();
+    return [
+      worldId as WorldIdString,
+      uniqueId as SpawnTarget
+    ] as BookmarkTarget;
+  }
+  return null;
+}
+
 function populateBookmarks() {
   bookmarksList.clearChildren()
 
@@ -91,26 +117,14 @@ function populateBookmarks() {
 
   //ADD BOOKMARK OPTION
   if(finalTpConfig.canBookmark === true) {
-    const entityConfig = root.itemConfig({
-      name: world.getObjectParameter(pane.sourceEntity(), "objectName") as unknown as string,
-      count: 1 as unsigned,
-      parameters: {} as unknown as JSON
-    });
-    let uniqueId:string = "";
-    if(entityConfig !== null) {
-      uniqueId = world.entityUniqueId(pane.sourceEntity())
-    }
-    if(uniqueId !== "") {
+    const currentTpLocation = getCurrentLocation();
+    if(currentTpLocation !== null) {
       //sourceEntity is an object AND has config AND UniqueId - the latter is the teleporter ID.
-      const worldId: WorldIdString = player.worldId();
       const destination: Destination = {
         icon: "default",
         name: finalTpConfig.bookmarkName as string,
         planetName: "???",
-        warpAction: [
-          worldId as WorldIdString,
-          uniqueId as SpawnTarget
-        ] as BookmarkTarget
+        warpAction: currentTpLocation
       }
 
       //TODO FIXME - + don't forget to disable current location in bookmarks for teleportation, if saved
@@ -122,16 +136,19 @@ function populateBookmarks() {
       }
       else if (mel_tp_util.IsBookmarkPlanet(destination.warpAction as BookmarkTarget)) {
         /* BookmarkTarget is CelestialWorldId */
-        const planetWorldIdString = worldId as CelestialWorldIdString;
-        destination.icon = world.type()||"default", //typeName of main planetary biome
+        const planetWorldIdString = destination.warpAction[0] as CelestialWorldIdString;
+        destination.icon = world.type()||"default"; //typeName of main planetary biome
         destination.planetName = celestial.planetName(mel_tp_util.WorldIdToObject(planetWorldIdString) as CelestialCoordinate) as string; //worldName of planet
       }
       else if(mel_tp_util.IsBookmarkInstance(destination.warpAction as BookmarkTarget)) {
         /* BookmarkTarget is InstanceWorldId */
-        const instanceWorldIdString = worldId as InstanceWorldIdString;
+        const instanceWorldIdString = destination.warpAction[0] as InstanceWorldIdString;
         const instanceWorldId: InstanceWorldId = mel_tp_util.WorldIdToObject(instanceWorldIdString) as InstanceWorldId;
-        destination.icon = world.type()||"default", //typeName of instance
-        destination.planetName = instanceWorldId.instance //worldName of instance
+        destination.icon = world.type()||"default"; //typeName of instance
+        if(instanceWorldId !== null) {
+          destination.planetName = instanceWorldId.instance; //worldName of instance
+        }
+        
       }
 
       const currentLocBookmarked = util.find(mel_tp.bookmarks as TeleportBookmark[], function(bkm: TeleportBookmark) {
@@ -140,18 +157,20 @@ function populateBookmarks() {
       if(currentLocBookmarked === null || finalTpConfig.canTeleport === false) {
         /* If current location is not saved to bookmarks OR it can only serve as destination for Tp - offer to save it */
         //open add new bookmark with <destination> as a bookmark
-      const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
-      currentBookmark.children[0].file = mel_tp_util.getIconFullPath(destination.icon);
-      if(destination.name !== "") {
-        currentBookmark.children[1].text = destination.name;
-      }
-      else {
-        currentBookmark.children[1].text = "Current location (not saved)";
-      }  
-      currentBookmark.children[2].text = destination.planetName;
-      const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.widget);
-      addedBookmark["onSelected"] = undefined; //OnTpTargetSelect; //FIXME - temp disable select for current location
-      addedBookmark["bkmData"] = destination;
+        const currentBookmark = mel_tp.bookmarkTemplate as tpItem;
+        currentBookmark.children[0].file = mel_tp_util.getIconFullPath(destination.icon);
+        if(destination.name !== "") {
+          currentBookmark.children[1].text = destination.name + " (not saved)";
+        }
+        else {
+          currentBookmark.children[1].text = "Current location (not saved)";
+        }  
+        currentBookmark.children[2].text = destination.planetName;
+        const addedBookmark = bookmarksList.addChild(currentBookmark as unknown as metagui.ListItem) as metagui.ListItem;
+        addedBookmark.onSelected = OnTpTargetSelect;
+        addedBookmark["bkmData"] = destination;
+        //Auto-select this location
+        addedBookmark.select();
       }
     }
   }
@@ -181,11 +200,9 @@ function populateBookmarks() {
           if(locationType === "FloatingDungeon"){
             maybeUuid = shipLocation[1] as Uuid;
          }         
-          // sb.logWarn(sb.printJson(systemLocations as unknown as JSON))
-          // sb.logWarn(sb.print(maybeUuid))
-          // sb.logWarn(sb.print(locationType))
+
           if(maybeUuid === undefined || mel_tp_util.TableContains(systemLocations, maybeUuid) === false || destination.deploy !== true) {
-            //location is not FLoatingDungeon OR current system locations have no such Uuid OR deploy is not activated
+            //location is not FloatingDungeon OR current system locations have no such Uuid OR deploy is not activated
             continue; //Warping down is available only when orbiting a planet or floating dungeon
           }
         }    
@@ -441,11 +458,14 @@ function clearPlanetInfo():void {
   listHazards.clearChildren();
 }
 
-function displayPlanetInfo(coord: CelestialCoordinate):void {
+function displayPlanetInfo(coord: CelestialCoordinate, currentLocation?: boolean):void {
   clearPlanetInfo();
   const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
   const name = celestial.planetName(coord);
   const planetParams = celestial.visitableParameters(coord);
+  if(currentLocation === true) {
+    lblBkmNote.setText("Your current location");
+  }
   if(name !== null) {
     lblBkmName.setText(name);
   }
@@ -477,8 +497,8 @@ function displayPlanetInfo(coord: CelestialCoordinate):void {
   }
 }
 
-function OnTpTargetSelect(bookmarkWidget:any):void {
-  mel_tp.selected = bookmarkWidget.bkmData as Destination;
+function OnTpTargetSelect(this:any):void {
+  mel_tp.selected = this.bkmData as Destination;
   const dbErrorText = mel_tp.dialogConfig.mel_tp_dialog["CelestialDatabaseError"] || "";
   clearPlanetInfo();
   btnEdit.color = inactiveColor;
@@ -531,7 +551,6 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
   }
   else {
     //Bookmark selected
-    btnEdit.color = "accent";
     const warpTarget:WorldIdString = (mel_tp.selected.warpAction as BookmarkTarget)[0];
     const coord:CelestialCoordinate|InstanceWorldId|null = mel_tp_util.WorldIdToObject(warpTarget)
     if(coord === null) {
@@ -541,7 +560,9 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
     else {
       if((coord as CelestialCoordinate).location !== undefined) {
         //TypeGuard: coord is a CelestialCoordinate
-        displayPlanetInfo(coord as CelestialCoordinate);
+        const currentLocString = mel_tp_util.TargetToWarpCommand(getCurrentLocation() as BookmarkTarget);
+        const targetString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction);
+        displayPlanetInfo(coord as CelestialCoordinate, currentLocString === targetString);
       }
       else {
         //coord is an InstanceWorldId
@@ -552,13 +573,16 @@ function OnTpTargetSelect(bookmarkWidget:any):void {
         if(instanceId.level !== "-") {
           lblBkmHazards.setText(`Level ${instanceId.level}`);
         }
-      }      
+      }
     }
+    btnEdit.color = "accent";
   }
-
-  lblDump.setText(sb.printJson(bookmarkWidget.bkmData));
+  lblDump.setText(sb.printJson(this.bkmData));
 };
 
+/**
+ * Apply filter to bookmarks
+ */
 txtboxFilter.onEnter = function ():void {
   mel_tp.filter = txtboxFilter.text;
   if(mel_tp.bookmarks === undefined) {
@@ -587,6 +611,9 @@ btnSortByPlanet.onClick = function ():void {
   populateBookmarks();
 }
 
+/**
+ * Edit selected bookmark
+ */
 btnEdit.onClick = function() {
   if(mel_tp.selected == undefined || typeof mel_tp.selected.warpAction === "string") {
     widget.playSound("/sfx/interface/clickon_error.ogg");
@@ -597,20 +624,31 @@ btnEdit.onClick = function() {
   player.interact("ScriptPane", { gui : {}, scripts : ["/metagui.lua"], ui : "/interface/mel_tp/mel_tp_edit.ui" , data: {mel_tp: mel_tp, localeData: mel_tp.dialogConfig.mel_tp_edit}} as unknown as JSON);
 }
 
+/**
+ * Warp player to selected location
+ */
 btnTeleport.onClick = function():void {
   if(mel_tp.selected == undefined) {
     widget.playSound("/sfx/interface/clickon_error.ogg")  
     lblDump.setText("No target selected")
     return;
   }
-  // let tempWarpTarget:WarpAction = mel_tp.selected.warpAction;
+  
   const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
+  if(getCurrentLocation() !== null && warpTarget === mel_tp_util.TargetToWarpCommand(getCurrentLocation() as BookmarkTarget)) {
+    widget.playSound("/sfx/interface/clickon_error.ogg")  
+    lblDump.setText("You are already here")
+    return;
+  }
 
   lblDump.setText(`Stringified warp target: ${warpTarget}`);
   player.warp(warpTarget, mel_tp.animation, mel_tp.selected.deploy || false);
   pane.dismiss();
 }
 
+/**
+ * Deploy mech to selected location
+ */
 btnDeploy.onClick = function():void {
   if(mel_tp.selected == undefined) {
     widget.playSound("/sfx/interface/clickon_error.ogg");
@@ -624,6 +662,11 @@ btnDeploy.onClick = function():void {
   }
 
   const warpTarget:WarpActionString = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
+  if(getCurrentLocation() !== null && warpTarget === mel_tp_util.TargetToWarpCommand(getCurrentLocation() as BookmarkTarget)) {
+    widget.playSound("/sfx/interface/clickon_error.ogg")  
+    lblDump.setText("You are already here")
+    return;
+  }
   player.warp(warpTarget, "deploy", true);
   pane.dismiss();
 }
@@ -699,6 +742,17 @@ function main(this:void):void {
     }
   }
   lblVersion.setText(mel_tp.version);
+
+  const currentLoc = getCurrentLocation();
+  if(currentLoc !== null) {
+    const currentLocBookmarked = util.find(mel_tp.bookmarks as TeleportBookmark[], function(bkm: TeleportBookmark) {
+      return mel_tp_util.TargetToWarpCommand(bkm.target) === mel_tp_util.TargetToWarpCommand(currentLoc);
+    });
+
+    if(currentLocBookmarked === null && mel_tp.selected !== undefined) {
+      btnEdit.onClick();
+    }
+  }
 }
 
 main();

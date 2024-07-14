@@ -15,8 +15,9 @@ interface Tab {
   color : string, // The accent color of the tab in HEX format.
   contents : metagui.widget[], // The contents of the tab's connected page.
 }
-
+/** @noResolution */
 declare module metagui {
+  
   /**
    * contents of optional metagui data parameter passed on pane init, if any
    */
@@ -33,22 +34,22 @@ declare module metagui {
     toolTip? : string; // Self explanatory. Can be multiple lines.
     data? : { [key: string] : unknown }; // Arbitrary JSON data. Mostly useful for script-built panes.
 
-    center(this: void):Vec2I; //Returns the widget's center position.
-    queueRedraw(this: void):void;
-    queueGeometryUpdate(this: void):void;
+    center():Vec2I; //Returns the widget's center position.
+    queueRedraw():void;
+    queueGeometryUpdate():void;
     relativeMousePosition():Vec2I;
-    setVisible(this: void, visible:boolean):void;
-    getTooltip(this: void):string|null;
-    addChild(this: void, widget: widget):widget; //Only recommended to use on layout, panel, or scrollArea.
-    clearChildren(this: void): void;
-    delete(this: void):void;
-    findParent(this: void, widgetType: string):widget; //Find most immediate parent of a specific type.
-    subscribeEvent(this: void, name:string, func: Function):void; //Subscribe to a named event on behalf of a widget.
-    pushEvent(this: void, name: string, ...$vararg):unknown; //Push event to widget with given parameters.
+    setVisible(visible:boolean):void;
+    getTooltip():string|null;
+    addChild(widget: widget):widget; //Only recommended to use on layout, panel, or scrollArea.
+    clearChildren(): void;
+    delete():void;
+    findParent(widgetType: string):widget; //Find most immediate parent of a specific type.
+    subscribeEvent(name:string, func: Function):void; //Subscribe to a named event on behalf of a widget.
+    pushEvent(name: string, ...$vararg):unknown; //Push event to widget with given parameters.
     //Checks self first, then each child. If own event gives a "truthy" value, immediately returns it;
     //if a child event gives one, it only short-circuits if it's nonboolean.
-    broadcast(this: void, name:string, ...$vararg):unknown; //Push event to widget's parent (and likely siblings).
-    wideBroadcast(this: void, level: unsigned, name: string, ...$vararg):unknown; //Same as broadcast, but from specified number of levels up.
+    broadcast(name:string, ...$vararg):unknown; //Push event to widget's parent (and likely siblings).
+    wideBroadcast(level: unsigned, name: string, ...$vararg):unknown; //Same as broadcast, but from specified number of levels up.
   } 
 
   interface Layout extends widget {
@@ -80,8 +81,8 @@ declare module metagui {
     scrollBars? : boolean, // Whether to show scroll bars after scrolling. Defaults to true.
     thumbScrolling? : boolean, // Whether "thumb" (absolute) scrolling is enabled. Defaults to true.
 
-    scrollBy(this: void, vec: int, suppressAnimation?: boolean):void; //Attempts to scroll contents by [vec] pixels. Shows scroll bars if suppressAnimation is false or omitted.
-    scrollTo(this: void, pos: number, suppressAnimation?: boolean, raw?: boolean):void; //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
+    scrollBy(vec: int, suppressAnimation?: boolean):void; //Attempts to scroll contents by [vec] pixels. Shows scroll bars if suppressAnimation is false or omitted.
+    scrollTo(pos: number, suppressAnimation?: boolean, raw?: boolean):void; //Attempts to center viewport on [pos]. Shows scroll bars if suppressAnimation is false or omitted. If raw is specified, sets raw position instead of centering.
   }
 
   abstract class TabField extends widget {
@@ -92,11 +93,11 @@ declare module metagui {
     tabs : Tab[]; // An array of tabs, formatted as follows:
     bottomBar : widget[]; // Contents of an optional bar below the contents. Mostly useful for vertical tab layout.
 
-    newTab(this: void, parameters: Tab):Tab; //Creates a new tab. Parameters are as in the "tabs" attribute. Returns a tab object.
-    select(this: void):void; //Switches to tab.
-    setTitle(this: void, title: string, icon?: string):void; //Changes the tab's title and (optionally) icon.
-    setColor(this: void, color:string):void; //Changes the tab's accent color.
-    setVisible(this: void, bool:boolean): void;
+    newTab(parameters: Tab):Tab; //Creates a new tab. Parameters are as in the "tabs" attribute. Returns a tab object.
+    select():void; //Switches to tab.
+    setTitle(title: string, icon?: string):void; //Changes the tab's title and (optionally) icon.
+    setColor(color:string):void; //Changes the tab's accent color.
+    setVisible(bool:boolean): void;
 
     //events
     abstract onTabChanged(tab, previous) //Called on changing tabs.
@@ -122,7 +123,7 @@ declare module metagui {
     expand? : boolean, // If true, gives (horizontal) expansion priority.
     wrap? : boolean, // Default: true. If false, disables word wrap.
 
-    setText(this: void, text:string):void;
+    setText(text:string):void;
   }
   
   /**
@@ -134,8 +135,8 @@ declare module metagui {
     scale? : unsigned, // Default: 1. Scale proportion for the image.
     noAutoCrop? : boolean, // Default: false. When true, preserve empty space in image margins; otherwise, behavior matches vanilla images.
 
-    setFile(this: void, path: string, noAutoCrop?: boolean):void;
-    setScale(this: void, value: number):void;
+    setFile(path: string, noAutoCrop?: boolean):void;
+    setScale(value: number):void;
   }
 
   /**
@@ -145,7 +146,7 @@ declare module metagui {
     type: "canvas",
 
     //Shorthand for widget.bindCanvas(canvas.backingWidget)
-    bind(this: void, );
+    bind();
   }
 
   abstract class Button extends widget {
@@ -157,7 +158,7 @@ declare module metagui {
     expand? : boolean; // If true, gives (horizontal) expansion priority.
 
     //Sets the button's caption.
-    setText(this: void, label:string):void;
+    setText(label:string):void;
 
     //Called when button released after pressing (left click).
     abstract onClick();
@@ -172,8 +173,8 @@ declare module metagui {
     hoverImage: string;
     pressImage: string;
 
-    setImage(this: void, idle: string, hover: string, press: string):void; //Sets the button's icon drawables.
-    setText(this: void, label:string):void; //TODD test if it works
+    setImage(idle: string, hover: string, press: string):void; //Sets the button's icon drawables.
+    setText(label:string):void; //TODD test if it works
 
     //Called when button released after pressing (left click).
     abstract onClick() 
@@ -187,11 +188,11 @@ declare module metagui {
     radioGroup? : string; // If specified, widget becomes a radio button grouped with others of its group.
     value? : any; // Any data type. Used by radio buttons.
 
-    setChecked(this: void, checked: boolean):void;
-    getGroupChecked(this: void):CheckBox|null; //If widget is a radio button, returns the checked widget of its group.
-    getGroupValue(this: void): any|null; //Same as above, except returns the widget's value attribute.
-    findValue(this: void, val: any):CheckBox|null; //If widget is a radio button, returns its sibling with given value if it exists.
-    selectValue(this: void, val: any):CheckBox|null; //Same as above, but also sets the specified sibling checked.
+    setChecked(checked: boolean):void;
+    getGroupChecked():CheckBox|null; //If widget is a radio button, returns the checked widget of its group.
+    getGroupValue(): any|null; //Same as above, except returns the widget's value attribute.
+    findValue(val: any):CheckBox|null; //If widget is a radio button, returns its sibling with given value if it exists.
+    selectValue(val: any):CheckBox|null; //Same as above, but also sets the specified sibling checked.
 
     //events
     abstract onClick()
@@ -209,14 +210,14 @@ declare module metagui {
     inline? : boolean; // Alias for an expandMode of [0, 0].
     expand? : boolean; // Alias for an expandMode of [2, 0].
 
-    focus(this: void): void; //Grabs keyboard focus.
-    blur(this: void): void;  //Releases focus.
-    setText(this: void, text: string): void; //Sets contents.
-    setColor(this: void, color: string):void; //Sets text color.
+    focus(): void; //Grabs keyboard focus.
+    blur(): void;  //Releases focus.
+    setText(text: string): void; //Sets contents.
+    setColor(color: string):void; //Sets text color.
 
-    setCursorPosition(this: void, pos: int):void; //Sets the position of the text cursor, in characters.
-    moveCursor(this: void, pos: int):void; //Moves the cursor by a given number of characters (left or right).
-    setScrollPosition(this: void, pos: number):void; //Sets how far the text field is scrolled, if contents overflow.
+    setCursorPosition(pos: int):void; //Sets the position of the text cursor, in characters.
+    moveCursor(pos: int):void; //Moves the cursor by a given number of characters (left or right).
+    setScrollPosition(pos: number):void; //Sets how far the text field is scrolled, if contents overflow.
 
     //events
     abstract onTextChanged() //Called on any change to the entered text.
@@ -236,12 +237,12 @@ declare module metagui {
     // Implicit for menuItems.
     selectionGroup? : string; // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
 
-    select(this: void):void;
-    deselect(this: void):void;
+    select():void;
+    deselect():void;
 
     //events
-    abstract onSelected()
-    abstract onClick()
+    abstract onSelected(args)
+    abstract onClick(args)
   }
 
   /**
@@ -255,8 +256,8 @@ declare module metagui {
       // Implicit for menuItems.
       selectionGroup? : string; // Selecting a menu item will only automatically deselect siblings with the same selection group (nil included).
   
-      select(this: void):void;
-      deselect(this: void):void;
+      select():void;
+      deselect():void;
   
       //events
       abstract onSelected()

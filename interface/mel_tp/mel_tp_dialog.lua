@@ -18,17 +18,40 @@ local mel_tp = {
 }
 local inactiveColor = "ff0000"
 
+local function getCurrentLocation()
+  local entityConfig = root.itemConfig({
+    name = world.getObjectParameter(
+      pane.sourceEntity(),
+      "objectName"
+    ),
+    count = 1,
+    parameters = {}
+  })
+  local uniqueId = ""
+  if entityConfig ~= nil then
+    uniqueId = world.entityUniqueId(pane.sourceEntity())
+  end
+  if uniqueId ~= "" then
+    local worldId = player.worldId()
+    return {worldId, uniqueId}
+  end
+  return nil
+end
+
 local function clearPlanetInfo()
   lblBkmName:setText("")
   lblBkmHazards:setText("")
   listHazards:clearChildren()
 end
 
-local function displayPlanetInfo(coord)
+local function displayPlanetInfo(coord, currentLocation)
   clearPlanetInfo()
   local dbErrorText = mel_tp.dialogConfig.mel_tp_dialog.CelestialDatabaseError or ""
   local name = celestial.planetName(coord)
   local planetParams = celestial.visitableParameters(coord)
+  if currentLocation == true then
+    lblBkmNote.setText("Your current location")
+  end
   if name ~= nil then
     lblBkmName:setText(name)
   else
@@ -106,8 +129,6 @@ local function OnTpTargetSelect(bookmarkWidget)
     lblBkmHazards:setText(world.timeOfDay())
   else
     --Bookmark 
-    btnEdit.color = "accent"
-
     ---@diagnostic disable-next-line: undefined-field
     local warpTarget = mel_tp.selected.warpAction[1]
     local coord = mel_tp_util.WorldIdToObject(warpTarget)
@@ -129,7 +150,7 @@ local function OnTpTargetSelect(bookmarkWidget)
         end
       end
     end
-
+    btnEdit.color = "accent"
   end
   --debug
   lblDump:setText(sb.printJson(bookmarkWidget.bkmData))
@@ -165,40 +186,27 @@ local function populateBookmarks()
 
   --Current location
   if finalTpConfig.canBookmark == true then
-    local entityConfig = root.itemConfig({
-      name = world.getObjectParameter(
-        pane.sourceEntity(),
-        "objectName"
-      ),
-      count = 1,
-      parameters = {}
-    })
-    local uniqueId = ""
-    if entityConfig ~= nil then
-      uniqueId = world.entityUniqueId(pane.sourceEntity())
-    end
-    if uniqueId ~= "" then
-      local worldId = player.worldId()
+    local currentTpLocation = getCurrentLocation()
+    if currentTpLocation ~= nil then
       local destination = {
         icon = "default",
         name = finalTpConfig.bookmarkName,
         planetName = "???",
-        warpAction = {worldId, uniqueId}
+        warpAction = currentTpLocation
       }
       if mel_tp_util.IsBookmarkShip(destination.warpAction) then
         destination.icon = "ship"
         destination.planetName = "Player Ship"
       elseif mel_tp_util.IsBookmarkPlanet(destination.warpAction) then
-        local planetWorldIdString = worldId
-        do
-          destination.icon = world.type() or "default"
-          destination.planetName = celestial.planetName(mel_tp_util.WorldIdToObject(planetWorldIdString))
-        end
+        local planetWorldIdString = destination.warpAction[1]
+        destination.icon = world.type() or "default"
+        destination.planetName = celestial.planetName(mel_tp_util.WorldIdToObject(planetWorldIdString))
       elseif mel_tp_util.IsBookmarkInstance(destination.warpAction) then
-        local instanceWorldIdString = worldId
+        local instanceWorldIdString = destination.warpAction[1]
         local instanceWorldId = mel_tp_util.WorldIdToObject(instanceWorldIdString)
-        do
-          destination.icon = world.type() or "default"
+        destination.icon = world.type() or "default"
+        if instanceWorldId ~= nil then
+          --should always be true
           destination.planetName = instanceWorldId.instance
         end
       end
@@ -213,16 +221,17 @@ local function populateBookmarks()
       if currentLocBookmarked == nil or finalTpConfig.canTeleport == false then
         local currentBookmark = mel_tp.bookmarkTemplate
         currentBookmark.children[1].file = mel_tp_util.getIconFullPath(destination.icon)
-        if(destination.name ~= "") then
-          currentBookmark.children[2].text = destination.name
+        if destination.name ~= "" then
+          currentBookmark.children[2].text = destination.name .. " (not saved)"
         else
           currentBookmark.children[2].text = "Current location (not saved)"
         end
         currentBookmark.children[3].text = destination.planetName
         local addedBookmark = bookmarksList:addChild(currentBookmark)
-        addedBookmark.onSelected = nil
+        addedBookmark.onSelected = OnTpTargetSelect
         addedBookmark.bkmData = destination
-      end
+        addedBookmark:select()
+    end
     end
   end
 
@@ -356,7 +365,7 @@ local function populateBookmarks()
   metagui.queueFrameRedraw()
 end
 
-function txtboxFilter:onEnter()
+txtboxFilter.onEnter = function(self)
   mel_tp.filter = txtboxFilter.text
   if mel_tp.bookmarks == nil then
     return
@@ -365,18 +374,18 @@ function txtboxFilter:onEnter()
   populateBookmarks()
 end
 
-function txtboxFilter:onEscape()
+txtboxFilter.onEscape = function(self)
   btnResetFilter:onClick()
 end
 
-function btnResetFilter:onClick()
+btnResetFilter.onClick = function(self)
   mel_tp.filter = ""
   txtboxFilter:setText("")
   mel_tp.bookmarksFiltered = nil
   populateBookmarks()
 end
 
-function btnSortByPlanet:onClick()
+btnSortByPlanet.onClick = function(self)
   if mel_tp.bookmarks == nil then
     return
   end
@@ -384,7 +393,7 @@ function btnSortByPlanet:onClick()
   populateBookmarks()
 end
 
-function btnEdit:onClick()
+btnEdit.onClick = function(self)
   ---@diagnostic disable-next-line: undefined-field
   if mel_tp.selected == nil or type(mel_tp.selected.warpAction) == "string" then
       widget.playSound("/sfx/interface/clickon_error.ogg")
@@ -394,7 +403,7 @@ function btnEdit:onClick()
   player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_edit.ui", data = {mel_tp = mel_tp, localeData = mel_tp.dialogConfig.mel_tp_edit}})
 end
 
-function btnTeleport:onClick()
+btnTeleport.onClick = function(self)
   if(mel_tp.selected == nil) then
     widget.playSound("/sfx/interface/clickon_error.ogg")  
     lblDump:setText("No target selected")
@@ -402,6 +411,11 @@ function btnTeleport:onClick()
   end
   ---@diagnostic disable-next-line: undefined-field
   local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
+  if getCurrentLocation() ~= nil and warpTarget == mel_tp_util.TargetToWarpCommand(getCurrentLocation()) then
+    widget.playSound("/sfx/interface/clickon_error.ogg")
+    lblDump:setText("You are already here")
+    return
+  end
   lblDump:setText("Stringified warp target: " .. warpTarget)
   
   ---@diagnostic disable-next-line: undefined-field
@@ -409,7 +423,7 @@ function btnTeleport:onClick()
   pane.dismiss()
 end
 
-function btnDeploy:onClick()
+btnDeploy.onClick = function(self)
   if mel_tp.selected == nil then
     widget.playSound("/sfx/interface/clickon_error.ogg")
     lblDump:setText("No target selected")
@@ -423,11 +437,16 @@ function btnDeploy:onClick()
   
 ---@diagnostic disable-next-line: undefined-field
   local warpTarget = mel_tp_util.TargetToWarpCommand(mel_tp.selected.warpAction)
-    player.warp(warpTarget, "deploy", true)
+  if getCurrentLocation() ~= nil and warpTarget == mel_tp_util.TargetToWarpCommand(getCurrentLocation()) then
+    widget.playSound("/sfx/interface/clickon_error.ogg")
+    lblDump:setText("You are already here")
+    return
+  end
+  player.warp(warpTarget, "deploy", true)
   pane.dismiss()
 end
 
-function btnFallback:onClick()
+btnFallback.onClick = function(self)
   player.interact("OpenTeleportDialog", mel_tp.configPath, pane.sourceEntity());
   pane.dismiss();
 end
@@ -488,8 +507,22 @@ local function main()
         end
     end
   end
-
   lblVersion:setText(mel_tp.version)
+
+  local currentLoc = getCurrentLocation()
+    if currentLoc ~= nil then
+      local currentLocBookmarked = util.find(
+        mel_tp.bookmarks,
+        function(bkm)
+          return mel_tp_util.TargetToWarpCommand(bkm.target) == mel_tp_util.TargetToWarpCommand(currentLoc)
+        end
+      )
+      sb.logWarn(sb.print(currentLocBookmarked))
+      sb.logWarn(sb.printJson(mel_tp.selected))
+      if currentLocBookmarked == nil and mel_tp.selected ~= nil then
+        btnEdit:onClick()
+      end
+  end
 end
 
 main()

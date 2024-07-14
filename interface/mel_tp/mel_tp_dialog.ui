@@ -60,7 +60,8 @@
         "data" : {},
         "children" : [
           {"type": "spacer", "size": 8, "expandMode": [0, 0]},
-          {"type":"label", "id":"lblBkmName", "text": "", "fontSize" : 9, "size": [20, 24], "expandMode": [2, 1], "align": "center"},    
+          {"type": "label", "id":"lblBkmName", "text": "", "fontSize" : 9, "size": [20, 24], "expandMode": [2, 1], "align": "center"},
+          {"type": "label", "id":"lblBkmNote", "text": "", "size": [20, 10], "expandMode": [2, 1], "align": "center"},
           {"type": "panel", "mode": "horizontal", "align": 0, "size": [20, 20], "style": "concave", "expandMode": [2, 1], "children": [
               {"type": "layout", "id": "listHazards", "mode": "horizontal", "align": 0, "expandMode": [2, 1], "children": [],
                 "data": { "type": "image", "file": "", "toolTip": "", "noAutoCrop" : true}
