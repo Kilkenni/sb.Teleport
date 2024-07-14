@@ -105,6 +105,7 @@ btnEditDelete.onClick = function() {
 			// sb.logWarn("[HELP] CONFIRMATION: YES")
 			pane.playSound("/sfx/projectiles/electric_barrier_shock_kill.ogg");
       player.removeTeleportBookmark(mel_tp_edit.bookmarkState);
+      player.setProperty("mel_tp_repopulate_required", true as unknown as JSON);
       pane.dismiss();
 			// widget.playSound("/sfx/objects/cropshipper_box_lock3.ogg")
     }
@@ -133,6 +134,7 @@ btnEditSave.onClick = function() {
     pane.playSound("/sfx/interface/ship_confirm1.ogg");
   }
   player.addTeleportBookmark(mel_tp_edit.bookmarkState);
+  player.setProperty("mel_tp_repopulate_required", true as unknown as JSON);
   pane.dismiss();
   return;
 }

@@ -143,33 +143,32 @@ declare module player {
    */
   function ownShipWorldId():string;
 
-  /*
+  //CUSTOM PLAYER PROPERTIES
 
+  /**
+   * Returns the value assigned to the specified generic player property. If there is no value set, returns defaultValue.
+   */
+  function getProperty(name: string, defaultValue?: JSON):JSON;
 
-#### `Json` player.getProperty(`String` name, `Json` default)
+  /**
+   * Sets a generic player property to the specified value.
+   */
+  function setProperty(name: string, value: JSON): void;
 
-Returns the value assigned to the specified generic player property. If there is no value set, returns default.
+  //OBJECT SCANNER
 
----
+  /**
+   * Adds the specified object to the player's scanned objects.
+   * @param name 
+   */
+  function addScannedObject(name: string): void;
 
-#### `void` player.setProperty(`String` name, `Json` value)
+  /**
+   * Removes the specified object from the player's scanned objects.
+   * @param name 
+   */
+  function removeScannedObject(name: string): void;
 
-Sets a generic player property to the specified value.
-
----
-
-#### `void` player.addScannedObject(`String` name)
-
-Adds the specified object to the player's scanned objects.
-
----
-
-#### `void` player.removeScannedObject(`String` name)
-
-Removes the specified object from the player's scanned objects.
-
----
-*/
   /**
    * Triggers an interact action on the player as if they had initiated an interaction and the result had returned the specified interaction type and configuration. Can be used to e.g. open GUI windows normally triggered by player interaction with entities.
    * @param interactionType 

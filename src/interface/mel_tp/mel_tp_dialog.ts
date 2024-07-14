@@ -2,6 +2,7 @@
  * This module handles main Teleport ScriptPane constructed with MetaGUI
  */
 /** @noResolution */
+// <reference path = "../../@types-mods/stardust_metagui.lua.d.ts" />
 import {metagui} from "../../@types-mods/stardust_metagui.lua";
 declare const bookmarksList:metagui.ScrollArea;
 declare const txtboxFilter: metagui.TextBox;
@@ -65,10 +66,6 @@ const mel_tp:{
 };
 const inactiveColor = "ff0000"; //red
 
-function refreshBookmarks():void {
-  mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
-}
-
 /**
  * @returns current location shaped as a BookmarkTarget. If the location cannot be bookmarked (example: handheld teleporter), returns null.
  */
@@ -91,6 +88,10 @@ function getCurrentLocation():BookmarkTarget|null {
     ] as BookmarkTarget;
   }
   return null;
+}
+
+function refreshBookmarks():void {
+  mel_tp.bookmarks = player.teleportBookmarks() as TeleportBookmark[];
 }
 
 function populateBookmarks() {
@@ -450,6 +451,22 @@ namespace Star {
   */
     
   metagui.queueFrameRedraw()
+}
+
+/**
+ * Automatic function that gets called with dt interval by C++
+ * @param dt Frequency of refreshing, in delta tick. 1 dt = 1/60 of a second
+ */
+function update(dt: number) {
+  if(player.getProperty("mel_tp_repopulate_required", false as unknown as JSON) as unknown as boolean === true) {
+    player.setProperty("mel_tp_repopulate_required", {} as unknown as JSON); //reset property
+    refreshBookmarks(); //force refresh bookmarks
+    if(mel_tp.bookmarks !== undefined) {
+      mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter) //force filter
+    }
+    mel_tp.selected = undefined; //reset data for selected widget, we have new widgets with new data
+    populateBookmarks();
+  }
 }
 
 function clearPlanetInfo():void {

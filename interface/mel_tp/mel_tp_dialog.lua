@@ -159,6 +159,7 @@ end
 local function refreshBookmarks()
   mel_tp.bookmarks = player.teleportBookmarks()
 end
+
 local function populateBookmarks()
   bookmarksList:clearChildren()
   local finalTpConfig = {
@@ -365,6 +366,21 @@ local function populateBookmarks()
   metagui.queueFrameRedraw()
 end
 
+--- Automatic function that gets called with dt interval by C++
+-- 
+-- @param dt Frequency of refreshing, in delta tick. 1 dt = 1/60 of a second
+function update(dt)
+  if player.getProperty("mel_tp_repopulate_required", false) == true then
+    player.setProperty("mel_tp_repopulate_required", {})
+    refreshBookmarks()
+    if mel_tp.bookmarks ~= nil then
+      mel_tp.bookmarksFiltered = mel_tp_util.FilterBookmarks(mel_tp.bookmarks, mel_tp.filter)
+    end
+    mel_tp.selected = nil
+    populateBookmarks()
+  end
+end
+
 txtboxFilter.onEnter = function(self)
   mel_tp.filter = txtboxFilter.text
   if mel_tp.bookmarks == nil then
@@ -517,8 +533,6 @@ local function main()
           return mel_tp_util.TargetToWarpCommand(bkm.target) == mel_tp_util.TargetToWarpCommand(currentLoc)
         end
       )
-      sb.logWarn(sb.print(currentLocBookmarked))
-      sb.logWarn(sb.printJson(mel_tp.selected))
       if currentLocBookmarked == nil and mel_tp.selected ~= nil then
         btnEdit:onClick()
       end

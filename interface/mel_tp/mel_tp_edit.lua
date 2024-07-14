@@ -46,6 +46,7 @@ function btnEditDelete:onClick()
       if choice == true then
         pane.playSound("/sfx/projectiles/electric_barrier_shock_kill.ogg")
         player.removeTeleportBookmark(mel_tp_edit.bookmarkState)
+        player.setProperty("mel_tp_repopulate_required", true)
         pane.dismiss()
       else
         return
@@ -67,6 +68,7 @@ function btnEditSave:onClick()
     pane.playSound("/sfx/interface/ship_confirm1.ogg")
   end
   player.addTeleportBookmark(mel_tp_edit.bookmarkState)
+  player.setProperty("mel_tp_repopulate_required", true)
   pane.dismiss()
 end
 
