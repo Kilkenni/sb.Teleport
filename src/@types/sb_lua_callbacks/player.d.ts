@@ -159,9 +159,9 @@ declare module player {
 
   /**
    * Adds the specified object to the player's scanned objects.
-   * @param name 
+   * @returns FIXME 
    */
-  function addScannedObject(name: string): void;
+  function addScannedObject(name: string): boolean;
 
   /**
    * Removes the specified object from the player's scanned objects.
@@ -280,141 +280,146 @@ Returns `true` if the player knows one or more recipes to create the specified i
    */
   function consumeCurrency(currencyName: string, amount:unsigned):boolean;
 
+  //ITEMS
+
+  /**
+   * Triggers an immediate cleanup of the player's inventory, removing item stacks with 0 quantity. May rarely be required in special cases of making several sequential modifications to the player's inventory within a single tick.
+   */
+  function cleanupItems():void;
+
+  /**
+   * Adds the specified item to the player's inventory.
+   * @param item 
+   */
+  function giveItem(item: ItemDescriptor):void;
+
+  /**
+   * @param item 
+   * @param exactMatch If exactMatch is `true` then parameters as well as item name must match.
+   * @returns Returns `true` if the player's inventory contains an item matching the specified descriptor and `false` otherwise. 
+   */
+  function hasItem(item: ItemDescriptor, exactMatch?: boolean): boolean;
+
+  /**
+   * @param item 
+   * @param exactMatch If exactMatch is `true` then parameters as well as item name must match.
+   * @returns Returns the total number of items in the player's inventory matching the specified descriptor. 
+   */
+  function hasCountOfItem(item:ItemDescriptor, exactMatch?: boolean):unsigned;
+
+  /**
+   * Attempts to consume the specified item from the player's inventory and returns the item consumed if successful. 
+   * @param item 
+   * @param consumePartial If consumePartial is `true`, matching stacks totalling fewer items than the requested count may be consumed, otherwise the operation will only be performed if the full count can be consumed.
+   * @param exactMatch If exactMatch is `true` then parameters as well as item name must match.
+   */
+  function consumeItem(item: ItemDescriptor, consumePartial?: boolean, exactMatch?: boolean):ItemDescriptor;
+
+  /**
+   * @returns Returns a summary of all tags of all items in the player's inventory. Keys in the returned map are tag names and their corresponding values are the total count of items including that tag.
+   */
+  function inventoryTags(): Map<string, unsigned>;
+
+  /**
+   * @returns Returns a list of `ItemDescriptor`s for all items in the player's inventory that include the specified tag.
+   */
+  function itemsWithTag(tag: string):ItemDescriptor[];
+
+  /**
+   * Consumes items from the player's inventory that include the matching tag, up to the specified count of items.
+   * @param tag 
+   * @param count 
+   */
+  function consumeTaggedItem(tag: string, count: unsigned):void;
+
+  /**
+   * @param parameter 
+   * @param value 
+   * @returns Returns `true` if the player's inventory contains at least one item which has the specified parameter set to the specified value.
+   */
+  function hasItemWithParameter(parameter: string, value: JSON):boolean;
+
+  /**
+   * Consumes items from the player's inventory that have the specified parameter set to the specified value, up to the specified count of items.
+   * @param parameter 
+   * @param value 
+   * @param count 
+   */
+  function consumeItemWithParameter(parameter: string, value: JSON, count: unsigned):void;
+
+  /**
+   * @param parameter 
+   * @param value 
+   * @returns Returns the first item in the player's inventory that has the specified parameter set to the specified value, or `nil` if no such item is found.
+   */
+  function getItemWithParameter(parameter: string, value: JSON):ItemDescriptor|null;
+
+  /**
+   * @returns Returns the player's currently equipped primary hand item, or `nil` if no item is equipped.
+   */
+  function primaryHandItem():ItemDescriptor|null;
+
+  /**
+   * @returns Returns the player's currently equipped alt hand item, or `nil` if no item is equipped.
+   */
+  function altHandItem():ItemDescriptor|null;
+
+  /**
+   * @returns Returns a list of the tags on the currently equipped primary hand item, or `nil` if no item is equipped.
+   */
+  function primaryHandItemTags(): string[]|niull;
+
+  /**
+   * @returns Returns a list of the tags on the currently equipped alt hand item, or `nil` if no item is equipped.
+  */
+  function altHandItemTags(): string[]|null;
+
+  /**
+   * @param slotName Essential slot names are "beamaxe", "wiretool", "painttool" and "inspectiontool".
+   * @returns Returns the contents of the specified essential slot, or `nil` if the slot is empty. 
+   */
+  function essentialItem(slotName: string): ItemDescriptor|null;
+
+  /**
+   * Sets the contents of the specified essential slot to the specified item.
+   * @param slotName 
+   * @param item 
+   */
+  function giveEssentialItem(slotName: string, item: ItemDescriptor): void;
+
+  /**
+   * Removes the essential item in the specified slot.
+   * @param slotName 
+   */
+  function removeEssentialItem(slotName: string): void;
+
+  /**
+   * @param slotName Equipment slot names are "head", "chest", "legs", "back", "headCosmetic", "chestCosmetic", "legsCosmetic" and "backCosmetic".
+   * @returns Returns the contents of the specified equipment slot, or `nil` if the slot is empty.
+   */
+  function equippedItem(slotName: string): ItemDescriptor|null;
+
+  /**
+   * Sets the item in the specified equipment slot to the specified item.
+   * @param slotName 
+   * @param item 
+   */
+  function setEquippedItem(slotName: string, item: JSON):void;
+
+  /**
+   * @returns Returns the contents of the player's swap (cursor) slot, or `nil` if the slot is empty.
+   */
+  function swapSlotItem():ItemDescriptor|null;
+
+  /**
+   * Sets the item in the player's swap (cursor) slot to the specified item.
+   * @param item 
+   */
+  function setSwapSlotItem(item: JSON):void;
+
+  //MISSION
+  
 /*
-#### `void` player.cleanupItems()
-
-Triggers an immediate cleanup of the player's inventory, removing item stacks with 0 quantity. May rarely be required in special cases of making several sequential modifications to the player's inventory within a single tick.
-
----
-
-#### `void` player.giveItem(`ItemDescriptor` item)
-
-Adds the specified item to the player's inventory.
-
----
-
-#### `bool` player.hasItem(`ItemDescriptor` item, [`bool` exactMatch])
-
-Returns `true` if the player's inventory contains an item matching the specified descriptor and `false` otherwise. If exactMatch is `true` then parameters as well as item name must match.
-
----
-
-#### `unsigned` player.hasCountOfItem(`ItemDescriptor` item, [`bool` exactMatch])
-
-Returns the total number of items in the player's inventory matching the specified descriptor. If exactMatch is `true` then parameters as well as item name must match.
-
----
-
-#### `ItemDescriptor` player.consumeItem(`ItemDescriptor` item, [`bool` consumePartial], [`bool` exactMatch])
-
-Attempts to consume the specified item from the player's inventory and returns the item consumed if successful. If consumePartial is `true`, matching stacks totalling fewer items than the requested count may be consumed, otherwise the operation will only be performed if the full count can be consumed. If exactMatch is `true` then parameters as well as item name must match.
-
----
-
-#### `Map<String, unsigned>` player.inventoryTags()
-
-Returns a summary of all tags of all items in the player's inventory. Keys in the returned map are tag names and their corresponding values are the total count of items including that tag.
-
----
-
-#### `JsonArray` player.itemsWithTag(`String` tag)
-
-Returns a list of `ItemDescriptor`s for all items in the player's inventory that include the specified tag.
-
----
-
-#### `void` player.consumeTaggedItem(`String` tag, `unsigned` count)
-
-Consumes items from the player's inventory that include the matching tag, up to the specified count of items.
-
----
-
-#### `bool` player.hasItemWithParameter(`String` parameter, `Json` value)
-
-Returns `true` if the player's inventory contains at least one item which has the specified parameter set to the specified value.
-
----
-
-#### `void` player.consumeItemWithParameter(`String` parameter, `Json` value, `unsigned` count)
-
-Consumes items from the player's inventory that have the specified parameter set to the specified value, upt to the specified count of items.
-
----
-
-#### `ItemDescriptor` player.getItemWithParameter(`String` parameter, `Json` value)
-
-Returns the first item in the player's inventory that has the specified parameter set to the specified value, or `nil` if no such item is found.
-
----
-
-#### `ItemDescriptor` player.primaryHandItem()
-
-Returns the player's currently equipped primary hand item, or `nil` if no item is equipped.
-
----
-
-#### `ItemDescriptor` player.altHandItem()
-
-Returns the player's currently equipped alt hand item, or `nil` if no item is equipped.
-
----
-
-#### `JsonArray` player.primaryHandItemTags()
-
-Returns a list of the tags on the currently equipped primary hand item, or `nil` if no item is equipped.
-
----
-
-#### `JsonArray` player.altHandItemTags()
-
-Returns a list of the tags on the currently equipped alt hand item, or `nil` if no item is equipped.
-
----
-
-#### `ItemDescriptor` player.essentialItem(`String` slotName)
-
-Returns the contents of the specified essential slot, or `nil` if the slot is empty. Essential slot names are "beamaxe", "wiretool", "painttool" and "inspectiontool".
-
----
-
-#### `void` player.giveEssentialItem(`String` slotName, `ItemDescriptor` item)
-
-Sets the contents of the specified essential slot to the specified item.
-
----
-
-#### `void` player.removeEssentialItem(`String` slotName)
-
-Removes the essential item in the specified slot.
-
----
-
-#### `ItemDescriptor` player.equippedItem(`String` slotName)
-
-Returns the contents of the specified equipment slot, or `nil` if the slot is empty. Equipment slot names are "head", "chest", "legs", "back", "headCosmetic", "chestCosmetic", "legsCosmetic" and "backCosmetic".
-
----
-
-#### `void` player.setEquippedItem(`String` slotName, `Json` item)
-
-Sets the item in the specified equipment slot to the specified item.
-
----
-
-#### `ItemDescriptor` player.swapSlotItem()
-
-Returns the contents of the player's swap (cursor) slot, or `nil` if the slot is empty.
-
----
-
-#### `void` player.setSwapSlotItem(`Json` item)
-
-Sets the item in the player's swap (cursor) slot to the specified item.
-
----
-
-
-
 #### `void` player.enableMission(`String` missionName)
 
 Adds the specified mission to the player's list of available missions.
