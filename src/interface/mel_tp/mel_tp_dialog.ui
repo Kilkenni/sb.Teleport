@@ -15,6 +15,16 @@
     { "mode" : "horizontal"},
     { "type": "layout", "mode": "vertical", "align": 0, "expandMode": [1, 2], "children":
       [
+        { "type": "layout", "mode": "horizontal", "expandMode": [1, 1], "children": [
+          {"type": "spacer", "size": 16, "expandMode": [0, 0]},
+          {"type": "spacer", "expandMode": [0, 0]},
+          { 
+            "type" : "button", 
+            "caption" : "Sort by planet", 
+            "id": "btnSortByPlanet",
+            "expandMode": [2, 0]
+          }
+        ] },
         {"type": "spacer", "size": 8, "expandMode": [0, 0]},
         { 
           "type" : "scrollArea", "id":"bookmarksList", "scrollDirections" : [1, 1], "expandMode": [1, 2], "scrollBars" : true, "align": 0, 
@@ -48,11 +58,6 @@
         "caption" : "Reset filter",
         "id" : "btnResetFilter",
         "color" : "accent"
-      },
-      { 
-        "type" : "button", 
-        "caption" : "Sort by planet", 
-        "id": "btnSortByPlanet"
       },
       {"type": "spacer", "size": 8, "expandMode": [0, 0]},
       { 

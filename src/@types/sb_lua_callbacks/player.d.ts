@@ -367,7 +367,7 @@ Returns `true` if the player knows one or more recipes to create the specified i
   /**
    * @returns Returns a list of the tags on the currently equipped primary hand item, or `nil` if no item is equipped.
    */
-  function primaryHandItemTags(): string[]|niull;
+  function primaryHandItemTags(): string[]|null;
 
   /**
    * @returns Returns a list of the tags on the currently equipped alt hand item, or `nil` if no item is equipped.

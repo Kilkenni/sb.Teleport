@@ -50,6 +50,10 @@ const mel_tp:{
   animation: string,
   dialogConfig: TpDialogConfig,
   version: string
+  sorting: {
+    byPlanetAsc: boolean,
+    byNameAsc: boolean
+  }
 } = {
   paneIcon: "/interface/warping/icon.png", //default values
   paneTitle: "Teleporter",
@@ -62,7 +66,11 @@ const mel_tp:{
   selected: undefined,
   animation: "default",
   dialogConfig: root.assetJson("/interface/mel_tp/mel_tp.config") as unknown as TpDialogConfig,
-  version: "SparkTpTec v: unknown"
+  version: "SparkTpTec v: unknown",
+  sorting: {
+    byPlanetAsc: false,
+    byNameAsc: true
+  }
 };
 const inactiveColor = "ff0000"; //red
 
@@ -624,7 +632,16 @@ btnSortByPlanet.onClick = function ():void {
   if(mel_tp.bookmarks === undefined) {
     return;
   }
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false) as unknown as TeleportBookmark[];
+  mel_tp.sorting.byPlanetAsc = !mel_tp.sorting.byPlanetAsc;
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", !mel_tp.sorting.byPlanetAsc) as unknown as TeleportBookmark[];
+  let label = "Sort by planet ";
+  if(mel_tp.sorting.byPlanetAsc === true) {
+    label = label + "˅";
+  }
+  else {
+    label = label + "˄";
+  }
+  btnSortByPlanet.setText(label);
   populateBookmarks();
 }
 
@@ -743,7 +760,7 @@ function main(this:void):void {
   metagui.setIcon(mel_tp.paneIcon);
 
   if(mel_tp.bookmarks !== undefined) {
-    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false) as unknown as TeleportBookmark[];
+    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", !mel_tp.sorting.byNameAsc) as unknown as TeleportBookmark[];
   }
   refreshBookmarks();
   populateBookmarks();

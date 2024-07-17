@@ -14,7 +14,11 @@ local mel_tp = {
   selected = nil,
   animation = "default",
   dialogConfig = root.assetJson("/interface/mel_tp/mel_tp.config"),
-  version = "SparkTpTec v: unknown"
+  version = "SparkTpTec v: unknown",
+  sorting = {
+    byPlanetAsc = false,
+    byNameAsc = true
+  }
 }
 local inactiveColor = "ff0000"
 
@@ -405,7 +409,15 @@ btnSortByPlanet.onClick = function(self)
   if mel_tp.bookmarks == nil then
     return
   end
-  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", false)
+  mel_tp.sorting.byPlanetAsc = not mel_tp.sorting.byPlanetAsc
+  mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "targetName", not mel_tp.sorting.byPlanetAsc)
+  local label = "Sort by planet "
+  if mel_tp.sorting.byPlanetAsc == true then
+    label = label .. "˅"
+  else
+    label = label .. "˄"
+  end
+  btnSortByPlanet:setText(label)
   populateBookmarks()
 end
 
@@ -503,7 +515,7 @@ local function main()
   metagui.setIcon(mel_tp.paneIcon);
 
   if mel_tp.bookmarks ~= nil then
-    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", false)
+    mel_tp.bookmarks = mel_tp_util.sortArrayByProperty(mel_tp.bookmarks, "bookmarkName", not mel_tp.sorting.byNameAsc)
   end
   refreshBookmarks()
   populateBookmarks()
