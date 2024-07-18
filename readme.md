@@ -10,9 +10,9 @@ Planned features will probably be available in Issues. Soon :tm: Suggestions are
 
 ## Flavor
 
-Everything is achieveable through technology. Better living, robust health and - for the first time in our history - the possibility of a better teleportation. Hello and welcome to Spark Indistries. What you'll need for spacefaring is right here.
+Everything is achievable through technology. Better living, robust health and - for the first time in our history - the possibility of a better teleportation. Hello and welcome to Spark Industries. What you'll need for spacefaring is right here.
 
-Project sb.Teleport, courtesy of SI, was created as a response to the tender published by the Terrene Protectorate. Its goal was to create a convenient, functional and simple UI system paired with their newly implemented Ship-based Artificial Intelligence Latice. Eventually another finalist had been chosen, one the Terrene Protectorate dubbed more... "agreeable".
+Project sb.Teleport, courtesy of SI, was created as a response to the tender published by the Terrene Protectorate. Its goal was to create a convenient, functional and simple UI system paired with their newly implemented Ship-based Artificial Intelligence Lattice. Eventually another finalist had been chosen, one the Terrene Protectorate dubbed more... "agreeable".
 
 We at SI, however, never lost hope. While the Protectorate's eventual demise was tragic and untimely, not in the least due to billing and development plans put on indefinite hold, it also offered an opportunity to get access to Ship Lattices circumventing usual Protectorate bureaucracy. We finally got a chance to see our ideas in practice. Please, keep in mind that new technology involves risks, so remember to backup your important data before upgrading, and report any issues with the system to our engineers. A happy customer is a healthy customer with their limbs still attached. Be safe and travel with a flash!
 
