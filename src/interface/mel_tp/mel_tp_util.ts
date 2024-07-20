@@ -183,7 +183,12 @@ function TargetToWarpCommand(target: WarpAction):WarpActionString {
     return `Player:${target[1] as Uuid}`; //FIXME
   }
   else {
-    return `${target[0]}=${target[1]}` as WarpToWorld;
+    if(target[1] === undefined) {
+      return `${target[0]}` as WarpToWorld;
+    }
+    else {
+      return `${target[0]}=${target[1]}` as WarpToWorld;
+    }
   }
 }
 

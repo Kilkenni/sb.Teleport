@@ -222,15 +222,19 @@ end
 local function TargetToWarpCommand(target)
   if type(target) == "string" then
     --WarpAlias
-      return target
+    return target
   end
   if target[1] == "player" then
-      return "Player:" .. target[2]
+    return "Player:" .. target[2]
   end
   if target[1] == "object" then
-      return "Player:" .. target[2]  --FIXME
+    return "Player:" .. target[2]  --FIXME
   else
-      return ((tostring(target[1]) .. "=") .. tostring(target[2])) 
+    if target[2] == nil then
+      return tostring(target[1])
+    else
+      return (tostring(target[1]) .. "=") .. tostring(target[2])
+    end
   end
 end
 
