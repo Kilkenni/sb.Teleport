@@ -3,7 +3,8 @@
     "op" : "add",
     "path" : "/panes/sbTeleport",
     "value" : {
-      "TeleportDialog" : "/interface/mel_tp/mel_tp_dialog.ui" //addressed as sbTeleport:TeleportDialog
+      "TeleportDialog" : "/interface/mel_tp/mel_tp_dialog.ui", //addressed as sbTeleport:TeleportDialog
+      "TeleportEdit" : "/interface/mel_tp/mel_tp_edit.ui"
     }
   }
 ]

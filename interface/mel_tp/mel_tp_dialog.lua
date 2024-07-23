@@ -428,7 +428,7 @@ btnEdit.onClick = function(self)
       lblDump:setText("No target selected")
       return
   end
-  player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "/interface/mel_tp/mel_tp_edit.ui", data = {mel_tp = mel_tp, localeData = mel_tp.dialogConfig.mel_tp_edit}})
+  player.interact("ScriptPane", {gui = {}, scripts = {"/metagui.lua"}, ui = "sbTeleport:TeleportEdit", data = {mel_tp = mel_tp, localeData = mel_tp.dialogConfig.mel_tp_edit}})
 end
 
 btnTeleport.onClick = function(self)

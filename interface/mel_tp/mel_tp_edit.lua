@@ -61,8 +61,17 @@ function btnEditSave:onClick()
     setError("> ^red;Bookmark needs a name!^reset;")
   end
   if sb.printJson(mel_tp_edit.bookmarkState) == sb.printJson(mel_tp_edit.original) then
-    setError("> No changes detected")
-    return
+    local bookmarks = player.teleportBookmarks()
+    local bkmExists = util.find(
+        bookmarks,
+        function(bkm)
+          return mel_tp_util.TargetToWarpCommand(mel_tp_edit.bookmarkState.target) == mel_tp_util.TargetToWarpCommand(bkm.target)
+        end
+      )
+    if bkmExists ~= nil then
+      setError("> No changes detected")
+      return
+    end
   else
     player.removeTeleportBookmark(mel_tp_edit.original)
     pane.playSound("/sfx/interface/ship_confirm1.ogg")

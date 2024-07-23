@@ -124,9 +124,16 @@ btnEditSave.onClick = function() {
   }
   
   if(sb.printJson(mel_tp_edit.bookmarkState as unknown as JSON) === sb.printJson(mel_tp_edit.original as unknown as JSON)) {
-    //bookmark is not changed, doing nothing
-    setError("> No changes detected");
-    return;
+    //bookmark is not changed
+    const bookmarks = player.teleportBookmarks();
+    const bkmExists = util.find(bookmarks, (bkm: TeleportBookmark) => {
+      return mel_tp_util.TargetToWarpCommand(mel_tp_edit.bookmarkState.target) === mel_tp_util.TargetToWarpCommand(bkm.target);
+    })
+    if(bkmExists !== null) {
+      //bookmark already exists, doing nothing
+      setError("> No changes detected");
+      return;
+    }
   }
   else {
     //Bookmark changed, needs saving
