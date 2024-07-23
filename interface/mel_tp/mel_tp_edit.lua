@@ -59,6 +59,7 @@ function btnEditSave:onClick()
   if mel_tp_edit.bookmarkState.bookmarkName == "" then
     widget.playSound("/sfx/interface/clickon_error.ogg")
     setError("> ^red;Bookmark needs a name!^reset;")
+    return
   end
   if sb.printJson(mel_tp_edit.bookmarkState) == sb.printJson(mel_tp_edit.original) then
     local bookmarks = player.teleportBookmarks()
