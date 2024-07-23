@@ -1,10 +1,12 @@
 {
 	"author" : "MelOzone",
-	"version" : "0.4.3-alpha",
+	"version" : "0.4.4-alpha",
   "name" : "sb.Teleport",
 	"friendlyName" : "sb.Teleport",
 	"link" : "https://github.com/Kilkenni/sb.Teleport",
-	"description" : "Like walking, but better",
-  "includes" : ["QuickbarMini"],
+	"description" : "Like walking, but better. \nTeleporting UI, reimagined by Spark Industries.",
+  "steamContentId": 3291472557,
+  "includes" : ["QuickbarMini", "StardustLib", "FrackinUniverse"],
+  "tags": "User Interface",
   "priority": 0
 }

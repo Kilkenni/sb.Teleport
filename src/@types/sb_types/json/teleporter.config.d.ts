@@ -9,6 +9,11 @@
 
 //Uuid = teleporter Id or name (for named teleporters)
 
+/**
+ * JSON file optionally passed to InteractAction `OpenTeleportDialog` to customize opening Teleport pane. If a .config is not passed, opening dialog proceeds with default values and without any custom `destinations`.
+ * Explicitly true `canTeleport` can be used with `canBookmark`=false for locations that cannot be bookmarked but still have usable teleporters (like missions).
+ */
+
 type InstanceWorldIdStringWithUuid = `${InstanceWorldIdString}=${Uuid}` | InstanceWorldIdString
 type warpActionJson = InstanceWorldIdStringWithUuid | WarpAlias
 

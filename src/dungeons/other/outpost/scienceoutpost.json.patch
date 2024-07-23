@@ -1,0 +1,12 @@
+[
+  {
+        "op": "test",
+        "path": "/layers/3/objects/46/properties/parameters",
+        "value": "{ \"interactData\" : \"\/interface\/warping\/fu_outpostteleporter.config\", \"uniqueId\" : \"scienceoutpost\" }" 
+  },
+  {
+        "op": "replace",
+        "path": "/layers/3/objects/46/properties/parameters",
+        "value": "{ \"interactData\" : { \"gui\" : {}, \"scripts\" : [\"/metagui.lua\"], \"ui\" : \"sbTeleport:TeleportDialog\" , \"data\": {\"configPath\": \"\/interface\/warping\/fu_outpostteleporter.config\"}}, \"uniqueId\" : \"scienceoutpost\" }" 
+  }
+]
