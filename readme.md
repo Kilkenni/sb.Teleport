@@ -65,7 +65,8 @@ Source Typescript files (`*.ts`) are transpiled into `*.lua-raw`. The reason of 
 
 ## License
 
-TBA
+GNU GPL 3.
+Feel free to contribute and ask me stuff.
 
 ## Requirements
 
