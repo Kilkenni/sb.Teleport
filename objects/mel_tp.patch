@@ -1,0 +1,26 @@
+[
+    [
+        { "op" : "test", "path" : "/interactData", "value" : "/interface/warping/remoteteleporter.config" },
+
+        { "op" : "replace", "path" : "/interactAction", "value" : "ScriptPane" },
+        { "op" : "replace", "path" : "/interactData", "value" : { 
+            "gui" : {}, 
+            "scripts" : ["/metagui.lua"], 
+            "ui" : "sbTeleport:TeleportDialog" ,
+            "data": {
+            "configPath": "/interface/warping/remoteteleporter.config" }
+        }}
+    ],
+    [
+        { "op" : "test", "path" : "/interactData", "value" : "/interface/warping/shipteleporter.config" },
+
+        { "op" : "replace", "path" : "/interactAction", "value" : "ScriptPane" },
+        { "op" : "replace", "path" : "/interactData", "value" : { 
+            "gui" : {}, 
+            "scripts" : ["/metagui.lua"], 
+            "ui" : "sbTeleport:TeleportDialog" ,
+            "data": {
+            "configPath": "/interface/warping/remoteteleporter.config" }
+        }}
+    ]
+]
