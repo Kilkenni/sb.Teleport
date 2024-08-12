@@ -20,7 +20,7 @@
             "scripts" : ["/metagui.lua"], 
             "ui" : "sbTeleport:TeleportDialog" ,
             "data": {
-            "configPath": "/interface/warping/remoteteleporter.config" }
+            "configPath": "/interface/warping/shipteleporter.config" }
         }}
     ]
 ]
