@@ -1,26 +1,17 @@
 [
     [
-        { "op" : "test", "path" : "/interactData", "value" : "/interface/warping/remoteteleporter.config" },
-
+        { "op" : "test", "path" : "/interactAction", "value" : "OpenTeleportDialog" },
+        
         { "op" : "replace", "path" : "/interactAction", "value" : "ScriptPane" },
-        { "op" : "replace", "path" : "/interactData", "value" : { 
+
+        { "op" : "move", "from" : "/interactData", "path" : "/temp" },
+        { "op" : "add", "path" : "/interactData", "value" : { 
             "gui" : {}, 
             "scripts" : ["/metagui.lua"], 
             "ui" : "sbTeleport:TeleportDialog" ,
             "data": {
-            "configPath": "/interface/warping/remoteteleporter.config" }
-        }}
-    ],
-    [
-        { "op" : "test", "path" : "/interactData", "value" : "/interface/warping/shipteleporter.config" },
-
-        { "op" : "replace", "path" : "/interactAction", "value" : "ScriptPane" },
-        { "op" : "replace", "path" : "/interactData", "value" : { 
-            "gui" : {}, 
-            "scripts" : ["/metagui.lua"], 
-            "ui" : "sbTeleport:TeleportDialog" ,
-            "data": {
-            "configPath": "/interface/warping/shipteleporter.config" }
-        }}
+            "configPath": null }
+        }},
+        { "op" : "move", "from" : "/temp", "path" : "/interactData/data/configPath" }
     ]
 ]
