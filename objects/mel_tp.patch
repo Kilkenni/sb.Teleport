@@ -1,0 +1,17 @@
+[
+    [
+        { "op" : "test", "path" : "/interactAction", "value" : "OpenTeleportDialog" },
+        
+        { "op" : "replace", "path" : "/interactAction", "value" : "ScriptPane" },
+
+        { "op" : "move", "from" : "/interactData", "path" : "/temp" },
+        { "op" : "add", "path" : "/interactData", "value" : { 
+            "gui" : {}, 
+            "scripts" : ["/metagui.lua"], 
+            "ui" : "sbTeleport:TeleportDialog" ,
+            "data": {
+            "configPath": null }
+        }},
+        { "op" : "move", "from" : "/temp", "path" : "/interactData/data/configPath" }
+    ]
+]

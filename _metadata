@@ -7,6 +7,9 @@
 	"description" : "Like walking, but better. \nTeleporting UI, reimagined by Spark Industries.",
   "steamContentId": 3291472557,
   "includes" : ["QuickbarMini", "StardustLib", "FrackinUniverse"],
+  "scripts" : {
+    "postLoad" : [ "/scripts/assets/mel_tp_postload.lua" ]
+  },
   "tags": "User Interface",
   "priority": 0
 }
